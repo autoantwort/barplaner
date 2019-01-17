@@ -1,0 +1,26 @@
+{
+    "name": "sequelize-backend",
+    "version": "1.0.0",
+    "description": "Nodejs-Rest-APIs-Sequelize-SQLite-Backend",
+    "main": "server.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [
+        "Nodejs",
+        "RestAPIs",
+        "Sequelize",
+        "SQLite",
+        "Vue.js"
+    ],
+    "author": "Leander Schulten",
+    "dependencies": {
+        "bcrypt": "^3.0.3",
+        "cookie-parser": "^1.4.3",
+        "cors": "^2.8.5",
+        "express": "^4.16.4",
+        "mysql2": "^1.6.4",
+        "sequelize": "^4.42.0",
+        "sqlite3": "^4.0.6"
+    }
+}
