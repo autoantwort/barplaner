@@ -19,8 +19,10 @@ module.exports = (sequelize, Sequelize) => {
         },
         telegramID: {
             type: Sequelize.STRING,
-            allowNull: true,
-            defaultValue: null,
+            defaultValue: () => {
+                // generate first login pin 
+                return "login pin: " + (Math.random() * 1000000).toFixed(0);
+            },
         },
         active: {
             type: Sequelize.BOOLEAN,
@@ -29,6 +31,15 @@ module.exports = (sequelize, Sequelize) => {
         sessionID: {
             type: Sequelize.STRING,
             unique: true
+        },
+        experienced_cleaner: {
+            type: Sequelize.BOOLEAN,
+            defaultValue: false
+        },
+        birthday: {
+            type: Sequelize.STRING(10),
+            defaultValue: null,
+            allowNull: true,
         },
     });
 

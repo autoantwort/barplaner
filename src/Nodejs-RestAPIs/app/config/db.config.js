@@ -12,6 +12,8 @@ const sequelize = new Sequelize(env.database, env.username, env.password, {
         acquire: env.pool.acquire,
         idle: env.pool.idle
     },
+    benchmark: true,
+    logging: (e, t) => console.log(e.substr(0, 500), " time : ", t),
 
     storage: env.databaseFile
 });
@@ -28,17 +30,22 @@ db.Bar = require('../model/bar.model.js')(sequelize, Sequelize);
 db.Role = require('../model/role.model.js')(sequelize, Sequelize);
 db.BarDuty = require('../model/barduty.model.js')(sequelize, Sequelize, db.Bar, db.User);
 db.UserRoles = require('../model/userroles.model.js')(sequelize, Sequelize, db.User, db.Role);
+db.Setting = require('../model/setting.model.js')(sequelize, Sequelize, db.Role);
 
 let funcArray = [];
 
 db.addSyncCallback = function(func) {
-    funcArray.push(func);
+    if (funcArray === null)
+        func();
+    else
+        funcArray.push(func);
 };
 
 db.callSyncCallbacks = function() {
     for (let func of funcArray) {
         func();
     }
+    funcArray = null;
 };
 
 module.exports = db;

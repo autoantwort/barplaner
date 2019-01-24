@@ -22,8 +22,10 @@ module.exports = function(app) {
     app.post('/api/user/:userID/role', user.addRole);
 
     // remove a role from a user
-    app.delete('/api/user/:userID/role', user.removeRole);
+    app.delete('/api/user/:userID/:role', user.removeRole);
 
     // get roles from a user
     app.get('/api/user/:userID/roles', user.getRoles);
+    // get all roles 
+    app.get('/api/users/roles', user.findAllRoles);
 };

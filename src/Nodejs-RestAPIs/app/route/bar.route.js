@@ -8,6 +8,16 @@ module.exports = function(app) {
     // Retrieve all Bars
     app.get('/api/bars', bar.findAll);
 
+    // Retrieve all Bars with Barduties
+    app.get('/api/bars/duties', bar.getAllBarsWithBarduties);
+    // update cleaning
+    app.put('/api/bar/:barID/duty/:userID/cleaning', bar.updateCleaning);
+    // update cleaning
+    app.put('/api/bar/:barID/duty/:userID', bar.updateDuty);
+
+    // update duty
+    app.post('/api/bar/:barID/duty', bar.distributeCleaningDuty);
+
     // Retrieve a single bar by Id
     app.get('/api/bar/:barID', bar.findById);
 

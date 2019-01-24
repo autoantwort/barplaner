@@ -15,11 +15,13 @@
     ],
     "author": "Leander Schulten",
     "dependencies": {
+        "axios": "^0.18.0",
         "bcrypt": "^3.0.3",
         "cookie-parser": "^1.4.3",
         "cors": "^2.8.5",
         "express": "^4.16.4",
         "mysql2": "^1.6.4",
+        "node-telegram-bot-api": "^0.30.0",
         "sequelize": "^4.42.0",
         "sqlite3": "^4.0.6"
     }

@@ -20,7 +20,7 @@ module.exports = (sequelize, Sequelize, Bar, User) => {
         },
         state: {
             type: Sequelize.ENUM,
-            values: ['no_info', 'present', 'absent'],
+            values: ['absent', 'no_info', 'present'],
             defaultValue: 'no_info',
         },
         job: {
@@ -39,6 +39,15 @@ module.exports = (sequelize, Sequelize, Bar, User) => {
             type: Sequelize.BOOLEAN,
             defaultValue: false,
         },
+    });
+
+    User.hasMany(Barduty, {
+        foreignKey: 'userID',
+        constraints: false,
+    });
+    Barduty.belongsTo(User, {
+        foreignKey: 'userID',
+        constraints: false,
     });
     return Barduty;
 };

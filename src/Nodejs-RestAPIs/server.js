@@ -2,13 +2,17 @@ var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
+var env = require('./app/config/env');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 const cors = require('cors');
 const corsOptions = {
+    //origin: "http://localhost:4200",
     origin: true,
-    optionsSuccessStatus: 200
+    optionsSuccessStatus: 200,
+    credentials: true,
+
 };
 app.use(cors(corsOptions));
 app.use(cookieParser());
@@ -21,18 +25,23 @@ bcrypt.genSalt(10, function(err, salt) {
 });
 
 // force: true will drop the table if it already exists
-db.sequelize.sync({ force: false }).then(() => {
+db.sequelize.sync({ force: env.resetDatabase }).then(() => {
     console.log('Sync with db');
     db.callSyncCallbacks();
     const Util = require('./app/util/adduser');
     Util.createAdmin("Test", "Test", e => console.log(e));
     Util.createAdmin("Test2", "Test2", e => console.log(e));
 });
+if (env.loadOldData === true)
+    require("./app/old_data/loadOldData").loadOldData();
 
+require("./app/util/facebook").runFacebookSync();
+require("./app/util/telegram");
 
+const crypto = require('crypto');
 
 const User = db.User;
-app.post('/app/login', (req, res) => {
+app.post('/api/login', (req, res) => {
     User.findOne({
         where: {
             name: req.body.name
@@ -41,16 +50,48 @@ app.post('/app/login', (req, res) => {
         if (user === null) {
             res.status(401).send("User not exists");
         } else {
-            bcrypt.compare(req.body.password, user.password).then(result => {
+            let func = (result) => {
                 if (result === true) {
-                    res.cookie('auth', user.sessionID, { httpOnly: true, sameSite: true, secure: req.secure });
+                    res.cookie('auth', user.sessionID, { httpOnly: true, sameSite: false /* TODO */ , secure: req.secure });
                     user.getRoles().then(roles => {
-                        res.send(roles)
+                        res.send({ user: user, roles: roles });
                     }).catch(err => res.status(500).send(err));
                 } else {
+
                     res.status(401).send("Wrong passord");
                 }
-            }).catch(err => res.status(500).send("Error -> " + err));
+            };
+            // old password hash from old db
+            if (user.password.indexOf('$md5$') === 0) {
+                const hash = crypto.createHash('md5');
+                hash.update(req.body.password);
+                // right, but old password hash
+                let result = user.password.substr(5) === hash.digest('hex');
+                if (result) {
+                    bcrypt.hash(req.body.password, 10).then(function(hash) {
+                        user.update({ password: hash })
+                            .then(() => { console.log("password hash updated") })
+                            .catch(err => console.error("Error while updating password hash : " + err));
+                    });
+                    if (user.sessionID === null) {
+                        user.update({ sessionID: crypto.randomBytes(32).toString('hex') })
+                            .then(() => { func(true) })
+                            .catch(err => res.status(500).send("Error -> " + err));
+                        return;
+                    }
+                }
+                func(result);
+            } else {
+                bcrypt.compare(req.body.password, user.password).then(result => {
+                    if (result === true && user.sessionID === null) {
+                        user.update({ sessionID: crypto.randomBytes(32).toString('hex') })
+                            .then(() => { func(true) })
+                            .catch(err => res.status(500).send("Error -> " + err));
+                        return;
+                    }
+                    func(result);
+                }).catch(err => res.status(500).send("Error -> " + err));
+            }
         }
     });
 });
@@ -71,8 +112,16 @@ app.use((req, res, next) => {
         res.status(500).send("Error -> " + err);
     });
 });
+app.post('/api/logout', (req, res) => {
+    res.clearCookie('auth', { httpOnly: true, sameSite: false /* TODO */ , secure: req.secure });
+    req.user.update({ sessionID: null })
+        .then(() => res.send("logged out"))
+        .catch(err => releaseEvents.status(500).send("Error -> " + err));
+});
 require('./app/route/user.route.js')(app);
 require('./app/route/bar.route.js')(app);
+require('./app/route/duty.route.js')(app);
+require('./app/route/setting.route.js')(app);
 
 // Create a Server
 var server = app.listen(8080, function() {

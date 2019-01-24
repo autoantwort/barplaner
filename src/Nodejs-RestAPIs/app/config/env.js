@@ -10,7 +10,13 @@ const env = {
         acquire: 30000,
         idle: 10000
     },
-    databaseFile: 'data.sqlite'
+    databaseFile: 'data.sqlite',
+    facebookAccessToken: 'Your access token',
+    symposionPageID: 'Facebook site id',
+    facebookFetchInterval: '5',
+    telegramAccessToken: 'Your access token',
+    resetDatabase: true,
+    loadOldData: true,
 };
 
 module.exports = env;

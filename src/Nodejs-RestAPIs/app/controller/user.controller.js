@@ -9,6 +9,7 @@ const BarDuty = db.BarDuty;
 const Op = db.Sequelize.Op;
 
 let UserAdminRole = null;
+let CleaningAdminRole = null;
 
 db.addSyncCallback(() => {
     Role.create({
@@ -20,6 +21,17 @@ db.addSyncCallback(() => {
     }).catch(err => {
         Role.findByPk("UserAdmin")
             .then(role => UserAdminRole = role)
+            .catch(err => console.error(err));
+        console.error(err);
+    });
+    Role.create({
+        name: "CleaningAdmin",
+        description: "You can update the have_to_clean state of barduties",
+    }).then(role =>  {
+        CleaningAdminRole = role;
+    }).catch(err => {
+        Role.findByPk("CleaningAdmin")
+            .then(role => CleaningAdminRole = role)
             .catch(err => console.error(err));
         console.error(err);
     });
@@ -47,6 +59,7 @@ exports.create = (req, res) => {
                     phone: req.body.phone,
                     active: req.body.active,
                     sessionID: crypto.randomBytes(32).toString('hex'),
+                    birthday: req.body.birthday
                 }).then(user => {
                     if (user.active) {
                         // add user to barduty of every bar in the future
@@ -70,9 +83,10 @@ exports.create = (req, res) => {
                             console.error(err);
                         });
                     }
-                    res.send(user);
+                    res.status(201).send(user);
                 }).catch(err => {
-                    res.status(500).send("Error -> " + err);
+                    // status 200 to make a workaround, otherwise axios will set response to undefined
+                    res.status(200).send(err);
                 });
             });
         }
@@ -126,7 +140,7 @@ exports.removeRole = (req, res) => {
         } else {
             UserRoles.findOne({
                 where: {
-                    [Op.or]: [{ userId: req.params.userID }, { roleName: req.params.role }]
+                    [Op.and]: [{ userId: req.params.userID }, { roleName: req.params.role }]
                 }
             }).then(userrole => {
                 if (userrole === null) {
@@ -147,9 +161,32 @@ exports.removeRole = (req, res) => {
 
 // FETCH all User
 exports.findAll = (req, res) => {
-    User.findAll().then(user => {
+    User.findAll({
+        raw: true,
+    }).then(user => {
         // Send all user to Client
         res.send(user);
+    }).catch(err => {
+        res.status(500).send("Error -> " + err);
+    });
+};
+// FETCH all Roles
+exports.findAllRoles = (req, res) => {
+    User.findAll({
+        raw: true,
+    }).then(user => {
+        UserRoles.findAll({ raw: true }).then((roles) => {
+            let map = {};
+            for (let i = 0; i < user.length; ++i) {
+                map[user[i].id] = user[i];
+                user[i].roles = [];
+            }
+            for (const role of roles) {
+                map[role.userId].roles.push(role);
+            }
+            res.send(user);
+        }).catch(err => res.status(500).send("Error -> " + err));
+
     }).catch(err => {
         res.status(500).send("Error -> " + err);
     });
@@ -167,11 +204,11 @@ exports.findById = (req, res) => {
 
 // Update a User
 exports.update = (req, res) => {
-    let realFunc = () => {
+    let realFunc = (data) => {
         var user = req.body;
         let createUser = function(hash) {
             // TODO: if update active status, add/remove the user from bars in the future             
-            let update = { name: req.body.name, email: req.body.email, phone: req.body.phone, telegramID: req.body.telegramID, active: req.body.active, password: hash };
+            let update = {...data, password: hash }; //{ name: req.body.name, email: req.body.email, phone: req.body.phone, telegramID: req.body.telegramID, active: req.body.active, password: hash };
             //remove undefined properties, otherwise update() will set the entries in the table to null
             Object.keys(update).forEach(key => update[key] === undefined && delete update[key]);
             User.update(update, {
@@ -179,36 +216,59 @@ exports.update = (req, res) => {
                     id: req.params.userID
                 }
             }).then(() => {
-                res.status(200).send(user + JSON.stringify(req.body) + JSON.stringify(req.params));
+                res.status(200).send(update);
             }).catch(err => {
-                res.status(500).send("Error -> " + err);
+                res.status(400).send(err);
             });
         };
-        if (req.body.password === undefined) {
+        if (req.body.password === undefined || req.body.password.length === 0) {
             createUser();
         } else {
+            if (req.password.length < 8) {
+                res.status(400).send({ errors: [{ message: "password is to short, min 8 chars", value: req.body.password.length }] })
+                return;
+            }
             bcrypt.hash(req.body.password, 10).then(function(hash) {
                 createUser(hash);
             });
         }
     };
     //you can change you data
-    if (req.params.userID == req.user.id) {
-        realFunc();
+    if (req.body.name !== undefined && req.body.name.length < 2) {
+        res.status(400).send({ errors: [{ message: "name is to short, min 2 chars", value: req.body.name.length }] })
+        return;
+    }
+    if (req.params.userID == req.user.id && req.body.experienced_cleaner === undefined) {
+        realFunc({ name: req.body.name, email: req.body.email, phone: req.body.phone, telegramID: req.body.telegramID, active: req.body.active, birthday: req.body.birthday, });
     } else {
-        //or an admin
-        UserRoles.findOne({
-            where: {
-                userId: req.user.id,
-                roleName: UserAdminRole.name,
-            }
-        }).then(result => {
-            if (result === null) {
-                res.status(403).send("You dont have this permission");
-            } else {
-                realFunc();
-            }
-        }).catch(err => res.status(500).send("Error -> " + err));
+        if (req.body.experienced_cleaner !== undefined) {
+            UserRoles.findOne({
+                where: {
+                    userId: req.user.id,
+                    roleName: CleaningAdminRole.name,
+                }
+            }).then(result => {
+                if (result === null) {
+                    res.status(403).send("You dont have this permission");
+                } else {
+                    realFunc({ experienced_cleaner: req.body.experienced_cleaner });
+                }
+            }).catch(err => res.status(500).send("Error -> " + err));
+        } else {
+
+            UserRoles.findOne({
+                where: {
+                    userId: req.user.id,
+                    roleName: UserAdminRole.name,
+                }
+            }).then(result => {
+                if (result === null) {
+                    res.status(403).send("You dont have this permission");
+                } else {
+                    realFunc({ name: req.body.name, email: req.body.email, phone: req.body.phone, telegramID: req.body.telegramID, active: req.body.active, birthday: req.body.birthday, });
+                }
+            }).catch(err => res.status(500).send("Error -> " + err));
+        }
     }
 };
 
