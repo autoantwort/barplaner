@@ -5,6 +5,7 @@ const BarDuty = db.BarDuty;
 const sequelize = db.sequelize;
 const Role = db.Role;
 const UserRoles = db.UserRoles;
+const Setting = db.Setting;
 
 
 // Post a Bar
@@ -226,7 +227,10 @@ exports.computeRatio = function() {
                         }
                     }
                     users.sort((l, r) => { return -(l.ratio - r.ratio) });
-                    resolve(users);
+                    Setting.findByPk("defaultNumberOfPersonsToClean").then(numberSetting => {
+                        let wieOftNicht = Math.round(users.length / Number(numberSetting.value) * 3 / 7);
+                        resolve({ users: users, howOftenNot: wieOftNicht });
+                    }).catch(reject);
                 }).catch(reject);
             }).catch(reject);
         }).catch(reject);

@@ -1,8 +1,14 @@
+#!/usr/bin/env node
+
 var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 var env = require('./app/config/env');
+
+if (env.staticVue === true)
+    app.use(express.static("../Vue.js-Client/dist"));
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 

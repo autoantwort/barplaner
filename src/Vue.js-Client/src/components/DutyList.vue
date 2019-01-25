@@ -2,8 +2,9 @@
   <div class="container">
     <div class="row">
       <div class="col-12 offset-md-1 col-md-10 offset-lg-2 col-lg-8">
-        <div class="mt-3 mb-3">
-          <div v-if="users.length!==0" class="table-responsive">
+        <div v-if="users.length!==0" class="mt-3 mb-3">
+          <div class="mb-3 text-center">Nachdem man geputzt hat, wird man aktuell für {{wieOftNicht}} Bars verschont.</div>
+          <div class="table-responsive">
             <table class="table table-hover">
               <thead>
                 <tr>
@@ -50,7 +51,8 @@ export default {
   data() {
     return {
       users: [],
-      cleaningAdmin: false
+      cleaningAdmin: false,
+      wieOftNicht: 2
     };
   },
   methods: {
@@ -59,7 +61,8 @@ export default {
       http
         .get("/duty")
         .then(response => {
-          this.users = response.data;
+          this.users = response.data.users;
+          this.wieOftNicht = response.data.howOftenNot;
         })
         .catch(e => {
           console.log(e);

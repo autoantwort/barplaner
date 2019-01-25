@@ -83,7 +83,7 @@ bot.onText(/\/login/, msg => {
 });
 
 bot.onText(/\/start/, msg => {
-    bot.sendMessage(msg.chat.id, "Hallo " + msg.from.first_name + ", gehe auf [Account](http://134.130.55.187:4200/account) und logge dich mittels /login <pin> ein.", { parse_mode: "Markdown" });
+    bot.sendMessage(msg.chat.id, "Hallo " + msg.from.first_name + ", gehe auf [Account](" + env.baseURL + "/#/account) und logge dich mittels /login <pin> ein.", { parse_mode: "Markdown" });
 });
 
 

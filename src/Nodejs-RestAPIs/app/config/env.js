@@ -17,6 +17,8 @@ const env = {
     telegramAccessToken: 'Your access token',
     resetDatabase: true,
     loadOldData: true,
+    baseURL: "http://localhost:8080",
+    staticVue: false,
 };
 
 module.exports = env;
