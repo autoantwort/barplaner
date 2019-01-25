@@ -28,7 +28,7 @@ export default {
         if (roles === undefined) {
             roles = JSON.parse(localStorage.getItem("roles"));
         }
-        if (role === null)
+        if (roles === null)
             return false;
         return roles.some(r => r === role);
     },
