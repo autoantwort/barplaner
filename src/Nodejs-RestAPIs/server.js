@@ -34,14 +34,16 @@ bcrypt.genSalt(10, function(err, salt) {
 db.sequelize.sync({ force: env.resetDatabase }).then(() => {
     console.log('Sync with db');
     db.callSyncCallbacks();
-    const Util = require('./app/util/adduser');
-    Util.createAdmin("Test", "Test", e => console.log(e));
-    Util.createAdmin("Test2", "Test2", e => console.log(e));
+    //const Util = require('./app/util/adduser');
+    //Util.createAdmin("Test", "Test", e => console.log(e));
 });
 if (env.loadOldData === true)
     require("./app/old_data/loadOldData").loadOldData();
 
-require("./app/util/facebook").runFacebookSync();
+if (typeof env.facebookAccessToken === "string" && env.facebookAccessToken.length > 0 &&
+    typeof env.symposionPageID === "string" && env.symposionPageID.length > 0) {
+    require("./app/util/facebook").runFacebookSync();
+}
 require("./app/util/telegram");
 
 const crypto = require('crypto');

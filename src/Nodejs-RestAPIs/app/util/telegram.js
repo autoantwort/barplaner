@@ -15,7 +15,9 @@ const Op = db.Sequelize.Op;
 const TOKEN = env.telegramAccessToken;
 const TelegramBot = require('node-telegram-bot-api');
 const options = {
-    polling: true
+    polling: {
+        autoStart: typeof env.telegramAccessToken === "string" && env.telegramAccessToken.length > 0
+    }
 };
 const bot = new TelegramBot(TOKEN, options);
 
