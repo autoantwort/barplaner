@@ -14,6 +14,7 @@
  4. \<your bot name\>
  5. \<your bot name\>_bot
  6. copy the access token to /src/Nodejs-RestAPIs/app/config/env.js into the `telegramAccessToken` field
+ 7. open the /src/Vue.js-Client/src/components/Account.vue file and search for `symposion_bot` and replace that with your bot name (ends with 'bot')
 
 ### Enable Facebook API (You need to manage a Facebook site to use this future)
  1. Visit [Facebook Developer](https://developers.facebook.com/apps/) and create a new app
@@ -27,7 +28,7 @@
  8. Now copy the Access Token from the text field into the `facebookAccessToken` field of the /src/Nodejs-RestAPIs/app/config/env.js file
     
 ### If I dont have a facebook or telegramm access key
- Remove the `facebookAccessToken`, `symposionPageID` and the `telegramAccessToken` fields from the /src/Nodejs-RestAPIs/app/config/env.js file. 
+ Remove the `facebookAccessToken`, `symposionPageID` and the `telegramAccessToken` fields from the /src/Nodejs-RestAPIs/app/config/env.js file or set them to an empty string.
 
 ## Run for development
  1. open /src/Nodejs-RestAPIs/app/config/env.js and set the following:  
@@ -39,7 +40,7 @@
  3. open an terminal and cd to /src/Nodejs-RestAPIs/ and run `npm run start`
  4. open another terminal and cd to /src/Vue.js-Client/ and run `npm run serve`
  
- Now you can visit http://localhost:4200 to test the website
+ Now you can visit http://localhost:4200 and login with Name: `Test` and Password: `Test`
 
  ## Run for production
  1. open /src/Nodejs-RestAPIs/app/config/env.js and set the following:  
