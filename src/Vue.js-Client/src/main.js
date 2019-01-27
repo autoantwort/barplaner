@@ -3,8 +3,9 @@ import App from "./App.vue";
 import router from './router';
 
 import axios from './http-common';
+import VueCollapse from 'vue2-collapse';
 
-
+Vue.use(VueCollapse);
 Vue.use(require('vue-moment'));
 
 Vue.config.productionTip = false;

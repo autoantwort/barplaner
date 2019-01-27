@@ -12,7 +12,8 @@
     "vue": "^2.5.17",
     "vue-moment": "^4.0.0",
     "vue-router": "^3.0.1",
-    "vue-single-select": "^1.0.29"
+    "vue-single-select": "^1.0.29",
+    "vue2-collapse": "^1.0.15"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.0.1",

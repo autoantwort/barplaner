@@ -46,7 +46,7 @@ export default {
       http
         .post("/login", data)
         .then(response => {         
-          let roles = response.data.roles.flatMap(e => e.name);
+          let roles = response.data.roles.map(e => e.name);
           Roles.setRoles(roles);
           Roles.setUser(response.data.user);
           console.log(response.data);
