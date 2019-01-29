@@ -224,7 +224,7 @@ exports.update = (req, res) => {
         if (req.body.password === undefined || req.body.password.length === 0) {
             createUser();
         } else {
-            if (req.password.length < 8) {
+            if (req.body.password.length < 8) {
                 res.status(400).send({ errors: [{ message: "password is to short, min 8 chars", value: req.body.password.length }] })
                 return;
             }
