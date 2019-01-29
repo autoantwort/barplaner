@@ -16,8 +16,8 @@
                 <div v-collapse-content>
                   <div class="card-body">
                     <!-- <div class="m-2 text-center" v-if="bar.start > now && cleaningAdmin">
-              <input class="form-control" style="display:inline;max-width:60px" type="number" min="0" value="2"> Personen zum putzen zuordnen lassen? 
-              <button class="btn btn-primary" title="Es wird nur die Differenz zwischen schon zugeteilten und soll Anzahl hinzugefüt">Ja</button>
+                    <input class="form-control" style="display:inline;max-width:60px" type="number" min="0" value="2"> Personen zum putzen zuordnen lassen? 
+                    <button class="btn btn-primary" title="Es wird nur die Differenz zwischen schon zugeteilten und soll Anzahl hinzugefüt">Ja</button>
                     </div>-->
                     <div class="table-responsive">
                       <table class="table">
@@ -34,7 +34,7 @@
                         <tbody>
                           <tr v-for="duty in bar.duties" :key="duty.id">
                             <th
-                              v-if="cleaningAdmin || (user.id === duty.userID &&!duty.have_to_clean && bar.start > now)"
+                              v-if="cleaningAdmin /*|| (user.id === duty.userID &&!duty.have_to_clean && bar.start > now)*//*sich selber eintragen*/"
                             >
                               <input
                                 type="checkbox"
