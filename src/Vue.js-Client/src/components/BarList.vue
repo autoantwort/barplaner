@@ -226,7 +226,6 @@
 import http from "../http-common";
 import Bars from "../bars";
 import Roles from "../roles";
-// import VueSingleSelect from "vue-single-select";
 
 export default {
   name: "bar-list",
