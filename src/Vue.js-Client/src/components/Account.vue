@@ -5,6 +5,7 @@
         <form class="was-validated" id="form">
           <div class="form-group">
             <label for="name">Name</label>
+            <input type="password" style="display:none;">
             <input
               type="text"
               class="form-control"
@@ -13,6 +14,7 @@
               name="name"
               required
               pattern=".{2,}"
+              autocomplete="new-password"
             >
             <div class="invalid-feedback">Minimum two characters.</div>
           </div>
