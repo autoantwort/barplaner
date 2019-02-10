@@ -84,7 +84,7 @@ export default {
       if (document.getElementById("form").checkValidity() === false) {
         return;
       }
-
+      this.user.name = this.user.name.trim();
       http
         .post("/user", this.user)
         .then(response => {

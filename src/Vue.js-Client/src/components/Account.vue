@@ -98,7 +98,7 @@ export default {
       }
 
       let data = {
-        name: this.user.name,
+        name: this.user.name.trim(),
         password: this.password,
         email: this.user.email,
         phone: this.user.phone,
