@@ -11,7 +11,7 @@ export default {
         if (user === undefined) {
             user = JSON.parse(localStorage.getItem("user"));
         }
-        return user !== null ? user : [];
+        return user;
     },
     setRoles: function(val) {
         if (!Array.isArray(val)) {

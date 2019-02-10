@@ -11,6 +11,7 @@ import DutyList from "./components/DutyList.vue";
 import Account from "./components/Account.vue";
 import Settings from "./components/Settings.vue";
 import axios from "./http-common";
+import Roles from "./roles";
 
 Vue.use(Router);
 
@@ -20,11 +21,21 @@ export default new Router({
             path: "/",
             name: "login",
             component: Login,
+            beforeEnter: (to, from, next) => {
+                if (Roles.getUser() === null) {
+                    next();
+                } else {
+                    next({ name: 'bar-list' });
+                }
+            },
         },
         {
             path: '/logout',
             beforeEnter: (to, from, next) => {
-                axios.post("/logout").then(() => next({ name: 'login' }));
+                axios.post("/logout").then(() => {
+                    Roles.setUser(null);
+                    next({ name: 'login' });
+                });
             },
         },
         {
