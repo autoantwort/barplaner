@@ -258,46 +258,52 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
 });
 let lastSentDate;
 let sendDaysBefore = [14, 6, 2, 1, 0];
-// check for bars
-setInterval(() => {
-    let daysAhead = new Date();
-    daysAhead.setDate(daysAhead.getDate() + 7);
-    Bar.findAll({
-        where: {
-            start: {
-                [Op.and]: {
-                    [Op.gt]: new Date(),
-                    [Op.lt]: daysAhead
+// check for bars, only start when the DB is in sync, so that in the setIntervall call the Bar.find will work directly 
+db.addSyncCallback(() => {
+    let checkForEventsAndSend = () => {
+        let daysAhead = new Date();
+        daysAhead.setDate(daysAhead.getDate() + 7);
+        Bar.findAll({
+            where: {
+                start: {
+                    [Op.and]: {
+                        [Op.gt]: new Date(),
+                        [Op.lt]: daysAhead
+                    }
                 }
             }
-
-        }
-    }).then(bars => {
-        const now = new Date();
-        now.setHours(0, 0, 0, 0);
-        bars = bars.filter(b => {
-            const barDate = new Date(b.start);
-            barDate.setHours(0, 0, 0, 0);
-            let dayDiff = (barDate - now) / 1000 / 60 / 60 / 24;
-            return sendDaysBefore.some(v => v === dayDiff);
-        })
-        if (bars.length !== 0) {
-            let index = 0;
-            let sendInfo = () => {
-                sendBarInfo(bars[index])
-                    .then(() => {
-                        ++index;
-                        if (index < bars.length) {
-                            sendInfo();
-                        }
-                    })
-                    .catch(console.error)
-            };
-            sendInfo();
-        }
-    });
-    lastSentDate = new Date();
-}, 1000 * 60 * 60 * 24); //every day
+        }).then(bars => {
+            const now = new Date();
+            now.setHours(0, 0, 0, 0);
+            bars = bars.filter(b => {
+                const barDate = new Date(b.start);
+                barDate.setHours(0, 0, 0, 0);
+                let dayDiff = (barDate - now) / 1000 / 60 / 60 / 24;
+                return sendDaysBefore.some(v => v === dayDiff);
+            })
+            if (bars.length !== 0) {
+                let index = 0;
+                let sendInfo = () => {
+                    sendBarInfo(bars[index])
+                        .then(() => {
+                            ++index;
+                            if (index < bars.length) {
+                                sendInfo();
+                            }
+                        })
+                        .catch(console.error)
+                };
+                sendInfo();
+            }
+        });
+        lastSentDate = new Date();
+    };
+    setInterval(() => {
+        checkForEventsAndSend();
+    }, 1000 * 60 * 60 * 24); //every day
+    // dont wait a day if we start the server
+    checkForEventsAndSend();
+});
 
 exports.barAdded = (bar) => {
     const today = new Date();
