@@ -14,43 +14,35 @@ let CleaningAdminRole = null;
 db.addSyncCallback(() => {
 
     // create default settings if not exists:
-    let create = () => {
-        Setting.create({
-            name: "defaultNumberOfPersonsToClean",
-            description: "Default number of persons, which should clean the bar",
-            value: "2",
-            permission: CleaningAdminRole.name
-        }).catch(err => {
-            console.error(err);
-        });
-    };
-
-    Role.create({
-        name: "FacebookAdmin",
-        description: "You can change the Facebook Access Token",
+    Role.findCreateFind({
+        where: { name: "FacebookAdmin", },
+        defaults: {
+            name: "FacebookAdmin",
+            description: "You can change the Facebook Access Token",
+        }
     }).then(role =>  {
-        FacebookAdminRole = role;
-    }).catch(err => {
-        Role.findByPk("FacebookAdmin")
-            .then(role => FacebookAdminRole = role)
-            .catch(err => console.error(err));
-        console.error(err);
-    });
-    Role.create({
-        name: "CleaningAdmin",
-        description: "You can update the have_to_clean state of barduties",
+        FacebookAdminRole = role[0];
+    }).catch(console.error);
+    Role.findCreateFind({
+        where: { name: "CleaningAdmin", },
+        defaults: {
+            name: "CleaningAdmin",
+            description: "You can update the have_to_clean state of barduties",
+        }
     }).then(role =>  {
-        CleaningAdminRole = role;
-        create();
-    }).catch(err => {
-        Role.findByPk("CleaningAdmin")
-            .then(role => {
-                CleaningAdminRole = role;
-                create();
-            })
-            .catch(err => console.error(err));
-        console.error(err);
-    });
+        CleaningAdminRole = role[0];
+        Setting.findCreateFind({
+            where: {
+                name: "defaultNumberOfPersonsToClean",
+            },
+            defaults: {
+                name: "defaultNumberOfPersonsToClean",
+                description: "Default number of persons, which should clean the bar",
+                value: "2",
+                permission: CleaningAdminRole.name
+            }
+        }).catch(console.error);
+    }).catch(console.error);
 
 
 });

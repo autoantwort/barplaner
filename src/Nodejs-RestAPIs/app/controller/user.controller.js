@@ -12,29 +12,24 @@ let UserAdminRole = null;
 let CleaningAdminRole = null;
 
 db.addSyncCallback(() => {
-    Role.create({
-        name: "UserAdmin",
-        description: "You can add/remove user, change properties of user, change roles of a user.",
+    Role.findCreateFind({
+        where: { name: "UserAdmin" },
+        defaults: {
+            name: "UserAdmin",
+            description: "You can add/remove user, change properties of user, change roles of a user.",
+        }
     }).then(role =>  {
-        console.log("")
-        UserAdminRole = role;
-    }).catch(err => {
-        Role.findByPk("UserAdmin")
-            .then(role => UserAdminRole = role)
-            .catch(err => console.error(err));
-        console.error(err);
-    });
-    Role.create({
-        name: "CleaningAdmin",
-        description: "You can update the have_to_clean state of barduties",
+        UserAdminRole = role[0];
+    }).catch(console.error);
+    Role.findCreateFind({
+        where: { name: "CleaningAdmin" },
+        defaults: {
+            name: "CleaningAdmin",
+            description: "You can update the have_to_clean state of barduties",
+        }
     }).then(role =>  {
-        CleaningAdminRole = role;
-    }).catch(err => {
-        Role.findByPk("CleaningAdmin")
-            .then(role => CleaningAdminRole = role)
-            .catch(err => console.error(err));
-        console.error(err);
-    });
+        CleaningAdminRole = role[0];
+    }).catch(console.error);
 });
 // Post a User
 exports.create = (req, res) => {

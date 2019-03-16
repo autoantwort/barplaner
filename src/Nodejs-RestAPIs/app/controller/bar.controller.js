@@ -12,28 +12,24 @@ let BarAdminRole = null;
 let CleaningAdminRole = null;
 
 db.addSyncCallback(() => {
-    Role.create({
-        name: "BarAdmin",
-        description: "You can add bars and change them",
+    Role.findCreateFind({
+        where: { name: "BarAdmin" },
+        defaults: {
+            name: "BarAdmin",
+            description: "You can add bars and change them",
+        },
     }).then(role =>  {
-        BarAdminRole = role;
-    }).catch(err => {
-        Role.findByPk("BarAdmin")
-            .then(role => BarAdminRole = role)
-            .catch(err => console.error(err));
-        console.error(err);
-    });
-    Role.create({
-        name: "CleaningAdmin",
-        description: "You can update the have_to_clean state of barduties",
+        BarAdminRole = role[0];
+    }).catch(console.error);
+    Role.findCreateFind({
+        where: { name: "CleaningAdmin" },
+        defaults: {
+            name: "CleaningAdmin",
+            description: "You can update the have_to_clean state of barduties",
+        },
     }).then(role =>  {
-        CleaningAdminRole = role;
-    }).catch(err => {
-        Role.findByPk("CleaningAdmin")
-            .then(role => CleaningAdminRole = role)
-            .catch(err => console.error(err));
-        console.error(err);
-    });
+        CleaningAdminRole = role[0];
+    }).catch(console.error);
 });
 
 // Post a Bar

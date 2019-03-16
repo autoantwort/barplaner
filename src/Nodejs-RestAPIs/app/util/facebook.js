@@ -24,9 +24,12 @@ let CopyEvents = null;
 let FetchInterval = null;
 
 db.addSyncCallback(() => {
-    Role.create({
-        name: "FacebookAdmin",
-        description: "You can change the the settings belongs to facebook"
+    Role.findCreateFind({
+        where: { name: "FacebookAdmin" },
+        defaults: {
+            name: "FacebookAdmin",
+            description: "You can change the the settings belongs to facebook",
+        },
     }).then(role => {
         role = role.name;
         Setting.findCreateFind({
