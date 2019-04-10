@@ -42,6 +42,8 @@ db.addSyncCallback(() => {
             }
         }).then(s => {
             AccessToken = s[0];
+            AccessToken.value = env.facebookAccessToken;
+            AccessToken.save().catch(console.error);
         }).catch(console.error);
         Setting.findCreateFind({
             where: { name: "pageID" },
