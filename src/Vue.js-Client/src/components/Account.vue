@@ -70,7 +70,6 @@
 <script>
 import http from "../http-common";
 import Roles from "../roles";
-import router from '../router';
 
 export default {
   name: "account",
@@ -134,9 +133,6 @@ export default {
   },
   mounted() {
     this.user = Roles.getUser();
-    if(this.user === null || this.user === undefined){
-      router.push({ name: 'login' });
-    }
   }
 };
 </script>

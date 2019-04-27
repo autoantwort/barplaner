@@ -42,6 +42,13 @@ export default new Router({
             path: "/restricted",
             name: "restricted",
             component: Restricted,
+            beforeEnter: (to, from, next) => {
+                if (Roles.getUser() === null) {
+                    next({ name: 'login' });
+                } else {
+                    next();
+                }
+            },
             children: [{
                 path: "/addBar",
                 name: "addBar",
