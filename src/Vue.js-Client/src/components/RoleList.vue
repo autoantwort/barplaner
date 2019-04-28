@@ -74,8 +74,15 @@ export default {
       http
         .get("/users/roles")
         .then(response => {
-          response.data.sort((r, l) => l.active > r.active);
-          this.users = response.data;
+          this.users = response.data.sort((r, l) => {
+            if (l.active < r.active) {
+              return -1;
+            } else if (l.active > r.active) {
+              return 1;
+            } else {
+              return 0;
+            }
+          });
           for (let i = 0; i < this.users.length; i++) {
             this.users[i].userAdmin = this.users[i].roles.some(
               r => r.roleName === "UserAdmin"
