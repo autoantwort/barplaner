@@ -12,6 +12,7 @@
                 <tr>
                   <th scope="col">Name</th>
                   <th scope="col">Email</th>
+                  <th scope="col">Geburtsdatum</th>
                   <th scope="col">Handy</th>
                   <th scope="col">Aktiv</th>
                   <th scope="col">Erfahrener Putzer</th>
@@ -21,6 +22,7 @@
                 <tr v-for="user in users" :key="user.id">
                   <td>{{user.name}}</td>
                   <td>{{user.email}}</td>
+                  <td>{{user.birthday}}</td>
                   <td>{{user.phone}}</td>
                   <th v-if="userAdmin || loginedUser.id === user.id">
                     <input
