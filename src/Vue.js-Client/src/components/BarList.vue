@@ -98,7 +98,7 @@
                                   <option>22:30</option>
                                   <option>23:00</option>
                                   <option>23:30</option>
-                                  <option>24:00</option>
+                                  <option>00:00</option>
                                   <option>00:30</option>
                                   <option>01:00</option>
                                 </select>
@@ -121,7 +121,7 @@
                                   <option>22:30</option>
                                   <option>23:00</option>
                                   <option>23:30</option>
-                                  <option>24:00</option>
+                                  <option>00:00</option>
                                   <option>00:30</option>
                                   <option>01:00</option>
                                   <option>01:30</option>
