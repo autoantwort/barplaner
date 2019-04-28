@@ -77,8 +77,15 @@ export default {
         .get("/users")
         .then(response => {
           if (this.userAdmin) {
-            response.data.sort((r, l) => l.active > r.active);
-            this.users = response.data;
+            this.users = response.data.sort((r, l) => {
+              if (l.active < r.active) {
+                return -1;
+              } else if (l.active > r.active) {
+                return 1;
+              } else {
+                return 0;
+              }
+            });
           }
           // JSON are parsed automatically.
           else this.users = response.data.filter(user => user.active); // JSON are parsed automatically.
