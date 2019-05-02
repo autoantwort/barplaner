@@ -29,12 +29,15 @@ exports.addBar = (barData, numberOfPersonsToClean) => {
                     console.log("## numberOfPersonsToClean", numberOfPersonsToClean);
                     if (numberOfPersonsToClean !== undefined && numberOfPersonsToClean > 0) {
                         Util.computeCleaning(bar.id, numberOfPersonsToClean)
-                            .then(resolve)
+                            .then(userIDs => {
+                                Telegram.barAdded(bar);
+                                resolve(userIDs);
+                            })
                             .catch(reject);
                     } else {
+                        Telegram.barAdded(bar);
                         resolve(bar);
                     }
-                    Telegram.barAdded(bar);
                 }).catch(err => {
                     reject(err);
                 });
