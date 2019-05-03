@@ -125,11 +125,30 @@ function sendBarInfo(bar, userID) {
                 var dayText = "am " + bar.start.getDate() + '.' + (bar.start.getMonth() + 1) + '.' + bar.start.getFullYear();
             }
             duties.filter(d => d.user.telegramID.indexOf("login") === -1).forEach(d => {
-                let mesage = "Hallo " + d.user.name + ",\n" +
-                    dayText + " ist " + bar.name + "!\n" +
-                    (d.have_to_clean ? "Du musst dieses Mal putzten.\n" : "Du musst dieses Mal nicht putzten.");
+                let message = "Hallo " + d.user.name + ",\n" +
+                    dayText + " ist " + bar.name + "!\n";
+                if (d.have_to_clean) {
+                    let haveToClean = [];
+                    duties.filter(duty => duty.user.name !== d.user.name && d.have_to_clean).forEach(duty => haveToClean.push(duty));
+                    message += "Du musst dieses Mal ";
+                    if (haveToClean.length === 0) {
+                        message += "alleine ";
+                    } else {
+                        message += "mit ";
+                        for (let i = 0; i < haveToClean.length - 2; ++i) {
+                            message += haveToClean[i] + ", ";
+                        }
+                        if (haveToClean.length > 1) {
+                            message += haveToClean[haveToClean.length - 2] + " und ";
+                        }
+                        message += haveToClean[haveToClean.length - 1] + " ";
+                    }
+                    message += "putzten.";
+                } else {
+                    message += "Du musst dieses Mal nicht putzten.";
+                }
 
-                bot.sendMessage(d.user.telegramID, mesage).then(() => {
+                bot.sendMessage(d.user.telegramID, message).then(() => {
                     bot.sendMessage(d.user.telegramID, "Kommst du?", {
                         reply_markup: {
                             inline_keyboard: [
@@ -251,7 +270,7 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
         BarDuty.update({
             to: data.data
         }, whereObj).then(() => {
-            bot.editMessageText("Schön dass du kommst!", opts);
+            bot.editMessageText("Schön, dass du kommst!", opts);
         });
     }
 
