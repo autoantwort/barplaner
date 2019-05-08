@@ -8,4 +8,4 @@ RUN npm install
 COPY . /code
 
 EXPOSE 4200
-CMD [ "npm", "serve" ]
+CMD [ "npm", "run", "serve" ]

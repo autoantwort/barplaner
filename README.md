@@ -12,13 +12,13 @@
  2. /start
  3. /newbot
  4. \<your bot name\>
- 5. \<your bot name\>_bot
+ 5. \<your bot name\>\_bot
  6. copy the access token to /src/Nodejs-RestAPIs/app/config/env.js into the `telegramAccessToken` field
  7. open the /src/Vue.js-Client/src/components/Account.vue file and search for `symposion_bot` and replace that with your bot name (ends with 'bot')
 
 ### Enable Facebook API (You need to manage a Facebook site to use this future)
  1. Visit [Facebook Developer](https://developers.facebook.com/apps/) and create a new app
- 2. Open [this](https://developers.facebook.com/tools/explorer/?method=GET&path=me%2Faccounts&version=v3.2) and press "Get Token" -> "Get User Access Token" 
+ 2. Open [this](https://developers.facebook.com/tools/explorer/?method=GET&path=me%2Faccounts&version=v3.2) and press "Get Token" -> "Get User Access Token"
     - Select `manage_pages` and press "Get Access Token"
  3. Copy the id of the Page (data\.id)
  4. Paste the Page id to /src/Nodejs-RestAPIs/app/config/env.js into the `symposionPageID` field
@@ -26,7 +26,7 @@
  6. Press "Debug" and then "Extend Access Token" and enter your password
  7. Press the "Debug" button next to the new green Access Token
  8. Now copy the Access Token from the text field into the `facebookAccessToken` field of the /src/Nodejs-RestAPIs/app/config/env.js file
-    
+
 ### If I dont have a facebook or telegramm access key
  Remove the `facebookAccessToken`, `symposionPageID` and the `telegramAccessToken` fields from the /src/Nodejs-RestAPIs/app/config/env.js file or set them to an empty string.
 
@@ -39,7 +39,7 @@
  2. open /src/Vue.js-Client/src/http-common.js and set `baseURL` to "http://localhost:8080/api"
  3. open an terminal and cd to /src/Nodejs-RestAPIs/ and run `npm run start`
  4. open another terminal and cd to /src/Vue.js-Client/ and run `npm run serve`
- 
+
  Now you can visit http://localhost:4200 and login with Name: `Test` and Password: `Test`
 
  ## Run for production
@@ -51,13 +51,13 @@
  2. open /src/Vue.js-Client/src/http-common.js and set `baseURL` to `baseURL` from point 1 + "/api"
  4. open a terminal and cd to /src/Vue.js-Client/ and run `npm run build`
  3. cd to /src/Nodejs-RestAPIs/ and run `npm run start`
- 
- Now you can visit your `baseURL` 
+
+ Now you can visit your `baseURL`
 
  ## Create service to run your server (for linux systems with systemd)
   1. create a file \<_your_service_name_\>.service
-    
-Content : 
+
+Content :
 
     [Unit]
     Description=<your description>
@@ -93,7 +93,7 @@ Content :
 
 # Import data from the old database(you need sql dump of the old database)
 
-  visit regex101.com 
+  visit regex101.com
 
 ## bardienst.json
 
@@ -102,7 +102,7 @@ open the sql dump and go to ``INSERT INTO `bardienst` VALUES`` and copy the data
 use regex: `\((?<id>[^,]+),([^,\(\)]+),([^,\(\)]+),([^,\(\)]+),([^,\(\)]+),'([^,]*)','([^,]*)','([^,\(\)]*)',([^,\(\)]+)\),?`
 
 use substitution: `{"id":$1,"barID":$2,"userID":$3,"status":$4,"was":$5,"von":"$6","bis":"$7","putzen":"$8","lastReminder":$9},`
- copy the result into the bardienst.json file in the src/Nodejs-RestAPIs/app/old_data/ folder 
+ copy the result into the bardienst.json file in the src/Nodejs-RestAPIs/app/old_data/ folder
 
 ## bars.json
 
@@ -112,7 +112,7 @@ regex: `\((?<id>[^,]+),'([^,]*)',([^,]*),([^,\(\)]*),'([^,\(\)]*)'\),?`
 
 substitution: `{"id":$1,"name":"$2","time":$3,"mailsend":$4,"kommentar":"$5"},`
 
-copy the result into the bars.json file in the src/Nodejs-RestAPIs/app/old_data/ folder 
+copy the result into the bars.json file in the src/Nodejs-RestAPIs/app/old_data/ folder
 
 ## user.json
 
@@ -122,4 +122,4 @@ regex: `\((?<id>[^,]+),'([^,]*)','([^,]*)','([^,]*)','([^,]*)','([^,]*)','([^,]*
 
 substitution: `{"id":$1,"name":"$2","password":"$3","email":"$4","bday":"$5","tel":"$6","handy":"$7","userlevl":$8,"icq":"$9","aktive":$10,"putzten":$11,"reminder":$12,"punkte_offset":$13},`
 
-copy the result into the user.json file in the src/Nodejs-RestAPIs/app/old_data/ folder 
+copy the result into the user.json file in the src/Nodejs-RestAPIs/app/old_data/ folder

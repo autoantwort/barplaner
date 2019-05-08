@@ -4,8 +4,6 @@ services:
   build_api:
     build: src/Nodejs-RestAPIs
     container_name: api.orga.symposion.hilton.rwth-aachen.de
-    volumes:
-      - ./src/Nodejs-RestAPIs/:/code
     ports:
       - "8080:8080"
     networks:
@@ -13,8 +11,6 @@ services:
   build_web:
     build: src/Vue.js-Client
     container_name: orga.symposion.hilton.rwth-aachen.de
-    volumes:
-      - ./src/Vue.js-Client/:/code
     ports:
       - "4200:4200"
     networks:
