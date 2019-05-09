@@ -129,7 +129,7 @@ function sendBarInfo(bar, userID) {
                     dayText + " ist " + bar.name + "!\n";
                 if (d.have_to_clean) {
                     let haveToClean = [];
-                    duties.filter(duty => duty.user.name !== d.user.name && d.have_to_clean).forEach(duty => haveToClean.push(duty));
+                    duties.filter(duty => duty.user.name !== d.user.name && duty.have_to_clean).forEach(duty => haveToClean.push(duty.user.name));
                     message += "Du musst dieses Mal ";
                     if (haveToClean.length === 0) {
                         message += "alleine ";
