@@ -104,7 +104,6 @@ function sendBarInfo(bar, userID) {
             where: {
                 ...userWhere,
                 barID: bar.id,
-                state: 'no_info'
             },
             include:  [{
                 model: User
@@ -124,7 +123,7 @@ function sendBarInfo(bar, userID) {
             } else {
                 var dayText = "am " + bar.start.getDate() + '.' + (bar.start.getMonth() + 1) + '.' + bar.start.getFullYear();
             }
-            duties.filter(d => d.user.telegramID.indexOf("login") === -1).forEach(d => {
+            duties.filter(d => d.user.telegramID.indexOf("login") === -1 && d.state === 'no_info').forEach(d => {
                 let message = "Hallo " + d.user.name + ",\n" +
                     dayText + " ist " + bar.name + "!\n";
                 if (d.have_to_clean) {
@@ -281,7 +280,7 @@ let sendDaysBefore = [14, 6, 2, 1, 0];
 db.addSyncCallback(() => {
     let checkForEventsAndSend = () => {
         let daysAhead = new Date();
-        daysAhead.setDate(daysAhead.getDate() + 7);
+        daysAhead.setDate(daysAhead.getDate() + 15);
         Bar.findAll({
             where: {
                 start: {
