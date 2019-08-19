@@ -123,36 +123,25 @@ exports.syncFacebookEvents = () => {
                 }
                 Setting.findByPk("defaultNumberOfPersonsToClean").then(numberSetting => {
                     let barsToCreate = [];
-                    if (bars.length > 0) {
-                        // both sorted by time
-                        for (let b = 0, e = 0; e < events.length && b < bars.length && events[e].start > now;) {
-                            // check if on same date:                    
-                            if (bars[b].start.getYear() === events[e].start.getYear() &&
-                                bars[b].start.getMonth() === events[e].start.getMonth() &&
-                                bars[b].start.getDate() === events[e].start.getDate()) {
-                                ++b;
-                                ++e;
-                                // bar is older then the facebook event, skip bar
-                            } else if (bars[b].start < events[e].start) {
-                                ++b;
-                            } else { // event is older then a bar => create bar
-                                const event = events[e];
-                                ++e;
-                                if (event.is_draft || event.is_canceled) {
-                                    continue;
-                                }
-                                barsToCreate.push({
-                                    name: event.name,
-                                    description: event.description,
-                                    start: event.start,
-                                    end: event.end,
-                                    facebookEventID: event.id,
-                                    public: event.type == "public",
-                                });
+                    // both sorted by time
+                    let e = 0;
+                    for (let b = 0; e < events.length && b < bars.length && events[e].start > now;) {
+                        // check if on same date:                    
+                        if (bars[b].start.getYear() === events[e].start.getYear() &&
+                            bars[b].start.getMonth() === events[e].start.getMonth() &&
+                            bars[b].start.getDate() === events[e].start.getDate()) {
+
+                            ++b;
+                            ++e;
+                            // bar is older then the facebook event, skip bar
+                        } else if (bars[b].start < events[e].start) {
+                            ++b;
+                        } else { // event is older then a bar => create bar
+                            const event = events[e];
+                            ++e;
+                            if (event.is_draft || event.is_canceled) {
+                                continue;
                             }
-                        }
-                    } else {
-                        events.forEach(event => {
                             barsToCreate.push({
                                 name: event.name,
                                 description: event.description,
@@ -161,6 +150,17 @@ exports.syncFacebookEvents = () => {
                                 facebookEventID: event.id,
                                 public: event.type == "public",
                             });
+                        }
+                    }
+                    for (; e < events.length; ++e) {
+                        const event = events[e];
+                        barsToCreate.push({
+                            name: event.name,
+                            description: event.description,
+                            start: event.start,
+                            end: event.end,
+                            facebookEventID: event.id,
+                            public: event.type == "public",
                         });
                     }
                     if (barsToCreate.length > 0) {
