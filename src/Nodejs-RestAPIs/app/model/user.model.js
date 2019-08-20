@@ -24,6 +24,11 @@ module.exports = (sequelize, Sequelize) => {
                 return "login pin: " + (Math.random() * 1000000).toFixed(0);
             },
         },
+        gitLabID: {
+            type: Sequelize.INTEGER,
+            allowNull: true,
+            defaultValue: null,
+        },
         active: {
             type: Sequelize.BOOLEAN,
             defaultValue: true

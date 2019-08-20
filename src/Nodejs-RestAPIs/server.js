@@ -45,6 +45,7 @@ if (typeof env.facebookAccessToken === "string" && env.facebookAccessToken.lengt
     require("./app/util/facebook").runFacebookSync();
 }
 require("./app/util/telegram");
+require("./app/util/gitlab");
 
 const crypto = require('crypto');
 

@@ -19,6 +19,7 @@ const env = {
     loadOldData: true,
     baseURL: "http://localhost:8080",
     staticVue: false,
+    gitLabAccessToken: 'Your gitlab access token',
 };
 
 module.exports = env;
