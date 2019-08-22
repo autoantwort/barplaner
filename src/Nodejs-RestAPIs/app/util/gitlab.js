@@ -3,6 +3,8 @@ const env = require('../config/env');
 const Telegram = require('./telegram.js');
 const CronJob = require('cron').CronJob;
 const Axios = require("axios");
+const fs = require("fs");
+const path = require('path');
 
 const User = db.User;
 const Op = db.Sequelize.Op;
@@ -68,6 +70,8 @@ exports.getUser = (userObject) => {
     });
 };
 
+let screenShotFileID = null;
+
 exports.sendNotificationsForIssus = () => {
     return new Promise((resolve, reject) => {
         // first we need a list of all projects to show a project name for an project id
@@ -116,9 +120,10 @@ exports.sendNotificationsForIssus = () => {
                         // welcome message if the user has no issue until now
                         let userMessage = userMessages[participant.id];
                         if (userMessage === undefined) {
-                            userMessage = "Eine Übersicht aller Issues zu denen du bei Git zugeordnet bist: \n";
+                            userMessage = "Eine Übersicht aller Issues im Git mit welchen du etwas zu tun hast: \n";
                             lastUserProject[participant.id] = issue.id;
                             participants[participant.id] = participant;
+                            participants[participant.id].hasAssignment = false;
                         }
                         // check if the user needs a project headline 
                         if (lastUserProject[participant.id] !== issue.project_id) {
@@ -127,6 +132,7 @@ exports.sendNotificationsForIssus = () => {
                         }
                         const isAssigned = issue.assignees.map(u => u.id).includes(participant.id);
                         userMessage += (isAssigned ? "👉" : "`      `") + "[#" + issue.iid + "](" + issue.web_url + ") " + issue.title + " ";
+                        participants[participant.id].hasAssignment |= isAssigned;
                         if (issue.upvotes > 0) {
                             userMessage += "👍" + issue.upvotes + " ";
                         }
@@ -143,10 +149,16 @@ exports.sendNotificationsForIssus = () => {
                 const promises = [];
                 const successfulUsers = [];
                 for (let participantID in participants) {
+                    console.log(participantID, " : ", participants[participantID]);
                     const promise = new Promise((resolve, reject) => {
                         this.getUser(participants[participantID]).then(user => {
                             if (user !== null) {
-                                Telegram.sendMessage(user, userMessages[participantID]);
+                                if (user.gitLabID === null) {
+                                    user.gitLabID = participantID;
+                                    user.save();
+                                }
+                                const userMessage = userMessages[participantID] + (participants[participantID].hasAssignment ? "\nBei Issus die mit 👉 markiert wurden wurdest du zugeordnet." : "");
+                                Telegram.sendMessage(user, userMessage);
                                 successfulUsers.push(user.id);
                             }
                             resolve();
@@ -158,7 +170,8 @@ exports.sendNotificationsForIssus = () => {
                 Promise.all(promises).then(() =>  {
                     User.findAll({ where: { active: true } }).then(users => {
                         users.filter(u => !successfulUsers.includes(u.id)).forEach(user => {
-                            Telegram.sendMessage(user, "Deinem Barplaner Account konnte kein GitLab Account automatisch zugeordnet werden. Du musst diese Zuordnung leider selber durchführen. Schreibe dafür @Leander100111 an. "); // Besuche dafür die Seite: orga.symposion.hilton.rwth-aachen.de/#/account");
+                            const file = screenShotFileID === null ? fs.createReadStream(path.join(__dirname, "..", "images", "screenshot_user_settings.png")) : screenShotFileID;
+                            Telegram.bot.sendPhoto(user.telegramID, file, { caption: "Deinem Barplaner Account konnte kein GitLab Account automatisch zugeordnet werden. Du musst diese Zuordnung leider selber durchführen. Gehe dafür bitte auf git.rwth-aachen.de/profile und kopiere die User ID und sende diese an @Leander100111." }).then(response => console.log(response.body)).catch(console.error); // Besuche dafür die Seite: orga.symposion.hilton.rwth-aachen.de/#/account");
                         });
                         resolve();
                     }).catch(reject);
