@@ -61,7 +61,7 @@ app.post('/api/login', (req, res) => {
         } else {
             let func = (result) => {
                 if (result === true) {
-                    res.cookie('auth', user.sessionID, { httpOnly: true, sameSite: false /* TODO */ , secure: req.secure });
+                    res.cookie('auth', user.sessionID, { maxAge: 1892160000000 /*60 years*/ , httpOnly: true, sameSite: false /* TODO */ , secure: req.secure });
                     user.getRoles().then(roles => {
                         res.send({ user: user, roles: roles });
                     }).catch(err => res.status(500).send(err));
