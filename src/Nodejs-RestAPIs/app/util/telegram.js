@@ -1,5 +1,6 @@
 const db = require('../config/db.config.js');
 const env = require('../config/env');
+const CronJob = require('cron').CronJob;
 
 
 const Bar = db.Bar;
@@ -275,7 +276,7 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
 
 });
 let lastSentDate;
-let sendDaysBefore = [14, 6, 2, 1, 0];
+let sendDaysBefore = [10, 7, 5, 3, 2, 1, 0];
 // check for bars, only start when the DB is in sync, so that in the setIntervall call the Bar.find will work directly 
 db.addSyncCallback(() => {
     let checkForEventsAndSend = () => {
@@ -316,11 +317,10 @@ db.addSyncCallback(() => {
         });
         lastSentDate = new Date();
     };
-    setInterval(() => {
+    // every day at 3 pm
+    const issueCronJob = new CronJob('00 00 15 * * *', function() {
         checkForEventsAndSend();
-    }, 1000 * 60 * 60 * 24); //every day
-    // dont wait a day if we start the server
-    checkForEventsAndSend();
+    }, null, true);
 });
 
 exports.barAdded = (bar) => {
@@ -335,7 +335,7 @@ exports.barAdded = (bar) => {
     console.log(sendDaysBefore.reduce((l, r) => Math.max(l, r)));
     console.log(dayDiff);
     if ((day === today || !sendDaysBefore.some(d => d === dayDiff)) && dayDiff <= sendDaysBefore.reduce((l, r) => Math.max(l, r))) {
-        sendBarInfo(bar);
+        sendBarInfo(bar).catch(console.error);
     }
 }
 
