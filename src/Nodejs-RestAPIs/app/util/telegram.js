@@ -270,7 +270,17 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
         BarDuty.update({
             to: data.data
         }, whereObj).then(() => {
-            bot.editMessageText("Schön, dass du kommst!", opts);
+            bot.editMessageText("Schön, dass du kommst!", {
+                ...opts,
+                reply_markup: {
+                    inline_keyboard: [
+                        [
+                            button("state", 'Angaben ändern', 'present'),
+                            button('state', 'Ich kann doch nicht', 'absent')
+                        ]
+                    ]
+                }
+            });
         });
     }
 
