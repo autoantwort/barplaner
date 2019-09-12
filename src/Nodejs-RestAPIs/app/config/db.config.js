@@ -31,6 +31,7 @@ db.Role = require('../model/role.model.js')(sequelize, Sequelize);
 db.BarDuty = require('../model/barduty.model.js')(sequelize, Sequelize, db.Bar, db.User);
 db.UserRoles = require('../model/userroles.model.js')(sequelize, Sequelize, db.User, db.Role);
 db.Setting = require('../model/setting.model.js')(sequelize, Sequelize, db.Role);
+db.ShouldDelete = require('../model/shouldDelete.model.js')(sequelize, Sequelize);
 
 let funcArray = [];
 

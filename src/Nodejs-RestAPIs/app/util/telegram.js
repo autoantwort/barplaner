@@ -10,6 +10,7 @@ const BarDuty = db.BarDuty;
 const Role = db.Role;
 const Setting = db.Setting;
 const Op = db.Sequelize.Op;
+const ShouldDelete = db.ShouldDelete;
 
 
 
@@ -171,6 +172,8 @@ function sendBarInfo(bar, userID) {
                                 }]
                             ]
                         }
+                    }).then(message => {
+                        exports.deleteTelegramMessage(d.user.telegramID, message.message_id, bar.start);
                     });
                 });
             });
@@ -354,3 +357,66 @@ exports.sendMessage = (user, message) => {
 };
 
 exports.bot = bot;
+
+//////////////////////////////////////////////////////
+///////////////// Delete Messages ////////////////////
+//////////////////////////////////////////////////////
+
+const runMessageDeletion = () => {
+    const query = {
+        where: {
+            deleteAfter: {
+                [Op.lte]: new Date()
+            }
+        }
+    }
+    ShouldDelete.findAll(query).then(messages => {
+        messages.forEach(message => {
+            const should_delete = message.newText === null && (Date.now() - message.createdAt < 1000 * 60 * 60 * 48);
+            if (should_delete) {
+                bot.deleteMessage(message.chatID, message.messageID).catch(console.error);
+            } else {
+                const newText = message.newText === null ? "Deleted" : message.newText;
+                bot.editMessageText(newText, { chat_id: message.chatID, message_id: message.messageID }).catch(console.error);
+            }
+        });
+        ShouldDelete.destroy(query).catch(console.error);
+        computeNewNextTimeout();
+    }).catch(console.error);
+}
+
+let deleteTimeout = null;
+let nextDeleteExecution = null;
+
+const computeNewNextTimeout = () => {
+    ShouldDelete.findOne({ order: db.Sequelize.col('deleteAfter') }).then(message => {
+        if (message !== null) {
+            nextDeleteExecution = message.deleteAfter;
+            deleteTimeout = setTimeout(runMessageDeletion, nextDeleteExecution - Date.now());
+        } else {
+            nextDeleteExecution = null;
+            deleteTimeout = null;
+        }
+    }).catch(console.error);
+}
+
+db.addSyncCallback(() => {
+    computeNewNextTimeout();
+});
+
+exports.deleteTelegramMessage = (chatID, messageID, deleteAfter, newText) => {
+    if (deleteAfter === undefined) {
+        throw new Error("Minimum 3 arguments are required!");
+    }
+    if (typeof newText !== "string") {
+        newText = null;
+    }
+    ShouldDelete.create({ chatID: chatID, messageID: messageID, deleteAfter: deleteAfter }).catch(console.error);
+    if (nextDeleteExecution === null || nextDeleteExecution > deleteAfter) {
+        if (deleteTimeout !== null) {
+            clearTimeout(deleteTimeout);
+        }
+        nextDeleteExecution = deleteAfter;
+        deleteTimeout = setTimeout(runMessageDeletion, nextDeleteExecution - Date.now());
+    }
+}
