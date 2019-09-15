@@ -353,7 +353,12 @@ exports.barAdded = (bar) => {
 }
 
 exports.sendMessage = (user, message) => {
-    bot.sendMessage(user.telegramID, message, { parse_mode: "Markdown", disable_web_page_preview: true }).catch(error => console.error("Error while sending telegram message: ", error));
+    if (user.telegramID.indexOf('login') === -1) {
+        bot.sendMessage(user.telegramID, message, { parse_mode: "Markdown", disable_web_page_preview: true }).catch(error => console.error("Error while sending telegram message: ", error));
+        return true;
+    } else {
+        return false;
+    }
 };
 
 exports.bot = bot;
