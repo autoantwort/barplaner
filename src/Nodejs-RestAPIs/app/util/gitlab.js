@@ -147,7 +147,6 @@ exports.sendNotificationsForIssus = () => {
                     });
                 });
                 const promises = [];
-                const successfulUsers = [];
                 for (let participantID in participants) {
                     console.log(participantID, " : ", participants[participantID]);
                     const promise = new Promise((resolve, reject) => {
@@ -159,7 +158,6 @@ exports.sendNotificationsForIssus = () => {
                                 }
                                 const userMessage = userMessages[participantID] + (participants[participantID].hasAssignment ? "\nBei Issus die mit 👉 markiert wurden wurdest du zugeordnet." : "");
                                 Telegram.sendMessage(user, userMessage);
-                                successfulUsers.push(user.id);
                             }
                             resolve();
                         }).catch(reject);
@@ -168,8 +166,13 @@ exports.sendNotificationsForIssus = () => {
                 }
                 // wenn alle Benutzer bestimmt und nachrichten versendet:
                 Promise.all(promises).then(() =>  {
-                    User.findAll({ where: { active: true } }).then(users => {
-                        users.filter(u => !successfulUsers.includes(u.id)).forEach(user => {
+                    User.findAll({
+                        where: {
+                            active: true,
+                            gitLabID: null,
+                        }
+                    }).then(users => {
+                        users.forEach(user => {
                             const file = screenShotFileID === null ? fs.createReadStream(path.join(__dirname, "..", "images", "screenshot_user_settings.png")) : screenShotFileID;
                             Telegram.bot.sendPhoto(user.telegramID, file, { caption: "Deinem Barplaner Account konnte kein GitLab Account automatisch zugeordnet werden. Du musst diese Zuordnung leider selber durchführen. Gehe dafür bitte auf git.rwth-aachen.de/profile und kopiere die User ID und sende diese an @Leander100111." }).then(response => console.log(response.body)).catch(console.error); // Besuche dafür die Seite: orga.symposion.hilton.rwth-aachen.de/#/account");
                         });
