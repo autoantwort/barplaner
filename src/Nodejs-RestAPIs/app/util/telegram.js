@@ -150,31 +150,11 @@ function sendBarInfo(bar, userID) {
                 }
 
                 bot.sendMessage(d.user.telegramID, message).then(() => {
-                    bot.sendMessage(d.user.telegramID, "Kommst du?", {
-                        reply_markup: {
-                            inline_keyboard: [
-                                [{
-                                    text: 'Ich komme',
-                                    callback_data: JSON.stringify({
-                                        id: "state",
-                                        data: "present",
-                                        barID: d.barID,
-                                        userID: d.userID,
-                                    })
-                                }, {
-                                    text: 'Ich komme nicht',
-                                    callback_data: JSON.stringify({
-                                        id: "state",
-                                        data: "absent",
-                                        barID: d.barID,
-                                        userID: d.userID,
-                                    })
-                                }]
-                            ]
-                        }
-                    }).then(message => {
-                        exports.deleteTelegramMessage(d.user.telegramID, message.message_id, bar.start);
-                    });
+                    const msg = addBarMessageCreator.createMessage(d.user, "Kommst du?");
+                    msg.addData('bar', bar.id);
+                    msg.addButtonToRow("Ich komme", 'state', 'present');
+                    msg.addButtonToRow("Ich komme nicht", 'state', 'absent');
+                    msg.sendMessage(bar.start).catch(console.error);
                 });
             });
             resolve();
@@ -182,112 +162,197 @@ function sendBarInfo(bar, userID) {
     });
 }
 
-
-
-
-
 // Handle callback queries
 bot.on('callback_query', function onCallbackQuery(callbackQuery) {
-    const data = JSON.parse(callbackQuery.data);
-    const msg = callbackQuery.message;
-    const opts = {
-        chat_id: msg.chat.id,
-        message_id: msg.message_id,
-    };
-    let reply = null;
-    let whereObj = {
-        where: {
-            barID: data.barID,
-            userID: data.userID,
+    const callbackDataToObject = (string) => {
+        const array = JSON.parse(string);
+        const obj = {
+            chatId: array[0],
+            userId: array[1],
+            systemId: array[2],
+            state: array[3],
+            data: array[4],
         }
-    };
-    let button = (id, text, data_) => {
-        if (data_ === undefined)
-            data_ = text;
+        for (let i = 5; i < array.length; i += 2) {
+            obj[array[i]] = array[i + 1]
+        }
+        return obj;
+    }
+    const data = callbackDataToObject(callbackQuery.data);
+    const callback = registeredResponseSystems[data.systemId];
+    if (callback !== undefined) {
+        data.messageId = callbackQuery.message.message_id;
+        callback(data);
+    }
+});
+
+const registeredResponseSystems = {};
+exports.registerResponseSystem = (systemId, responseCallback) => {
+    if (registeredResponseSystems['systemId'] !== undefined) {
+        throw new Error("A response system with id " + systemId + " is already registered.");
+    }
+    const callbackDataToString = (chatId, userId, systemId, state, data, additionalData) => {
+        const array = JSON.stringify([chatId, userId, systemId, state, data].concat(additionalData));
+        if (array > 64) {
+            console.error("callback_data is to long : " + array + " length : " + array.length);
+            throw new Error("callback_data is to long : " + array + " length : " + array.length);
+        }
+        return array;
+    }
+    const button = (chatId, userId, systemId, state, text, data, additionalData) => {
+        const callbackData = callbackDataToString(chatId, userId, systemId, state, data === undefined ? text : data, additionalData);
         return {
             text: text,
-            callback_data: JSON.stringify({
-                id: id,
-                data: data_,
-                barID: data.barID,
-                userID: data.userID,
-            })
+            callback_data: callbackData,
         };
     };
-    if (data.id === "state") {
-        BarDuty.update({
-            state: data.data
-        }, whereObj).then(() => {
-            if (data.data === "present") {
-                bot.editMessageText("Welche Theke machst du?", {
-                    ...opts,
+    const messageCreator = {
+        createMessage: (user, text) => {
+            if (user.telegramID.indexOf("login") !== -1) {
+                throw new Error("The user has no telegramID!");
+            }
+            return {
+                text: text,
+                buttons: [
+                    []
+                ],
+                _additionalData: [],
+                addData: function(key, value) {
+                    this._additionalData.push(key);
+                    this._additionalData.push(value);
+                },
+                addButtonToRow: function(text, newState, data) {
+                    this.buttons[this.buttons.length - 1].push(button(user.telegramID, user.id, systemId, newState, text, data, this._additionalData));
+                },
+                newRow: function() {
+                    this.buttons.push([]);
+                },
+                sendMessage: async function(deleteAfter, textAfterDelete) {
+                    const message = await bot.sendMessage(user.telegramID, this.text, {
+                        reply_markup: {
+                            inline_keyboard: this.buttons,
+                        }
+                    });
+                    if (deleteAfter !== undefined) {
+                        exports.deleteTelegramMessage(user.telegramID, message.message_id, deleteAfter, textAfterDelete);
+                    }
+                },
+            };
+        }
+    };
+    registeredResponseSystems[systemId] = (data) => {
+        const message = {
+            ...data,
+            newText: "",
+            buttons: [
+                []
+            ],
+            _additionalData: [],
+            addData: function(key, value) {
+                this._additionalData.push(key);
+                this._additionalData.push(value);
+            },
+            addButtonToRow: function(text, newState, data) {
+                this.buttons[this.buttons.length - 1].push(button(this.chatId, this.userId, systemId, newState, text, data, this._additionalData));
+            },
+            newRow: function() {
+                this.buttons.push([]);
+            },
+            sendUpdatedMessage: function() {
+                if (this.newText === null && this.buttons[0].length === 0) {
+                    // There is nothing to update
+                    return;
+                }
+                if (this.newText === null) {
+                    return bot.editMessageReplyMarkup({ inline_keyboard: this.buttons }, {
+                        chat_id: this.chatId,
+                        message_id: this.messageId,
+                    });
+                } else {
+                    return bot.editMessageText(this.newText, {
+                        chat_id: this.chatId,
+                        message_id: this.messageId,
+                        reply_markup: { inline_keyboard: this.buttons },
+                    });
+                }
+            },
+            sendNewMessage: async function(deleteAfter, textAfterDelete) {
+                const message = await bot.sendMessage(chatId, newText, {
                     reply_markup: {
-                        inline_keyboard: [
-                            [button("job", 'Biertheke'), button("job", 'Cocktailtheke')]
-                        ]
+                        inline_keyboard: buttons,
                     }
                 });
+                if (deleteAfter !== undefined) {
+                    exports.deleteTelegramMessage(chatId, message.message_id, deleteAfter, textAfterDelete);
+                }
+            },
+        }
+        responseCallback(message);
+    }
+    return messageCreator;
+}
+
+// handle responses to the bar
+const addBarMessageCreator = exports.registerResponseSystem("addBar", (message) => {
+    let whereObj = {
+        where: {
+            barID: message.bar,
+            userID: message.userId,
+        }
+    };
+    message.addData('bar', message.bar);
+    if (message.state === "state") {
+        BarDuty.update({
+            state: message.data
+        }, whereObj).then(() => {
+            if (message.data === "present") {
+                message.newText = "Welche Theke machst du?";
+                message.addButtonToRow('Biertheke', 'job', 'Biertheke');
+                message.addButtonToRow('Cocktailtheke', 'job', 'Cocktailtheke');
+                message.sendUpdatedMessage();
             } else {
-                bot.editMessageText("Schade!", {
-                    ...opts,
-                    reply_markup: {
-                        inline_keyboard: [
-                            [button("state", 'Ich komme doch!', 'present')]
-                        ]
-                    }
-                });
+                message.newText = "Schade!";
+                message.addButtonToRow("Ich komme doch!", 'state', 'present');
+                message.sendUpdatedMessage();
             }
         });
-    } else if (data.id === "job") {
+    } else if (message.state === "job") {
         BarDuty.update({
-            job: data.data
+            job: message.data
         }, whereObj).then(() => {
-            let buttons = [];
+            message.newText = "Wann fängst du an?";
             for (let i = 20; i < 26; ++i) {
-                buttons.push([button("from", ((i % 24) < 10 ? '0' : '') + (i % 24) + ":00"), button("from", ((i % 24) < 10 ? '0' : '') + (i % 24) + ":30")]);
+                message.addButtonToRow(((i % 24) < 10 ? '0' : '') + (i % 24) + ":00", 'from');
+                message.addButtonToRow(((i % 24) < 10 ? '0' : '') + (i % 24) + ":30", 'from');
+                message.newRow();
             }
-            bot.editMessageText("Wann fängst du an?", {
-                ...opts,
-                reply_markup: {
-                    inline_keyboard: buttons
-                }
-            });
+            message.sendUpdatedMessage();
         });
-    } else if (data.id === "from") {
+    } else if (message.state === "from") {
         BarDuty.update({
-            from: data.data
+            from: message.data
         }, whereObj).then(() => {
-            let buttons = [];
+            message.newText = "Bis wann bleibst du?";
             for (let i = 22; i < 24 + 7; ++i) {
-                buttons.push([button("to", ((i % 24) < 10 ? '0' : '') + (i % 24) + ":00"), button("to", ((i % 24) < 10 ? '0' : '') + (i % 24) + ":30")]);
+                message.addButtonToRow(((i % 24) < 10 ? '0' : '') + (i % 24) + ":00", 'to');
+                message.addButtonToRow(((i % 24) < 10 ? '0' : '') + (i % 24) + ":30", 'to');
+                message.newRow();
             }
-            buttons.push([button("to", "Ende")]);
-            bot.editMessageText("Bis wann bleibst du?", {
-                ...opts,
-                reply_markup: {
-                    inline_keyboard: buttons
-                }
-            });
+            message.sendUpdatedMessage();
         });
-    } else if (data.id === "to") {
+    } else if (message.state === "to") {
         BarDuty.update({
-            to: data.data
+            to: message.data
         }, whereObj).then(() => {
-            bot.editMessageText("Schön, dass du kommst!", {
-                ...opts,
-                reply_markup: {
-                    inline_keyboard: [
-                        [
-                            button("state", 'Angaben ändern', 'present'),
-                            button('state', 'Ich kann doch nicht', 'absent')
-                        ]
-                    ]
-                }
-            });
+            message.newText = "Schön, dass du kommst!";
+            message.addButtonToRow("Angaben ändern", 'state', 'present');
+            message.addButtonToRow("Ich kann doch nicht", 'state', 'absent');
+            message.sendUpdatedMessage();
         });
     }
-
 });
+
+
 let lastSentDate;
 let sendDaysBefore = [10, 7, 5, 3, 2, 1, 0];
 // check for bars, only start when the DB is in sync, so that in the setIntervall call the Bar.find will work directly 
