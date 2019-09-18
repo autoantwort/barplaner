@@ -342,12 +342,7 @@ exports.barAdded = (bar) => {
     const barDate = new Date(bar.start);
     barDate.setHours(0, 0, 0, 0);
     let dayDiff = (barDate - today) / 1000 / 60 / 60 / 24;
-    // when last send Day was today, wo should send messages
-    const day = new Date(lastSentDate);
-    day.setHours(0, 0, 0, 0);
-    console.log(sendDaysBefore.reduce((l, r) => Math.max(l, r)));
-    console.log(dayDiff);
-    if ((day === today || !sendDaysBefore.some(d => d === dayDiff)) && dayDiff <= sendDaysBefore.reduce((l, r) => Math.max(l, r))) {
+    if (sendDaysBefore.some(d => d === dayDiff)) {
         sendBarInfo(bar).catch(console.error);
     }
 }
