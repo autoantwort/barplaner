@@ -4,7 +4,7 @@
       <div class="col-12 col-md-8 offset-md-3 col-lg-6 offset-lg-3">
         <div class="card">
           <div class="card-header">Login</div>
-          <div class="card-body">
+          <form class="card-body" action="javascript:void(0);">
             <div class="form-group">
               <label for="usr">Name:</label>
               <input type="text" class="form-control" v-bind:class="{ 'is-invalid': wrongData }" id="usr" required v-model="name" name="username">
@@ -14,7 +14,7 @@
               <input type="password" class="form-control" v-bind:class="{ 'is-invalid': wrongData }" id="pwd" required v-model="password" name="password">
             </div>
             <button type="submit" class="btn btn-primary" v-on:click="login" >Login</button>
-          </div>
+          </form>
           <!--<div class="card-footer">Footer</div> -->
         </div>
       </div>
