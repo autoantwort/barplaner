@@ -158,6 +158,7 @@ exports.removeRole = (req, res) => {
 exports.findAll = (req, res) => {
     User.findAll({
         raw: true,
+        attributes: ['active', 'birthday', 'email', 'experienced_cleaner', 'gitLabID', 'id', 'name', 'phone', 'telegramID'],
     }).then(user => {
         // Send all user to Client
         res.send(user);
@@ -189,7 +190,10 @@ exports.findAllRoles = (req, res) => {
 
 // Find a User by Id
 exports.findById = (req, res) => {
-    User.findByPk(req.params.userID).then(user => {
+    User.findByPk(req.params.userID, {
+        raw: true,
+        attributes: ['active', 'birthday', 'email', 'experienced_cleaner', 'gitLabID', 'id', 'name', 'phone', 'telegramID'],
+    }).then(user => {
         res.send(user);
     }).catch(err => {
         res.status(500).send("Error -> " + err);
