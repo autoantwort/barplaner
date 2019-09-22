@@ -243,7 +243,7 @@ exports.registerResponseSystem = (systemId, responseCallback) => {
     registeredResponseSystems[systemId] = (data) => {
         const message = {
             ...data,
-            newText: "",
+            newText: null,
             buttons: [
                 []
             ],
@@ -412,9 +412,15 @@ exports.barAdded = (bar) => {
     }
 }
 
-exports.sendMessage = (user, message) => {
+exports.sendMessage = (user, message, deleteAfter, afterDeleteText) => {
     if (user.telegramID.indexOf('login') === -1) {
-        bot.sendMessage(user.telegramID, message, { parse_mode: "Markdown", disable_web_page_preview: true }).catch(error => console.error("Error while sending telegram message: ", error));
+        bot.sendMessage(user.telegramID, message, { parse_mode: "Markdown", disable_web_page_preview: true }).then(message => {
+            if (deleteAfter instanceof Date) {
+                exports.deleteTelegramMessage(user.telegramID, message.message_id, deleteAfter, afterDeleteText);
+            } else if (deleteAfter !== null && deleteAfter !== undefined) {
+                console.error(deleteAfter + " is not a date at Telegram.sendMessage(...)");
+            }
+        }).catch(error => console.error("Error while sending telegram message: ", error));
         return true;
     } else {
         return false;

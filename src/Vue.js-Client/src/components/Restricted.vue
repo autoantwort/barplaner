@@ -35,6 +35,9 @@
           <li class="nav-item">
             <router-link class="nav-link" to="/duty">Putzen</router-link>
           </li>
+          <li class="nav-item">
+            <router-link class="nav-link" to="/surveyList">Umfragen</router-link>
+          </li>
           <li class="nav-item" v-if="cleaningAdmin">
             <router-link class="nav-link" to="/settings">Settings</router-link>
           </li>

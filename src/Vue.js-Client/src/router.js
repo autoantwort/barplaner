@@ -4,6 +4,8 @@ import Login from "./components/Login.vue";
 import Restricted from "./components/Restricted.vue";
 import AddBar from "./components/AddBar.vue";
 import AddUser from "./components/AddUser.vue";
+import AddSurvey from "./components/AddSurvey.vue";
+import SurveyList from "./components/SurveyList.vue";
 import BarList from "./components/BarList.vue";
 import UserList from "./components/UserList.vue";
 import RoleList from "./components/RoleList.vue";
@@ -73,6 +75,14 @@ export default new Router({
                 path: "/addUser",
                 name: "add-user",
                 component: AddUser,
+            }, {
+                path: "/addSurvey",
+                name: "add-survey",
+                component: AddSurvey,
+            }, {
+                path: "/surveyList",
+                name: "survey-list",
+                component: SurveyList,
             }, {
                 path: "/account",
                 name: "account",

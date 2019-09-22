@@ -131,6 +131,7 @@ require('./app/route/user.route.js')(app);
 require('./app/route/bar.route.js')(app);
 require('./app/route/duty.route.js')(app);
 require('./app/route/setting.route.js')(app);
+require('./app/route/survey.route.js')(app);
 
 // Create a Server
 var server = app.listen(8080, function() {
