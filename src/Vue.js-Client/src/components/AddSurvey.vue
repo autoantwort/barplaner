@@ -42,16 +42,18 @@
             </ul>
           </div>
           <div class="form-group">
-            <label for="add-answer">Frage hinzufügen</label>
+            <label for="add-answer">Antwortmöglichkeit hinzufügen</label>
             <input
               type="text"
               class="form-control"
               id="add-answer"
               name="add-answer"
               v-on:keyup.enter="addAnswer"
+              placeholder="Durch Enter hinzufügen"
             />
           </div>
 
+          <label>Antwortmöglichkeiten für Zeitraum hinzufügen</label>
           <div class="form-row">
             <div class="col-auto">
               <label for="date" style="width:1px">Datum</label>
@@ -169,8 +171,9 @@ export default {
       if (document.getElementById("form").checkValidity() === false) {
         return;
       }
-      if(this.survey.answers.length < 2){
-        this.errorString = "Es müssen mindestens zwei Antwortmöglichkeiten existieren.";
+      if (this.survey.answers.length < 2) {
+        this.errorString =
+          "Es müssen mindestens zwei Antwortmöglichkeiten existieren.";
         return;
       }
       const end = this.supportDateTime
@@ -239,7 +242,6 @@ export default {
 
 <style>
 select.form-control {
-  background-position: center right calc(0.55em + 0.6rem) !important;
   padding-right: calc(1em + 0.2rem) !important;
 }
 </style>
