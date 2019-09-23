@@ -412,6 +412,55 @@ exports.barAdded = (bar) => {
     }
 }
 
+exports.changeCleaningStatus = (barId, userId, newHaveToCleanState) => {
+    Bar.findByPk(barId).then(bar => {
+        const end = bar.start.setHours(bar.start.getHours() + 12);
+        if (new Date() > end) {
+            return;
+        }
+        const startText = "Du musst bei der " + bar.name + " am " + bar.start.toLocaleDateString("de-DE");
+        if (!newHaveToCleanState) {
+            User.findByPk(userId).then(user => {
+                this.sendMessage(user, startText + " doch nicht mehr putzten.");
+            }).catch(console.error);
+        }
+        BarDuty.findAll({
+            where: {
+                barID: barId,
+                have_to_clean: true,
+            },
+            include: [{
+                model: User,
+                attributes: ['id', 'name', 'telegramID'],
+            }],
+        }).then(duties => {
+            if (duties.length === 1) {
+                this.sendMessage(duties[0].user, startText + " aktuell alleine putzten.");
+            } else {
+                for (let i = 0; i < duties.length; ++i) {
+                    let message = startText + " nun mit ";
+                    let count = duties.length;
+                    for (let ii = 0; ii < duties.length; ++ii) {
+                        --count;
+                        if (ii !== i) {
+                            message += duties[ii].user.name;
+                            if (count === 0) {
+                                message += " ";
+                            } else if (count === 1) {
+                                message += " und ";
+                            } else {
+                                message += ", ";
+                            }
+                        }
+                    }
+                    message += "putzten.";
+                    this.sendMessage(duties[i].user, message);
+                }
+            }
+        }).catch(console.error);
+    }).catch(console.error);
+}
+
 exports.sendMessage = (user, message, deleteAfter, afterDeleteText) => {
     if (user.telegramID.indexOf('login') === -1) {
         bot.sendMessage(user.telegramID, message, { parse_mode: "Markdown", disable_web_page_preview: true }).then(message => {

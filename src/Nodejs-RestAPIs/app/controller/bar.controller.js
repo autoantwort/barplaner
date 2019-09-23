@@ -1,6 +1,7 @@
 const db = require('../config/db.config.js');
 const Util = require('../util/cleaning');
 const BarUtil = require('../util/addBar');
+const Telegram = require('../util/telegram');
 const Bar = db.Bar;
 const User = db.User;
 const BarDuty = db.BarDuty;
@@ -80,6 +81,7 @@ exports.updateCleaning = (req, res) => {
                 barID: req.params.barID,
             }
         }).spread((affectedCount, affectedRows) => {
+            Telegram.changeCleaningStatus(req.params.barID, req.params.userID, req.body.have_to_clean);
             // Send all bars to Client
             res.status(200).send(JSON.stringify(affectedCount));
         }).catch(err => {
