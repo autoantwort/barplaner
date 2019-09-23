@@ -415,7 +415,13 @@ exports.barAdded = (bar) => {
 exports.changeCleaningStatus = (barId, userId, newHaveToCleanState) => {
     Bar.findByPk(barId).then(bar => {
         const end = bar.start.setHours(bar.start.getHours() + 12);
+        // bar is to old
         if (new Date() > end) {
+            return;
+        }
+        const start = bar.start.setDate(bar.start.getDate() - sendDaysBefore.reduce((l, r) => Math.max(l, r)));
+        // bar is to new
+        if (start > new Date()) {
             return;
         }
         const startText = "Du musst bei der " + bar.name + " am " + bar.start.toLocaleDateString("de-DE");
