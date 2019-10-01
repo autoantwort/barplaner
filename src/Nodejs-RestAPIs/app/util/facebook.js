@@ -170,7 +170,7 @@ exports.syncFacebookEvents = () => {
                         let createBar = () => {
                             BarUtil.addBar(barsToCreate[index], Number(numberSetting.value))
                                 .then(userIDs => {
-                                    console.log("Es müssen putzten : ", userIDs)
+                                    console.log("Es müssen putzen : ", userIDs)
                                         ++index;
                                     if (index < barsToCreate.length) {
                                         createBar();

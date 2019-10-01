@@ -120,6 +120,6 @@ open the sql dump and go to ``INSERT INTO `users` VALUES`` and copy the data(the
 
 regex: `\((?<id>[^,]+),'([^,]*)','([^,]*)','([^,]*)','([^,]*)','([^,]*)','([^,]*)',([^,]*),'([^,]*)',([^,]*),([^,]*),([^,\(\)]*),([^,\(\)]*)\),?`
 
-substitution: `{"id":$1,"name":"$2","password":"$3","email":"$4","bday":"$5","tel":"$6","handy":"$7","userlevl":$8,"icq":"$9","aktive":$10,"putzten":$11,"reminder":$12,"punkte_offset":$13},`
+substitution: `{"id":$1,"name":"$2","password":"$3","email":"$4","bday":"$5","tel":"$6","handy":"$7","userlevl":$8,"icq":"$9","aktive":$10,"putzen":$11,"reminder":$12,"punkte_offset":$13},`
 
 copy the result into the user.json file in the src/Nodejs-RestAPIs/app/old_data/ folder

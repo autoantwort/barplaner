@@ -95,7 +95,7 @@ exports.updateCleaning = (req, res) => {
         }
     }).then(result => {
         if (result === null) {
-            // man darf freiwillig putzten
+            // man darf freiwillig putzen
             if (Number(req.params.userID) === req.user.id && (req.body.have_to_clean == true || req.body.have_to_clean === undefined)) {
                 Bar.findByPk(req.params.barID).then(bar => {
                     if (bar.start > new Date()) {

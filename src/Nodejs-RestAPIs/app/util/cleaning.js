@@ -16,9 +16,9 @@ exports.computeCleaning = (barID, numberOfPersons) => {
         Bar.findByPk(barID).then(bar => {
             //console.log("---------------", ++what, "---------------");
             User.findAll({ where: { active: true }, raw: true }).then(users => {
-                // es können users.length viele Leute putzten, wenn jedes mal 
-                // numberOfPersons viele putzten, sollte man users.length/numberOfPersons * 3/7
-                // oft erstmal nicht mehr putzten müssen
+                // es können users.length viele Leute putzen, wenn jedes mal 
+                // numberOfPersons viele putzen, sollte man users.length/numberOfPersons * 3/7
+                // oft erstmal nicht mehr putzen müssen
                 let wieOftNicht = Math.round(users.length / numberOfPersons * 3 / 7);
                 //console.log("wieOftNicht", wieOftNicht);
                 //console.log("---------------", ++what, "---------------");
@@ -47,7 +47,7 @@ exports.computeCleaning = (barID, numberOfPersons) => {
                     }).then(duties => {
                         //console.log("---------------", ++what, "---------------");
                         let experienced_cleaner_present = false;
-                        // vielleicht putzten ja schon welche
+                        // vielleicht putzen ja schon welche
                         //console.log("---------------", ++what, "---------------");
                         duties.forEach(duty => {
                             if (duty.have_to_clean && duty.barID === barID) {
@@ -148,7 +148,7 @@ exports.computeCleaning = (barID, numberOfPersons) => {
                                         }
                                     }
                                     //console.log("---------------", ++what, "---------------");
-                                    // weitere putzter hinzufügen bis wir genug leute haben die putzten
+                                    // weitere putzter hinzufügen bis wir genug leute haben die putzen
                                     if (numberOfPersons > 0) {
                                         for (const user of users) {
                                             if (user !== undefined) {
