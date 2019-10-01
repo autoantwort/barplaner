@@ -48,7 +48,7 @@ bot.onText(/\/login/, msg => {
             user.update({
                 telegramID: msg.chat.id,
             }).then(() => {
-                bot.sendMessage(msg.chat.id, "Du hast dich erfolgreich eingeloggt! Hier wirst du über anstehende Bars informiert und ob du z.B. putzten musst.");
+                bot.sendMessage(msg.chat.id, "Du hast dich erfolgreich eingeloggt! Hier wirst du über anstehende Bars informiert und ob du z.B. putzen musst.");
             }).catch(err => {
                 console.error(err);
                 bot.sendMessage(msg.chat.id, "Fehler :( \n" + JSON.stringify(err));
@@ -144,9 +144,9 @@ function sendBarInfo(bar, userID) {
                         }
                         message += haveToClean[haveToClean.length - 1] + " ";
                     }
-                    message += "putzten.";
+                    message += "putzen.";
                 } else {
-                    message += "Du musst dieses Mal nicht putzten.";
+                    message += "Du musst dieses Mal nicht putzen.";
                 }
 
                 bot.sendMessage(d.user.telegramID, message).then(() => {
@@ -427,7 +427,7 @@ exports.changeCleaningStatus = (barId, userId, newHaveToCleanState) => {
         const startText = "Du musst bei der " + bar.name + " am " + bar.start.toLocaleDateString("de-DE");
         if (!newHaveToCleanState) {
             User.findByPk(userId).then(user => {
-                this.sendMessage(user, startText + " doch nicht mehr putzten.");
+                this.sendMessage(user, startText + " doch nicht mehr putzen.");
             }).catch(console.error);
         }
         BarDuty.findAll({
@@ -441,7 +441,7 @@ exports.changeCleaningStatus = (barId, userId, newHaveToCleanState) => {
             }],
         }).then(duties => {
             if (duties.length === 1) {
-                this.sendMessage(duties[0].user, startText + " aktuell alleine putzten.");
+                this.sendMessage(duties[0].user, startText + " aktuell alleine putzen.");
             } else {
                 for (let i = 0; i < duties.length; ++i) {
                     let message = startText + " nun mit ";
@@ -459,7 +459,7 @@ exports.changeCleaningStatus = (barId, userId, newHaveToCleanState) => {
                             }
                         }
                     }
-                    message += "putzten.";
+                    message += "putzen.";
                     this.sendMessage(duties[i].user, message);
                 }
             }
