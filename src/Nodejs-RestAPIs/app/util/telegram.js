@@ -419,12 +419,14 @@ exports.changeCleaningStatus = (barId, userId, newHaveToCleanState) => {
         if (new Date() > end) {
             return;
         }
-        const start = bar.start.setDate(bar.start.getDate() - sendDaysBefore.reduce((l, r) => Math.max(l, r)));
+        // do not change the original date
+        const start = new Date(bar.start);
+        start.setDate(start.getDate() - sendDaysBefore.reduce((l, r) => Math.max(l, r)));
         // bar is to new
         if (start > new Date()) {
             return;
         }
-        const startText = "Du musst bei der " + bar.name + " am " + bar.start.toLocaleDateString("de-DE");
+        const startText = "Du musst bei der " + bar.name + " am " + bar.start.getDate() + '.' + (bar.start.getMonth() + 1) + '.' + bar.start.getFullYear();
         if (!newHaveToCleanState) {
             User.findByPk(userId).then(user => {
                 this.sendMessage(user, startText + " doch nicht mehr putzen.");
