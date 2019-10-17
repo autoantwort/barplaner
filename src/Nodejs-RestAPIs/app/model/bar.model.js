@@ -25,6 +25,11 @@ module.exports = (sequelize, Sequelize) => {
             allowNull: true,
             defaultValue: null,
         },
+        facebookCoverImageURL: {
+            type: Sequelize.STRING(512),
+            allowNull: true,
+            defaultValue: null,
+        },
     });
     return Bar;
 };
