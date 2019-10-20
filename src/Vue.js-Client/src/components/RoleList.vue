@@ -9,9 +9,9 @@
                 <tr>
                   <th scope="col">Name</th>
                   <th scope="col">Aktiv</th>
-                  <th scope="col">UserAdmin</th>
-                  <th scope="col">CleaningAdmin</th>
-                  <th scope="col">BarAdmin</th>
+                  <th scope="col" v-for="role in roles" :key="role.name" :title="role.description">
+                    {{role.name}}
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -19,27 +19,13 @@
                   <td>{{user.name}}</td>
                   <td v-if="user.active">Ja</td>
                   <td v-else>Nein</td>
-                  <th>
+                  <td v-for="role in roles" :key="role.name" :title="role.description">
                     <input
                       type="checkbox"
-                      v-on:click="updateRole(user.id,'UserAdmin',$event)"
-                      v-model="user.userAdmin"
+                      v-on:click="updateRole(user.id,role.name,$event)"
+                      v-model="user.roles[role.name]"
                     >
-                  </th>
-                  <th>
-                    <input
-                      type="checkbox"
-                      v-on:click="updateRole(user.id,'CleaningAdmin',$event)"
-                      v-model="user.cleaningAdmin"
-                    >
-                  </th>
-                  <th>
-                    <input
-                      type="checkbox"
-                      v-on:click="updateRole(user.id,'BarAdmin',$event)"
-                      v-model="user.barAdmin"
-                    >
-                  </th>
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -65,16 +51,17 @@ export default {
   data() {
     return {
       users: [],
-      user: {}
+      roles: [],
     };
   },
   methods: {
     /* eslint-disable no-console */
     retrieveUser() {
       http
-        .get("/users/roles")
+        .get("/users/roleTable")
         .then(response => {
-          this.users = response.data.sort((r, l) => {
+          this.roles = response.data.roles;
+          this.users = response.data.user.sort((r, l) => {
             if (l.active < r.active) {
               return -1;
             } else if (l.active > r.active) {
@@ -83,17 +70,6 @@ export default {
               return 0;
             }
           });
-          for (let i = 0; i < this.users.length; i++) {
-            this.users[i].userAdmin = this.users[i].roles.some(
-              r => r.roleName === "UserAdmin"
-            );
-            this.users[i].barAdmin = this.users[i].roles.some(
-              r => r.roleName === "BarAdmin"
-            );
-            this.users[i].cleaningAdmin = this.users[i].roles.some(
-              r => r.roleName === "CleaningAdmin"
-            );
-          }
         })
         .catch(e => {
           console.log(e);

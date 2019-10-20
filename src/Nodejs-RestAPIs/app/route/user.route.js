@@ -28,4 +28,6 @@ module.exports = function(app) {
     app.get('/api/user/:userID/roles', user.getRoles);
     // get all roles 
     app.get('/api/users/roles', user.findAllRoles);
+    // get all roles as table
+    app.get('/api/users/roleTable', user.userRolesTable);
 };

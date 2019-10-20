@@ -188,6 +188,34 @@ exports.findAllRoles = (req, res) => {
     });
 };
 
+exports.userRolesTable = (req, res) => {
+    User.findAll({
+        raw: true,
+    }).then(user => {
+        Role.findAll({
+            raw: true
+        }).then(roles => {
+            let map = {};
+            for (let i = 0; i < user.length; ++i) {
+                map[user[i].id] = user[i];
+                user[i].roles = {};
+                roles.forEach(role => {
+                    user[i].roles[role.name] = false;
+                })
+            }
+            UserRoles.findAll({ raw: true }).then(userRoles => {
+                userRoles.forEach(userRole => {
+                    map[userRole.userId].roles[userRole.roleName] = true;
+                });
+                res.send({
+                    roles: roles,
+                    user: user,
+                });
+            }).catch(err => res.status(500).send(err));
+        }).catch(err => res.status(500).send(err));
+    }).catch(err => res.status(500).send(err));
+};
+
 // Find a User by Id
 exports.findById = (req, res) => {
     User.findByPk(req.params.userID, {
