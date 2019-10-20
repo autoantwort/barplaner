@@ -18,10 +18,26 @@ const sequelize = new Sequelize(env.database, env.username, env.password, {
     storage: env.databaseFile
 });
 
+const wordpressDB = new Sequelize(env.wordpress.database, env.wordpress.username, env.wordpress.password, {
+    host: env.wordpress.host,
+    dialect: env.wordpress.dialect,
+    logging: (e, t) => {},
+});
+wordpressDB
+    .authenticate()
+    .then(() => {
+        console.log('Connection to the wordpress database has been established successfully.');
+    })
+    .catch(err => {
+        console.error('Unable to connect to the wordpress database:', err);
+    });
+
 const db = {};
 
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
+
+db.Wordpress = wordpressDB;
 
 //Models/tables
 db.customers = require('../model/customer.model.js')(sequelize, Sequelize);

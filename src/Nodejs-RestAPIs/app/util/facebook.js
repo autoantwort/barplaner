@@ -89,7 +89,7 @@ exports.getFacebookEvents = () => {
         } else {
             AccessToken.reload().then(() => {
                 PageID.reload().then(() => {
-                    axios.get(PageID.value + "/events?fields=start_time,end_time,description,id,interested_count,is_canceled,is_draft,maybe_count,name,declined_count,noreply_count,type&access_token=" + AccessToken.value).then(response => {
+                    axios.get(PageID.value + "/events?fields=start_time,end_time,description,id,interested_count,is_canceled,is_draft,maybe_count,name,declined_count,noreply_count,type,cover&access_token=" + AccessToken.value).then(response => {
                         resolve(response.data.data); // the events array in saved in a data property
                     }).catch(err => reject(err.response.data));
                 });
@@ -148,6 +148,7 @@ exports.syncFacebookEvents = () => {
                                 start: event.start,
                                 end: event.end,
                                 facebookEventID: event.id,
+                                facebookCoverImageURL: event.cover.source,
                                 public: event.type == "public",
                             });
                         }
@@ -160,6 +161,7 @@ exports.syncFacebookEvents = () => {
                             start: event.start,
                             end: event.end,
                             facebookEventID: event.id,
+                            facebookCoverImageURL: event.cover.source,
                             public: event.type == "public",
                         });
                     }
