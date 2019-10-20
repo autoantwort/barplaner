@@ -20,6 +20,13 @@ const env = {
     baseURL: "http://localhost:8080",
     staticVue: false,
     gitLabAccessToken: 'Your gitlab access token',
+    wordpress: {
+        database: 'wordpress',
+        username: 'barplaner2',
+        password: '***',
+        host: '***',
+        dialect: 'mysql',
+    },
 };
 
 module.exports = env;

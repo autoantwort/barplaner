@@ -1,5 +1,6 @@
 const db = require('../config/db.config.js');
 const Telegram = require('./telegram.js');
+const Newsletter = require('./newsletter.js');
 const Axios = require("axios");
 
 const Bar = db.Bar;
@@ -14,6 +15,7 @@ const Util = require('../util/cleaning');
 exports.addBar = (barData, numberOfPersonsToClean) => {
     return new Promise((resolve, reject) => {
         Bar.create(barData).then(bar => {
+            Newsletter.sendEmailForBar(bar);
             User.findAll({
                 where: {
                     active: true
