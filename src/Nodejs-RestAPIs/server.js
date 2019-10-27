@@ -2,6 +2,7 @@
 
 var express = require('express');
 var app = express();
+var expressWs = require('express-ws')(app);
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 var env = require('./app/config/env');
@@ -46,6 +47,8 @@ if (typeof env.facebookAccessToken === "string" && env.facebookAccessToken.lengt
 }
 require("./app/util/telegram");
 require("./app/util/gitlab");
+const remoteVolumeControl = require("./app/util/remoteVolumeControl");
+remoteVolumeControl.registerClients(app);
 
 const crypto = require('crypto');
 
@@ -127,6 +130,7 @@ app.post('/api/logout', (req, res) => {
         .then(() => res.send("logged out"))
         .catch(err => releaseEvents.status(500).send("Error -> " + err));
 });
+remoteVolumeControl.registerMasters(app);
 require('./app/route/user.route.js')(app);
 require('./app/route/bar.route.js')(app);
 require('./app/route/duty.route.js')(app);
