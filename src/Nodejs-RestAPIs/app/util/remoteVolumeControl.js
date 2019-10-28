@@ -22,6 +22,8 @@ exports.registerClients = function(app) {
                 clients[name] = ws;
             } else if (msg.startsWith("Value:")) {
                 if (name !== "unnamed") {
+                    // save last volume, so that new mastern know the current volume
+                    clients[name].lastValue = msg.substring(6);
                     sendMessageToController("Value:" + name + ":" + msg.substring(6));
                 }
             }
@@ -35,10 +37,17 @@ exports.registerClients = function(app) {
 exports.registerMasters = app => {
     app.ws('/volumeMaster', (ws, req) => {
         controllers.push(ws);
+        // send all know clients to the new master
+        for (let c in clients) {
+            ws.send("Add:" + c);
+            ws.send("Value:" + c + ":" + clients[c].lastValue);
+        }
         ws.on('message', msg => {
+            // master setting volume, format: <name>:<value>
             const strings = msg.split(":");
             if (clients[strings[0]] !== undefined) {
                 clients[strings[0]].send(strings[1]);
+                clients[strings[0]].lastValue = strings[1];
                 controllers.filter(c => c !== ws && c.readyState === 1 /*WebSocket.OPEN*/ ).forEach(c => {
                     c.send("Value:" + msg);
                 });
