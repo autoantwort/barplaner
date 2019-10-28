@@ -10,9 +10,10 @@
         <table class="table">
           <thead>
             <tr>
-              <th style="width: 30%" scope="col">Device</th>
+              <th style="width: 25%" scope="col">Device</th>
               <th style="width: 10%" scope="col"></th>
-              <th style="width: 60%" scope="col">System Volume</th>
+              <th style="width: 55%" scope="col">System Volume</th>
+              <th style="width: 10%" scope="col"></th>
             </tr>
           </thead>
           <tbody>
@@ -26,8 +27,16 @@
                   to="100"
                   style="width: 100%"
                   v-model="client.value"
-                  @input="updateDevice(client.name,$event.target.value)"
+                  @input="updateDevice(client,$event.target.value)"
                 />
+              </td>
+                <td style="padding: .5rem; padding-left: 0px; padding-right: 0px;">
+                <div class="btn-group btn-group-sm" role="group" aria-label="First group">
+                  <button type="button" class="btn btn-secondary" :disabled="client.value<1"  v-on:click="updateDevice(client, client.value = Math.max(0, client.value-5))" >-5</button>
+                  <button type="button" class="btn btn-secondary" :disabled="client.value<1"  v-on:click="updateDevice(client, --client.value)" >-1</button>
+                  <button type="button" class="btn btn-secondary" :disabled="client.value>99" v-on:click="updateDevice(client, ++client.value)" >+1</button>
+                  <button type="button" class="btn btn-secondary" :disabled="client.value>99" v-on:click="updateDevice(client, client.value = Math.min(100, client.value-(-5)))" >+5</button>
+                </div>
               </td>
             </tr>
           </tbody>
@@ -48,8 +57,8 @@ export default {
   },
   methods: {
     /* eslint-disable no-console */
-    updateDevice(name, value) {
-      this.webSocket.send(name + ":" + value / 100);
+    updateDevice(client, value) {
+      this.webSocket.send(client.name + ":" + value / 100);
     },
     initialize() {
       this.webSocket.onopen = () => {
@@ -69,7 +78,7 @@ export default {
           const name = msg[1];
           const c = this.clients.find(c => c.name === name);
           if (c !== undefined) {
-            this.clients.slice(this.clients.indexOf(c), 1);
+            this.clients.splice(this.clients.indexOf(c), 1);
           }
         } else if (msg[0] === "Rename") {
           const c = this.clients.find(c => c.name === msg[1]);
@@ -79,7 +88,7 @@ export default {
         } else if (msg[0] === "Value") {
           const c = this.clients.find(c => c.name === msg[1]);
           if (c !== undefined) {            
-            c.value = Number(msg[2]);
+            c.value = (Number(msg[2]) * 100).toFixed(0);
           }
         }
       };
