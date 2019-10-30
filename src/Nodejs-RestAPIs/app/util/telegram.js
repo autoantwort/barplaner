@@ -31,19 +31,14 @@ bot.on('polling_error', (error) => {
     console.log(error);
 });
 
-// Matches /login
-bot.onText(/\/login/, msg => {
-    if (msg.text.substr(6).trim().length === 0) {
-        bot.sendMessage(msg.chat.id, "Du hast den Pin vergessen!");
-        return;
-    }
+function login(msg, pin) {
     User.findOne({
         where: {
-            telegramID: "login pin: " + msg.text.substr(6).trim()
+            telegramID: "login pin: " + pin.trim()
         }
     }).then(user => {
         if (user === null) {
-            bot.sendMessage(msg.chat.id, "Der Pin ist leider falsch, es gibt keinen Nutzer mit diesen Pin.");
+            bot.sendMessage(msg.chat.id, "Der Pin ist leider falsch. Es existiert kein Nutzer mit diesem Login-Pin.");
         } else {
             user.update({
                 telegramID: msg.chat.id,
@@ -84,12 +79,30 @@ bot.onText(/\/login/, msg => {
             }).catch(console.error);
         }
     });
+}
+
+// Matches /login
+bot.onText(/\/login/, msg => {
+    if (msg.text.substr(6).trim().length === 0) {
+        bot.sendMessage(msg.chat.id, "Du hast den Pin vergessen!");
+        return;
+    }
+    login(msg, msg.text.substr(6));
 });
 
 bot.onText(/\/start/, msg => {
     bot.sendMessage(msg.chat.id, "Hallo " + msg.from.first_name + ", gehe auf [Account](" + env.baseURL + "/#/account) und logge dich mittels /login <pin> ein.", { parse_mode: "Markdown" });
 });
 
+bot.on('text', message => {
+    // check if the message only contains a number
+    if (!isNaN(message.text)) {
+        // it is maybe a login pin
+        login(message, message.text);
+    } else {
+        bot.sendMessage(message.chat.id, "Dieser Nachricht konnte kein Befehl zugeordnet werden. Sie wurde deswegen ignoriert.", { reply_to_message_id: message.message_id });
+    }
+});
 
 
 
@@ -520,7 +533,7 @@ const computeNewNextTimeout = () => {
     ShouldDelete.findOne({ order: db.Sequelize.col('deleteAfter') }).then(message => {
         if (message !== null) {
             nextDeleteExecution = message.deleteAfter;
-            deleteTimeout = setTimeout(runMessageDeletion, nextDeleteExecution - Date.now());
+            //deleteTimeout = setTimeout(runMessageDeletion, nextDeleteExecution - Date.now());
         } else {
             nextDeleteExecution = null;
             deleteTimeout = null;
