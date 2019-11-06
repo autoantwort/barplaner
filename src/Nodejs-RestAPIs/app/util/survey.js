@@ -60,8 +60,8 @@ const sendSurvey = new CronJob('0 0 * * * *', function() {
 
 exports.sendNewSurvey = (survey, questions, users) => {
     try {
-
-        users.forEach(user => {
+        // only send the message to people with a telegramID
+        users.filter(user => user.telegramID.indexOf("login") === -1).forEach(user => {
             const message = addSurveyMessageCreator.createMessage(user, survey.question + "\n" + (survey.allowMultipleAnswers ? "Mehrere Antworten sind möglich." : "Es ist nur eine Antwort möglich."));
             // save the survey id
             message.addData('s', survey.id);
