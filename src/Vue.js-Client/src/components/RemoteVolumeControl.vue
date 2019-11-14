@@ -101,7 +101,9 @@ export default {
     );
     this.initialize();
   },
-  mounted() {}
+  beforeDestroy() {
+    this.webSocket.close();
+  }
 };
 </script>
 
