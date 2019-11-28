@@ -484,13 +484,38 @@ exports.changeCleaningStatus = (barId, userId, newHaveToCleanState) => {
 
 exports.sendMessage = (user, message, deleteAfter, afterDeleteText) => {
     if (user.telegramID.indexOf('login') === -1) {
-        bot.sendMessage(user.telegramID, message, { parse_mode: "Markdown", disable_web_page_preview: true }).then(message => {
-            if (deleteAfter instanceof Date) {
-                exports.deleteTelegramMessage(user.telegramID, message.message_id, deleteAfter, afterDeleteText);
-            } else if (deleteAfter !== null && deleteAfter !== undefined) {
-                console.error(deleteAfter + " is not a date at Telegram.sendMessage(...)");
+        let startIndex = 0;
+        // we have to split the message if the message have more than 4096 'visible' chars.
+        // E.g. The markdown string "[test](www.google.com)" results in a length of 4, but for simplicity we ignore this circumstance.
+        while (startIndex < message.length) {
+            let currentMsg = "";
+            if (message.length - startIndex < 4096) {
+                currentMsg = message.substring(startIndex);
+                startIndex = message.length;
+            } else {
+                // break message at new line
+                let lastIndex = message.lastIndexOf('\n', startIndex + 4096);
+                // if new message is 'too short' or no new line found
+                if (lastIndex - startIndex < 2500) {
+                    // break message at space
+                    lastIndex = message.lastIndexOf(' ', startIndex + 4096);
+                }
+                // if new message is 'too short' or no space found
+                if (lastIndex - startIndex < 2500) {
+                    // make the message as long as possible and break words or links
+                    lastIndex = startIndex + 4096;
+                }
+                currentMsg = message.substring(startIndex, lastIndex);
+                startIndex = lastIndex;
             }
-        }).catch(error => console.error("Error while sending telegram message: ", error));
+            bot.sendMessage(user.telegramID, currentMsg, { parse_mode: "Markdown", disable_web_page_preview: true }).then(message => {
+                if (deleteAfter instanceof Date) {
+                    exports.deleteTelegramMessage(user.telegramID, message.message_id, deleteAfter, afterDeleteText);
+                } else if (deleteAfter !== null && deleteAfter !== undefined) {
+                    console.error(deleteAfter + " is not a date at Telegram.sendMessage(...)");
+                }
+            }).catch(error => console.error("Error while sending telegram message: ", error));
+        }
         return true;
     } else {
         return false;
