@@ -233,19 +233,65 @@ exports.findById = (req, res) => {
 exports.update = (req, res) => {
     let realFunc = (data) => {
         let createUser = function(hash) {
-            // TODO: if update active status, add/remove the user from bars in the future             
             let update = {...data, password: hash }; //{ name: req.body.name, email: req.body.email, phone: req.body.phone, telegramID: req.body.telegramID, active: req.body.active, password: hash };
             //remove undefined properties, otherwise update() will set the entries in the table to null
             Object.keys(update).forEach(key => update[key] === undefined && delete update[key]);
-            User.update(update, {
-                where: {
-                    id: req.params.userID
+            User.findByPk(req.params.userID, { attributes: ['active'] }).then(user => {
+                User.update(update, {
+                    where: {
+                        id: req.params.userID
+                    }
+                }).then(() => {
+                    res.status(200).send(update);
+                }).catch(err => {
+                    res.status(400).send(err);
+                });
+                // check if users active status changes a bar duties should be created/deleted
+                if ((update.active == true || update.active == false ) && user.active != update.active) {
+                    if (update.active) {
+                        // we have to add bar duties
+                        // get all new bars
+                        Bar.findAll({
+                            where: {
+                                start: {
+                                    [Op.gt]: new Date(),
+                                },
+                            },
+                            attributes: ['id'],
+                        }).then(bars => {
+                            // create bar duty for every bar
+                            bars.forEach(bar => {
+                                // if it is already there, we get an error, but we ignore the result
+                                BarDuty.create({
+                                    barID: bar.id,
+                                    userID: req.params.userID,
+                                }).catch(err => {});
+                            });
+                        }).catch(console.error);
+                    } else {
+                        // delete BarDuties in the future if state is 'no_info'
+                        BarDuty.findAll({
+                            where: {
+                                userID: req.params.userID,
+                                state: 'no_info',
+                            },
+                            attributes: ['userID', 'barID'],
+                            include: [{
+                                model: Bar,
+                                where: {
+                                    start: {
+                                        [Op.gt]: new Date(),
+                                    },
+                                },
+                                required: true,
+                            }],
+                        }).then(duties => {
+                            // delete all found duties
+                            duties.forEach(duty => duty.destroy().catch(console.error));
+                        }).catch(console.error);
+                    }
                 }
-            }).then(() => {
-                res.status(200).send(update);
-            }).catch(err => {
-                res.status(400).send(err);
-            });
+            }).catch(err => res.status(400).send(err));
         };
         if (req.body.password === undefined || req.body.password.length === 0) {
             createUser();

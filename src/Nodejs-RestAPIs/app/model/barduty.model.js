@@ -49,5 +49,13 @@ module.exports = (sequelize, Sequelize, Bar, User) => {
         foreignKey: 'userID',
         constraints: false,
     });
+    Bar.hasMany(Barduty, {
+        foreignKey: 'barID',
+        constraints: false,
+    });
+    Barduty.belongsTo(Bar, {
+        foreignKey: 'barID',
+        constraints: false,
+    });
     return Barduty;
 };
