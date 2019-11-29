@@ -20,6 +20,12 @@ const env = {
     baseURL: "http://localhost:8080",
     staticVue: false,
     gitLabAccessToken: 'Your gitlab access token',
+    gitLabBrowser: {
+        host: "git.rwth-aachen.de",
+        projectId: "31804",
+        convertedToPdf: ["doc", "docx", "odt", "wbk", "md"],
+        jobName: "docToPdf",
+    },
     wordpress: {
         database: 'wordpress',
         username: 'barplaner2',

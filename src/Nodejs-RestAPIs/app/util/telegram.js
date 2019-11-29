@@ -100,7 +100,9 @@ bot.on('text', message => {
         // it is maybe a login pin
         login(message, message.text);
     } else {
-        bot.sendMessage(message.chat.id, "Dieser Nachricht konnte kein Befehl zugeordnet werden. Sie wurde deswegen ignoriert.", { reply_to_message_id: message.message_id });
+        if (message.chat.type === "private" && !/\/(files?|datei(en)?|pdfs?|git|gitlab)/.test(message.text)) {
+            bot.sendMessage(message.chat.id, "Dieser Nachricht konnte kein Befehl zugeordnet werden. Sie wurde deswegen ignoriert.", { reply_to_message_id: message.message_id });
+        }
     }
 });
 
