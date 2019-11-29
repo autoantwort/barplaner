@@ -232,7 +232,6 @@ exports.findById = (req, res) => {
 // Update a User
 exports.update = (req, res) => {
     let realFunc = (data) => {
-        var user = req.body;
         let createUser = function(hash) {
             // TODO: if update active status, add/remove the user from bars in the future             
             let update = {...data, password: hash }; //{ name: req.body.name, email: req.body.email, phone: req.body.phone, telegramID: req.body.telegramID, active: req.body.active, password: hash };
@@ -266,7 +265,7 @@ exports.update = (req, res) => {
         return;
     }
     if (req.params.userID == req.user.id && req.body.experienced_cleaner === undefined) {
-        realFunc({ name: req.body.name, email: req.body.email, phone: req.body.phone, telegramID: req.body.telegramID, active: req.body.active, birthday: req.body.birthday, });
+        realFunc({ name: req.body.name, email: req.body.email, phone: req.body.phone, telegramID: req.body.telegramID, active: req.body.active, birthday: req.body.birthday, gitLabID: req.body.gitLabID, });
     } else {
         if (req.body.experienced_cleaner !== undefined) {
             UserRoles.findOne({
@@ -292,7 +291,7 @@ exports.update = (req, res) => {
                 if (result === null) {
                     res.status(403).send("You dont have this permission");
                 } else {
-                    realFunc({ name: req.body.name, email: req.body.email, phone: req.body.phone, telegramID: req.body.telegramID, active: req.body.active, birthday: req.body.birthday, });
+                    realFunc({ name: req.body.name, email: req.body.email, phone: req.body.phone, telegramID: req.body.telegramID, active: req.body.active, birthday: req.body.birthday, gitLabID: req.body.gitLabID, });
                 }
             }).catch(err => res.status(500).send("Error -> " + err));
         }

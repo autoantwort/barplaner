@@ -5,7 +5,7 @@
         <form class="was-validated" id="form">
           <div class="form-group">
             <label for="name">Name</label>
-            <input type="password" style="display:none;">
+            <input type="password" style="display:none;" />
             <input
               type="text"
               class="form-control"
@@ -15,7 +15,7 @@
               required
               pattern=".{2,}"
               autocomplete="new-password"
-            >
+            />
             <div class="invalid-feedback">Minimum two characters.</div>
           </div>
           <div class="form-group">
@@ -26,16 +26,16 @@
               id="password"
               v-model="password"
               pattern=".{8,}"
-            >
+            />
             <div class="invalid-feedback">Minimum eight characters.</div>
           </div>
           <div class="form-group">
             <label for="email">Email</label>
-            <input type="email" class="form-control" id="email" v-model="user.email">
+            <input type="email" class="form-control" id="email" v-model="user.email" />
           </div>
           <div class="form-group">
             <label for="phone">Telefonummer</label>
-            <input type="text" class="form-control" id="phone" v-model="user.phone">
+            <input type="text" class="form-control" id="phone" v-model="user.phone" />
           </div>
           <div class="form-group">
             <label for="birthday">Geburtstag</label>
@@ -46,17 +46,45 @@
               v-model="user.birthday"
               pattern="[0-3]\d\.[0-1]\d\.[1-2]\d\d\d"
               title="dd.mm.yyyy"
-            >
+            />
             <div class="invalid-feedback">Format: dd.mm.yyyy</div>
           </div>
 
           <div class="form-group">
+            <label for="gitLabId">GitLab User ID</label>
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="https://git.rwth-aachen.de/profile"
+                  class="btn btn-outline-link"
+                >My GitLab User ID</a>
+              </div>
+              <input
+                type="text"
+                autocomplete="off"
+                placeholder="Open the left link and determine your User ID"
+                style="margin-right: 0px"
+                class="form-control"
+                id="gitLabId"
+                v-model="user.gitLabID"
+                pattern="\d+"
+              />
+              <div class="invalid-feedback">The GitLab User ID is a number.</div>
+            </div>
+          </div>
+
+          <div class="form-group">
             <label for="active">Active</label>
-            <input type="checkbox" class="form-control" id="active" v-model="user.active">
+            <input type="checkbox" class="form-control" id="active" v-model="user.active" />
           </div>
           <div class="form-group" v-if="user.telegramID.indexOf('login') === 0">
             <label>Dein Telegram Login Pin: {{user.telegramID.substr(11)}}</label>
-            <a href="tg://resolve?domain=symposion_bot&start=true"  class="btn btn-success ml-4">Start Bot</a>
+            <a
+              href="tg://resolve?domain=symposion_bot&start=true"
+              class="btn btn-success ml-4"
+            >Start Bot</a>
           </div>
           <div class="mt-2 mb-2 text-danger" v-if="errorString.length !== 0">{{errorString}}</div>
           <button type="button" v-on:click="updateUser" class="btn btn-success">Update information</button>
@@ -83,6 +111,7 @@ export default {
         birthday: "",
         active: false,
         telegramID: "",
+        gitLabID: ""
       },
       errorString: "",
       password: "",
@@ -103,7 +132,8 @@ export default {
         email: this.user.email,
         phone: this.user.phone,
         active: this.user.active,
-        birthday: this.user.birthday
+        birthday: this.user.birthday,
+        gitLabID: this.user.gitLabID
       };
 
       http
@@ -116,16 +146,19 @@ export default {
           this.user.email = response.data.email;
           this.user.active = response.data.active;
           this.user.birthday = response.data.birthday;
+          this.user.gitLabID = response.data.gitLabID;
           Roles.setUser(this.user);
           console.log("result : ", response.data);
           setTimeout(() => (this.success = false), 2000);
         })
         .catch(e => {
           console.log(JSON.parse(JSON.stringify(e)));
-          if (e.response.status === 400) {            
+          if (e.response.status === 400) {
             this.success = false;
             this.errorString =
-              e.response.data.errors[0].type + ": " + e.response.data.errors[0].message;
+              e.response.data.errors[0].type +
+              ": " +
+              e.response.data.errors[0].message;
           }
         });
     }
@@ -138,4 +171,12 @@ export default {
 </script>
 
 <style>
+.btn-outline-link {
+  color: #007bff;
+  border-color: #28a745;
+}
+.btn-outline-link:hover {
+  color: #0056b3;
+  text-decoration: underline;
+}
 </style>
