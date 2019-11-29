@@ -114,7 +114,7 @@ const fileBrowserMessageCreator = Telegram.registerResponseSystem("gitBrowser", 
         // https://docs.gitlab.com/ee/api/jobs.html#download-a-single-artifact-file-from-specific-tag-or-branch
         const path = (data.path.endsWith(".md") ? data.path : data.path.substring(0, data.path.lastIndexOf("."))) + ".pdf";
         fileOptions.filename = path.substring(data.path.lastIndexOf('/') + 1);
-        axios.get("/projects/" + env.gitLabBrowser.projectId + "/jobs/artifacts/master/raw/" + path + "?job=" + env.gitLabBrowser.jobName, { responseType: 'stream' }).then(res => {
+        axios.get("/projects/" + env.gitLabBrowser.projectId + "/jobs/artifacts/master/raw/" + encodeURIComponent(path) + "?job=" + env.gitLabBrowser.jobName, { responseType: 'stream' }).then(res => {
             Telegram.bot.sendDocument(message.chatId, res.data, {}, fileOptions).catch(console.error);
             Telegram.deleteTelegramMessage(message.chatId, message.messageId, new Date());
         }).catch(console.error);
