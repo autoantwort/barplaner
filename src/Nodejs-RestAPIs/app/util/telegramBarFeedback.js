@@ -2,13 +2,35 @@ const db = require('../config/db.config.js');
 const env = require('../config/env');
 const CronJob = require('cron').CronJob;
 const Telegram = require('./telegram');
+const SettingsController = require('../controller/setting.controller');
 
 
 const Bar = db.Bar;
 const User = db.User;
 const BarDuty = db.BarDuty;
 const Setting = db.Setting;
+const Role = db.Role;
 const Op = db.Sequelize.Op;
+
+let SendDaysBefore = null;
+
+db.addSyncCallback(() => {
+    // after 5 seconds the BarAdmin role should be created if the role does not exists
+    setTimeout(() => {}, 5000);
+    Role.findByPk('BarAdmin').then(role => {
+        Setting.findCreateFind({
+            where: { name: "telegramBarFeedbackDaysBefore" },
+            defaults: {
+                name: "telegramBarFeedbackDaysBefore",
+                permission: role.name,
+                description: "On wich days before the bar the users should get a message where they can say weather they will come. Regex format is: (\d+ *, *)*\d+",
+                value: "10, 7, 5, 3, 2, 1, 0",
+            }
+        }).then(s => {
+            SendDaysBefore = s[0];
+        }).catch(console.error);
+    }).catch(console.error);
+});
 
 const bot = Telegram.bot;
 
@@ -199,10 +221,10 @@ const addBarMessageCreator = Telegram.registerResponseSystem("addBar", (message)
 
 
 let lastSentDate;
-let sendDaysBefore = [10, 7, 5, 3, 2, 1, 0];
+const defaultSendDaysBefore = [10, 7, 5, 3, 2, 1, 0];
 // check for bars, only start when the DB is in sync, so that in the setIntervall call the Bar.find will work directly 
 db.addSyncCallback(() => {
-    let checkForEventsAndSend = () => {
+    const checkForEventsAndSend = sendDaysBefore => {
         let daysAhead = new Date();
         daysAhead.setDate(daysAhead.getDate() + 15);
         Bar.findAll({
@@ -242,8 +264,20 @@ db.addSyncCallback(() => {
     };
     // every day at 3 pm
     const issueCronJob = new CronJob('00 00 15 * * *', function() {
-        checkForEventsAndSend();
-    }, null, true);
+        if (SendDaysBefore === null) {
+            checkForEventsAndSend(defaultSendDaysBefore);
+        } else {
+            SendDaysBefore.reload().then(() => {
+                try {
+                    let daysBefore = JSON.parse('[' + SendDaysBefore.value + ']');
+                    checkForEventsAndSend(daysBefore);
+                } catch (e) {
+                    console.error("The value of the setting telegramBarFeedbackDaysBefore has the wrong format: ", SendDaysBefore.value);
+                    checkForEventsAndSend(defaultSendDaysBefore);
+                }
+            });
+        }
+    }, null, true, "Europe/Berlin");
 });
 
 exports.barAdded = (bar) => {
