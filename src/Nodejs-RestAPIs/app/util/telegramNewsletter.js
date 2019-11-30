@@ -64,7 +64,7 @@ TelegramNewsletter.findAll().then(values => {
 });
 
 Telegram.bot.onText(/\/newsletter/, msg => {
-    const text = msg.text.substring(msg.text.indexOf("/newsletter") + "/newsletter".length).trim();
+    const text = msg.text.substring(msg.text.indexOf(' ', msg.text.indexOf("/newsletter"))).trim();
     const chatId = msg.chat.id;
     if (text === "off") {
         TelegramNewsletter.findByPk(chatId).then(value => {
