@@ -1,18 +1,9 @@
 const db = require('../config/db.config.js');
 const env = require('../config/env');
-const CronJob = require('cron').CronJob;
 
-
-const Bar = db.Bar;
 const User = db.User;
-const UserRoles = db.UserRoles;
-const BarDuty = db.BarDuty;
-const Role = db.Role;
-const Setting = db.Setting;
 const Op = db.Sequelize.Op;
 const ShouldDelete = db.ShouldDelete;
-
-
 
 const TOKEN = env.telegramAccessToken;
 const TelegramBot = require('node-telegram-bot-api');
@@ -23,71 +14,10 @@ const options = {
 };
 const bot = new TelegramBot(TOKEN, options);
 
-
-
 console.log("## start bot, polling : ", bot.isPolling());
 
 bot.on('polling_error', (error) => {
     console.log(error);
-});
-
-function login(msg, pin) {
-    User.findOne({
-        where: {
-            telegramID: "login pin: " + pin.trim()
-        }
-    }).then(user => {
-        if (user === null) {
-            bot.sendMessage(msg.chat.id, "Der Pin ist leider falsch. Es existiert kein Nutzer mit diesem Login-Pin.");
-        } else {
-            user.update({
-                telegramID: msg.chat.id,
-            }).then(() => {
-                bot.sendMessage(msg.chat.id, "Du hast dich erfolgreich eingeloggt! Hier wirst du über anstehende Bars informiert und ob du z.B. putzen musst.");
-            }).catch(err => {
-                console.error(err);
-                bot.sendMessage(msg.chat.id, "Fehler :( \n" + JSON.stringify(err));
-            });
-            // send the newest bars:
-            let daysAhead = new Date();
-            daysAhead.setDate(daysAhead.getDate() + 7);
-            Bar.findAll({
-                where: {
-                    start: {
-                        [Op.and]: {
-                            [Op.gt]: new Date(),
-                            [Op.lt]: daysAhead
-                        }
-                    }
-
-                }
-            }).then(bars => {
-                if (bars.length !== 0) {
-                    let index = 0;
-                    let sendInfo = () => {
-                        sendBarInfo(bars[index], user.id)
-                            .then(() => {
-                                ++index;
-                                if (index < bars.length) {
-                                    sendInfo();
-                                }
-                            })
-                            .catch(console.error)
-                    };
-                    sendInfo();
-                }
-            }).catch(console.error);
-        }
-    });
-}
-
-// Matches /login
-bot.onText(/\/login/, msg => {
-    if (msg.text.substr(6).trim().length === 0) {
-        bot.sendMessage(msg.chat.id, "Du hast den Pin vergessen!");
-        return;
-    }
-    login(msg, msg.text.substr(6));
 });
 
 bot.onText(/\/start/, msg => {
@@ -106,77 +36,6 @@ bot.on('text', message => {
     }
 });
 
-
-
-
-
-
-function sendBarInfo(bar, userID) {
-    return new Promise((resolve, reject) => {
-        let userWhere = {};
-        if (userID !== undefined) {
-            userWhere.userID = userID;
-        }
-        BarDuty.findAll({
-            where: {
-                ...userWhere,
-                barID: bar.id,
-            },
-            include:  [{
-                model: User
-            }]
-        }).then(duties => {
-            const now = new Date();
-            now.setHours(0, 0, 0, 0);
-            const barDate = new Date(bar.start);
-            barDate.setHours(0, 0, 0, 0);
-            let dayDiff = (now - barDate) / 1000 / 60 / 60 / 24;
-            if (dayDiff === 0) {
-                var dayText = "heute";
-            } else if (dayDiff === 1) {
-                var dayText = "morgen";
-            } else if (dayDiff === 2) {
-                var dayText = "übermorgen";
-            } else {
-                var dayText = "am " + bar.start.getDate() + '.' + (bar.start.getMonth() + 1) + '.' + bar.start.getFullYear();
-            }
-            duties.filter(d => d.user.telegramID.indexOf("login") === -1 && d.state === 'no_info').forEach(d => {
-                let message = "Hallo " + d.user.name + ",\n" +
-                    dayText + " ist " + bar.name + "!\n";
-                if (d.have_to_clean) {
-                    let haveToClean = [];
-                    duties.filter(duty => duty.user.name !== d.user.name && duty.have_to_clean).forEach(duty => haveToClean.push(duty.user.name));
-                    message += "Du musst dieses Mal ";
-                    if (haveToClean.length === 0) {
-                        message += "alleine ";
-                    } else {
-                        message += "mit ";
-                        for (let i = 0; i < haveToClean.length - 2; ++i) {
-                            message += haveToClean[i] + ", ";
-                        }
-                        if (haveToClean.length > 1) {
-                            message += haveToClean[haveToClean.length - 2] + " und ";
-                        }
-                        message += haveToClean[haveToClean.length - 1] + " ";
-                    }
-                    message += "putzen.";
-                } else {
-                    message += "Du musst dieses Mal nicht putzen.";
-                }
-
-                bot.sendMessage(d.user.telegramID, message).then(() => {
-                    const msg = addBarMessageCreator.createMessage(d.user, "Kommst du?");
-                    msg.addData('bar', bar.id);
-                    msg.addButtonToRow("Ich komme", 'state', 'present');
-                    msg.addButtonToRow("Ich komme nicht", 'state', 'absent');
-                    msg.sendMessage(bar.start).catch(console.error);
-                });
-            });
-            resolve();
-        }).catch(reject);
-    });
-}
-
 // Handle callback queries
 bot.on('callback_query', function onCallbackQuery(callbackQuery) {
     const callbackDataToObject = (string) => {
@@ -187,12 +46,12 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
             systemId: array[2],
             state: array[3],
             data: array[4],
-        }
+        };
         for (let i = 5; i < array.length; i += 2) {
-            obj[array[i]] = array[i + 1]
+            obj[array[i]] = array[i + 1];
         }
         return obj;
-    }
+    };
     const data = callbackDataToObject(callbackQuery.data);
     const callback = registeredResponseSystems[data.systemId];
     if (callback !== undefined) {
@@ -201,9 +60,11 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
     }
 });
 
+
 const registeredResponseSystems = {};
+
 exports.registerResponseSystem = (systemId, responseCallback) => {
-    if (registeredResponseSystems['systemId'] !== undefined) {
+    if (registeredResponseSystems[systemId] !== undefined) {
         throw new Error("A response system with id " + systemId + " is already registered.");
     }
     const callbackDataToString = (chatId, userId, systemId, state, data, additionalData) => {
@@ -213,7 +74,7 @@ exports.registerResponseSystem = (systemId, responseCallback) => {
             throw new Error("callback_data is to long : " + array + " length : " + array.length);
         }
         return array;
-    }
+    };
     const button = (chatId, userId, systemId, state, text, data, additionalData) => {
         const callbackData = callbackDataToString(chatId, userId, systemId, state, data === undefined ? text : data, additionalData);
         return {
@@ -305,183 +166,6 @@ exports.registerResponseSystem = (systemId, responseCallback) => {
         responseCallback(message);
     }
     return messageCreator;
-}
-
-// handle responses to the bar
-const addBarMessageCreator = exports.registerResponseSystem("addBar", (message) => {
-    let whereObj = {
-        where: {
-            barID: message.bar,
-            userID: message.userId,
-        }
-    };
-    message.addData('bar', message.bar);
-    if (message.state === "state") {
-        BarDuty.update({
-            state: message.data
-        }, whereObj).then(() => {
-            if (message.data === "present") {
-                message.newText = "Welche Theke machst du?";
-                message.addButtonToRow('Biertheke', 'job', 'Biertheke');
-                message.addButtonToRow('Cocktailtheke', 'job', 'Cocktailtheke');
-                message.sendUpdatedMessage();
-            } else {
-                message.newText = "Schade!";
-                message.addButtonToRow("Ich komme doch!", 'state', 'present');
-                message.sendUpdatedMessage();
-            }
-        });
-    } else if (message.state === "job") {
-        BarDuty.update({
-            job: message.data
-        }, whereObj).then(() => {
-            message.newText = "Wann fängst du an?";
-            for (let i = 20; i < 26; ++i) {
-                message.addButtonToRow(((i % 24) < 10 ? '0' : '') + (i % 24) + ":00", 'from');
-                message.addButtonToRow(((i % 24) < 10 ? '0' : '') + (i % 24) + ":30", 'from');
-                message.newRow();
-            }
-            message.sendUpdatedMessage();
-        });
-    } else if (message.state === "from") {
-        BarDuty.update({
-            from: message.data
-        }, whereObj).then(() => {
-            message.newText = "Bis wann bleibst du?";
-            for (let i = 22; i < 24 + 7; ++i) {
-                message.addButtonToRow(((i % 24) < 10 ? '0' : '') + (i % 24) + ":00", 'to');
-                message.addButtonToRow(((i % 24) < 10 ? '0' : '') + (i % 24) + ":30", 'to');
-                message.newRow();
-            }
-            message.sendUpdatedMessage();
-        });
-    } else if (message.state === "to") {
-        BarDuty.update({
-            to: message.data
-        }, whereObj).then(() => {
-            message.newText = "Schön, dass du kommst!";
-            message.addButtonToRow("Angaben ändern", 'state', 'present');
-            message.addButtonToRow("Ich kann doch nicht", 'state', 'absent');
-            message.sendUpdatedMessage();
-        });
-    }
-});
-
-
-let lastSentDate;
-let sendDaysBefore = [10, 7, 5, 3, 2, 1, 0];
-// check for bars, only start when the DB is in sync, so that in the setIntervall call the Bar.find will work directly 
-db.addSyncCallback(() => {
-    let checkForEventsAndSend = () => {
-        let daysAhead = new Date();
-        daysAhead.setDate(daysAhead.getDate() + 15);
-        Bar.findAll({
-            where: {
-                start: {
-                    [Op.and]: {
-                        [Op.gt]: new Date(),
-                        [Op.lt]: daysAhead
-                    }
-                }
-            }
-        }).then(bars => {
-            const now = new Date();
-            now.setHours(0, 0, 0, 0);
-            bars = bars.filter(b => {
-                const barDate = new Date(b.start);
-                barDate.setHours(0, 0, 0, 0);
-                let dayDiff = (barDate - now) / 1000 / 60 / 60 / 24;
-                return sendDaysBefore.some(v => v === dayDiff);
-            })
-            if (bars.length !== 0) {
-                let index = 0;
-                let sendInfo = () => {
-                    sendBarInfo(bars[index])
-                        .then(() => {
-                            ++index;
-                            if (index < bars.length) {
-                                sendInfo();
-                            }
-                        })
-                        .catch(console.error)
-                };
-                sendInfo();
-            }
-        });
-        lastSentDate = new Date();
-    };
-    // every day at 3 pm
-    const issueCronJob = new CronJob('00 00 15 * * *', function() {
-        checkForEventsAndSend();
-    }, null, true);
-});
-
-exports.barAdded = (bar) => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const barDate = new Date(bar.start);
-    barDate.setHours(0, 0, 0, 0);
-    let dayDiff = (barDate - today) / 1000 / 60 / 60 / 24;
-    if (sendDaysBefore.some(d => d === dayDiff)) {
-        sendBarInfo(bar).catch(console.error);
-    }
-}
-
-exports.changeCleaningStatus = (barId, userId, newHaveToCleanState) => {
-    Bar.findByPk(barId).then(bar => {
-        const end = bar.start.setHours(bar.start.getHours() + 12);
-        // bar is to old
-        if (new Date() > end) {
-            return;
-        }
-        // do not change the original date
-        const start = new Date(bar.start);
-        start.setDate(start.getDate() - sendDaysBefore.reduce((l, r) => Math.max(l, r)));
-        // bar is to new
-        if (start > new Date()) {
-            return;
-        }
-        const startText = "Du musst bei der " + bar.name + " am " + bar.start.getDate() + '.' + (bar.start.getMonth() + 1) + '.' + bar.start.getFullYear();
-        if (!newHaveToCleanState) {
-            User.findByPk(userId).then(user => {
-                this.sendMessage(user, startText + " doch nicht mehr putzen.");
-            }).catch(console.error);
-        }
-        BarDuty.findAll({
-            where: {
-                barID: barId,
-                have_to_clean: true,
-            },
-            include: [{
-                model: User,
-                attributes: ['id', 'name', 'telegramID'],
-            }],
-        }).then(duties => {
-            if (duties.length === 1) {
-                this.sendMessage(duties[0].user, startText + " aktuell alleine putzen.");
-            } else {
-                for (let i = 0; i < duties.length; ++i) {
-                    let message = startText + " nun mit ";
-                    let count = duties.length;
-                    for (let ii = 0; ii < duties.length; ++ii) {
-                        --count;
-                        if (ii !== i) {
-                            message += duties[ii].user.name;
-                            if (count === 0) {
-                                message += " ";
-                            } else if (count === 1) {
-                                message += " und ";
-                            } else {
-                                message += ", ";
-                            }
-                        }
-                    }
-                    message += "putzen.";
-                    this.sendMessage(duties[i].user, message);
-                }
-            }
-        }).catch(console.error);
-    }).catch(console.error);
 }
 
 exports.sendMessage = (user, message, deleteAfter, afterDeleteText) => {

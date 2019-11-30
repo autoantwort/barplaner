@@ -1,5 +1,5 @@
 const db = require('../config/db.config.js');
-const Telegram = require('./telegram.js');
+const TelegramBarFeedback = require('./telegramBarFeedback');
 const Newsletter = require('./newsletter.js');
 const Axios = require("axios");
 
@@ -32,12 +32,12 @@ exports.addBar = (barData, numberOfPersonsToClean) => {
                     if (numberOfPersonsToClean !== undefined && numberOfPersonsToClean > 0) {
                         Util.computeCleaning(bar.id, numberOfPersonsToClean)
                             .then(userIDs => {
-                                Telegram.barAdded(bar);
+                                TelegramBarFeedback.barAdded(bar);
                                 resolve(userIDs);
                             })
                             .catch(reject);
                     } else {
-                        Telegram.barAdded(bar);
+                        TelegramBarFeedback.barAdded(bar);
                         resolve(bar);
                     }
                 }).catch(err => {
