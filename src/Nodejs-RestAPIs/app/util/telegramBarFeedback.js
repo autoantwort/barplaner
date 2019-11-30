@@ -1,6 +1,6 @@
 const db = require('../config/db.config.js');
 const env = require('../config/env');
-const CronJob = require('cron').CronJob;
+const cron = require('cron');
 const Telegram = require('./telegram');
 const SettingsController = require('../controller/setting.controller');
 
@@ -13,6 +13,12 @@ const Role = db.Role;
 const Op = db.Sequelize.Op;
 
 let SendDaysBefore = null;
+let SendAt = null;
+
+const updateSendAtTime = value => {
+    sendCronJob.setTime(new cron.CronTime("0 " + value.substring(3, 5) + " " + value.substring(0, 2) + " * * *", "Europe/Berlin"));
+    sendCronJob.start();
+};
 
 db.addSyncCallback(() => {
     // after 5 seconds the BarAdmin role should be created if the role does not exists
@@ -29,8 +35,22 @@ db.addSyncCallback(() => {
         }).then(s => {
             SendDaysBefore = s[0];
         }).catch(console.error);
+        Setting.findCreateFind({
+            where: { name: "telegramBarFeedbackSendAt" },
+            defaults: {
+                name: "telegramBarFeedbackSendAt",
+                permission: role.name,
+                description: "When should the messages be sent? Format is: hh:mm   e.g. 08:45",
+                value: "15:00",
+            }
+        }).then(s => {
+            SendAt = s[0];
+            updateSendAtTime(SendAt.value);
+        }).catch(console.error);
     }).catch(console.error);
 });
+
+SettingsController.addSettingChangeListener("telegramBarFeedbackSendAt", updateSendAtTime);
 
 const bot = Telegram.bot;
 
@@ -220,65 +240,62 @@ const addBarMessageCreator = Telegram.registerResponseSystem("addBar", (message)
 });
 
 
-let lastSentDate;
 const defaultSendDaysBefore = [10, 7, 5, 3, 2, 1, 0];
-// check for bars, only start when the DB is in sync, so that in the setIntervall call the Bar.find will work directly 
-db.addSyncCallback(() => {
-    const checkForEventsAndSend = sendDaysBefore => {
-        let daysAhead = new Date();
-        daysAhead.setDate(daysAhead.getDate() + 15);
-        Bar.findAll({
-            where: {
-                start: {
-                    [Op.and]: {
-                        [Op.gt]: new Date(),
-                        [Op.lt]: daysAhead
-                    }
+
+const checkForEventsAndSend = sendDaysBefore => {
+    let daysAhead = new Date();
+    daysAhead.setDate(daysAhead.getDate() + 15);
+    Bar.findAll({
+        where: {
+            start: {
+                [Op.and]: {
+                    [Op.gt]: new Date(),
+                    [Op.lt]: daysAhead
                 }
             }
-        }).then(bars => {
-            const now = new Date();
-            now.setHours(0, 0, 0, 0);
-            bars = bars.filter(b => {
-                const barDate = new Date(b.start);
-                barDate.setHours(0, 0, 0, 0);
-                let dayDiff = (barDate - now) / 1000 / 60 / 60 / 24;
-                return sendDaysBefore.some(v => v === dayDiff);
-            })
-            if (bars.length !== 0) {
-                let index = 0;
-                let sendInfo = () => {
-                    sendBarInfo(bars[index])
-                        .then(() => {
-                            ++index;
-                            if (index < bars.length) {
-                                sendInfo();
-                            }
-                        })
-                        .catch(console.error)
-                };
-                sendInfo();
+        }
+    }).then(bars => {
+        const now = new Date();
+        now.setHours(0, 0, 0, 0);
+        bars = bars.filter(b => {
+            const barDate = new Date(b.start);
+            barDate.setHours(0, 0, 0, 0);
+            let dayDiff = (barDate - now) / 1000 / 60 / 60 / 24;
+            return sendDaysBefore.some(v => v === dayDiff);
+        })
+        if (bars.length !== 0) {
+            let index = 0;
+            let sendInfo = () => {
+                sendBarInfo(bars[index])
+                    .then(() => {
+                        ++index;
+                        if (index < bars.length) {
+                            sendInfo();
+                        }
+                    })
+                    .catch(console.error)
+            };
+            sendInfo();
+        }
+    });
+};
+
+// every day at 3 pm
+const sendCronJob = new cron.CronJob('00 00 15 * * *', function() {
+    if (SendDaysBefore === null) {
+        checkForEventsAndSend(defaultSendDaysBefore);
+    } else {
+        SendDaysBefore.reload().then(() => {
+            try {
+                let daysBefore = JSON.parse('[' + SendDaysBefore.value + ']');
+                checkForEventsAndSend(daysBefore);
+            } catch (e) {
+                console.error("The value of the setting telegramBarFeedbackDaysBefore has the wrong format: ", SendDaysBefore.value);
+                checkForEventsAndSend(defaultSendDaysBefore);
             }
         });
-        lastSentDate = new Date();
-    };
-    // every day at 3 pm
-    const issueCronJob = new CronJob('00 00 15 * * *', function() {
-        if (SendDaysBefore === null) {
-            checkForEventsAndSend(defaultSendDaysBefore);
-        } else {
-            SendDaysBefore.reload().then(() => {
-                try {
-                    let daysBefore = JSON.parse('[' + SendDaysBefore.value + ']');
-                    checkForEventsAndSend(daysBefore);
-                } catch (e) {
-                    console.error("The value of the setting telegramBarFeedbackDaysBefore has the wrong format: ", SendDaysBefore.value);
-                    checkForEventsAndSend(defaultSendDaysBefore);
-                }
-            });
-        }
-    }, null, true, "Europe/Berlin");
-});
+    }
+}, null, true, "Europe/Berlin");
 
 exports.barAdded = (bar) => {
     const today = new Date();

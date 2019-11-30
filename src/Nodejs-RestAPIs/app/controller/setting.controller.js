@@ -47,6 +47,24 @@ db.addSyncCallback(() => {
 
 });
 
+// a mapping from settings name => listener
+const settingChangeListener = {};
+const addSettingChangeListener = (name, callback) => {
+    if (settingChangeListener[name] === undefined) {
+        settingChangeListener[name] = [callback];
+    } else {
+        settingChangeListener[name].push(callback);
+    }
+};
+exports.addSettingChangeListener = addSettingChangeListener;
+const sendSettingsChangeEvent = (name, newValue) => {
+    if (settingChangeListener[name] !== undefined) {
+        for (let c of settingChangeListener[name]) {
+            c(newValue);
+        }
+    }
+};
+
 // get Settings
 exports.getAll = (req, res) => {
     UserRoles.findAll({
@@ -106,6 +124,7 @@ exports.updateOne = (req, res) => {
             let update = () =>  {
                 s.update({ value: req.body.value }).then(() => {
                     res.send("success");
+                    sendSettingsChangeEvent(req.params.name, req.body.value);
                 }).catch(err => {
                     console.log(err);
                     res.status(500).send(JSON.stringify(err))
