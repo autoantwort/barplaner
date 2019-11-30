@@ -47,6 +47,7 @@ if (typeof env.facebookAccessToken === "string" && env.facebookAccessToken.lengt
 }
 require("./app/util/telegram");
 require("./app/util/gitFileBrowser");
+require("./app/util/telegramNewsletter");
 require("./app/util/gitlab");
 const remoteVolumeControl = require("./app/util/remoteVolumeControl");
 remoteVolumeControl.registerClients(app);

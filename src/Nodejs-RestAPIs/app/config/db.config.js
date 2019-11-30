@@ -48,6 +48,7 @@ db.BarDuty = require('../model/barduty.model.js')(sequelize, Sequelize, db.Bar, 
 db.UserRoles = require('../model/userroles.model.js')(sequelize, Sequelize, db.User, db.Role);
 db.Setting = require('../model/setting.model.js')(sequelize, Sequelize, db.Role);
 db.ShouldDelete = require('../model/shouldDelete.model.js')(sequelize, Sequelize);
+db.TelegramNewsletter = require('../model/telegramNewsletter.model')(sequelize, Sequelize);
 
 db.Survey = require('../model/survey.model.js')(sequelize, Sequelize, db.User);
 db.Question = require('../model/question.model.js')(sequelize, Sequelize, db.Survey);
