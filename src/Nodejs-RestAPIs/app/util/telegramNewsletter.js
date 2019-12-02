@@ -56,7 +56,7 @@ const createCronJob = value => {
                     });
             });
         }).catch(console.error);
-    }, null, true, "Europe/Berlin");
+    }, null, value.enabled, "Europe/Berlin");
 };
 
 TelegramNewsletter.findAll().then(values => {
@@ -73,9 +73,12 @@ Telegram.bot.onText(/\/newsletter/, msg => {
                 value.save()
                     .then(() => Telegram.bot.sendMessage(chatId, "Newsletter erfolgreich deabonniert. Nutze /newsletter um ihn wieder zu aktivieren"))
                     .catch(() => Telegram.bot.sendMessage(chatId, "Error while disabling the newsletter :("));
+                cronJobs[value.chatId].stop();
             }
         }).catch(console.error);
     } else if (clockRegex.test(text)) {
+        const wasRunning = cronJobs[chatId].running;
+        const extraText = wasRunning ? "" : " Du hast den Newsletter jedoch deabonniert, deswegen werden keine Nachrichten versendet. Sende /newsletter um ihn wieder zu aktivieren.";
         const result = clockRegex.exec(text);
         const hours = result[1];
         const minutes = result[2];
@@ -86,11 +89,13 @@ Telegram.bot.onText(/\/newsletter/, msg => {
                     chatId: chatId,
                 }
             })
-            .then(() => Telegram.bot.sendMessage(chatId, "Newsletter werden ab jetzt immer um " + hours + ":" + minutes + " gesendet."))
-            .catch(() => Telegram.bot.sendMessage(chatId, "Fehler beim speichern der aktualisierten  der Sendezeit :("));
+            .then(() => Telegram.bot.sendMessage(chatId, "Newsletter werden ab jetzt immer um " + hours + ":" + minutes + " gesendet." + extraText))
+            .catch(() => Telegram.bot.sendMessage(chatId, "Fehler beim Speichern der aktualisierten der Sendezeit :("));
 
         cronJobs[chatId].setTime(new CronTime('00 ' + minutes + ' ' + hours + ' * * *', "Europe/Berlin"));
-        cronJobs[chatId].start();
+        if (wasRunning) {
+            cronJobs[chatId].start();
+        }
     } else if (daysBeforeRegex.test(text)) {
         let newDaysBefore = [];
         let match;
@@ -99,6 +104,8 @@ Telegram.bot.onText(/\/newsletter/, msg => {
             newDaysBefore.push(Number(match[1]));
         }
 
+        const wasRunning = cronJobs[chatId].running;
+        const extraText = wasRunning ? "" : " Du hast den Newsletter jedoch deabonniert, deswegen werden keine Nachrichten versendet. Sende /newsletter um ihn wieder zu aktivieren.";
         TelegramNewsletter.update({
                 sendDaysBefore: JSON.stringify(newDaysBefore),
             }, {
@@ -106,7 +113,7 @@ Telegram.bot.onText(/\/newsletter/, msg => {
                     chatId: chatId,
                 }
             })
-            .then(() => Telegram.bot.sendMessage(chatId, "Newsletter werden ab jetzt immer " + JSON.stringify(newDaysBefore).slice(1, -1) + " Tage vorher gesendet."))
+            .then(() => Telegram.bot.sendMessage(chatId, "Newsletter werden ab jetzt immer " + JSON.stringify(newDaysBefore).slice(1, -1) + " Tage vorher gesendet." + extraText))
             .catch(() => Telegram.bot.sendMessage(chatId, "Fehler beim Aktualisieren der Sendezeit :("));
     } else {
         TelegramNewsletter.findByPk(chatId).then(value => {
@@ -116,6 +123,7 @@ Telegram.bot.onText(/\/newsletter/, msg => {
                     value.save()
                         .then(() => Telegram.bot.sendMessage(chatId, "Newsletter erfolgreich abonniert."))
                         .catch(() => Telegram.bot.sendMessage(chatId, "Error while disabling the newsletter :("));
+                    cronJobs[value.chatId].start();
                 } else {
                     Telegram.bot.sendMessage(chatId, helpText, { parse_mode: "Markdown" });
                 }
