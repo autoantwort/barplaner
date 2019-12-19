@@ -40,7 +40,6 @@ db.sequelize = sequelize;
 db.Wordpress = wordpressDB;
 
 //Models/tables
-db.customers = require('../model/customer.model.js')(sequelize, Sequelize);
 db.User = require('../model/user.model.js')(sequelize, Sequelize);
 db.Bar = require('../model/bar.model.js')(sequelize, Sequelize);
 db.Role = require('../model/role.model.js')(sequelize, Sequelize);
