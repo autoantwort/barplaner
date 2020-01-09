@@ -280,22 +280,21 @@ const checkForEventsAndSend = sendDaysBefore => {
     });
 };
 
-// every day at 3 pm
-const sendCronJob = new cron.CronJob('00 00 15 * * *', function() {
+const getSendDaysBefore = async() => {
     if (SendDaysBefore === null) {
-        checkForEventsAndSend(defaultSendDaysBefore);
-    } else {
-        SendDaysBefore.reload().then(() => {
-            try {
-                let daysBefore = JSON.parse('[' + SendDaysBefore.value + ']');
-                checkForEventsAndSend(daysBefore);
-            } catch (e) {
-                console.error("The value of the setting telegramBarFeedbackDaysBefore has the wrong format: ", SendDaysBefore.value);
-                checkForEventsAndSend(defaultSendDaysBefore);
-            }
-        });
+        return defaultSendDaysBefore;
     }
-}, null, true, "Europe/Berlin");
+    await SendDaysBefore.reload();
+    try {
+        return JSON.parse('[' + SendDaysBefore.value + ']');
+    } catch (e) {
+        console.error("The value of the setting telegramBarFeedbackDaysBefore has the wrong format: ", SendDaysBefore.value);
+        return defaultSendDaysBefore;
+    }
+}
+
+// every day at 3 pm
+const sendCronJob = new cron.CronJob('00 00 15 * * *', async() => checkForEventsAndSend(await getSendDaysBefore()), null, true, "Europe/Berlin");
 
 exports.barAdded = (bar) => {
     const today = new Date();
@@ -303,9 +302,11 @@ exports.barAdded = (bar) => {
     const barDate = new Date(bar.start);
     barDate.setHours(0, 0, 0, 0);
     let dayDiff = (barDate - today) / 1000 / 60 / 60 / 24;
-    if (sendDaysBefore.some(d => d === dayDiff)) {
-        sendBarInfo(bar).catch(console.error);
-    }
+    getSendDaysBefore().then(daysBefore => {
+        if (daysBefore.some(d => d === dayDiff)) {
+            sendBarInfo(bar).catch(console.error);
+        }
+    });
 }
 
 exports.changeCleaningStatus = (barId, userId, newHaveToCleanState) => {
