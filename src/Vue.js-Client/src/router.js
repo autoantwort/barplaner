@@ -13,6 +13,7 @@ import DutyList from "./components/DutyList.vue";
 import Account from "./components/Account.vue";
 import Settings from "./components/Settings.vue";
 import RemoteVolumeControl from "./components/RemoteVolumeControl.vue";
+import RemoteControlPane from "./components/RemoteControlPane.vue";
 import axios from "./http-common";
 import Roles from "./roles";
 
@@ -96,6 +97,10 @@ export default new Router({
                 path: "/remoteVolumeControl",
                 name: "remote-volume-control",
                 component: RemoteVolumeControl,
+            }, {
+                path: "/remoteControlPane",
+                name: "remote-control-pane",
+                component: RemoteControlPane,
             }, ]
         },
     ]

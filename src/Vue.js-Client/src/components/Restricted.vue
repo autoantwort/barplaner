@@ -45,6 +45,9 @@
             <router-link class="nav-link" to="/remoteVolumeControl">Remote Volume</router-link>
           </li>
           <li class="nav-item">
+            <router-link class="nav-link" to="/remoteControlPane">Remote Control Pane</router-link>
+          </li>
+          <li class="nav-item">
             <router-link class="nav-link" to="/account">Account</router-link>
           </li>
           <li class="nav-item">

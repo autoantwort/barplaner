@@ -51,6 +51,8 @@ require("./app/util/telegramNewsletter");
 require("./app/util/gitlab");
 const remoteVolumeControl = require("./app/util/remoteVolumeControl");
 remoteVolumeControl.registerClients(app);
+const remoteControlPane = require("./app/util/remoteControlPane");
+remoteControlPane.registerClients(app);
 
 const crypto = require('crypto');
 
@@ -132,6 +134,7 @@ app.post('/api/logout', (req, res) => {
         .catch(err => releaseEvents.status(500).send("Error -> " + err));
 });
 remoteVolumeControl.registerMasters(app);
+remoteControlPane.registerMasters(app);
 require('./app/route/user.route.js')(app);
 require('./app/route/bar.route.js')(app);
 require('./app/route/duty.route.js')(app);
