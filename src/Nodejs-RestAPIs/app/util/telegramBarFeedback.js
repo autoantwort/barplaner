@@ -225,6 +225,7 @@ const addBarMessageCreator = Telegram.registerResponseSystem("addBar", (message)
                 message.addButtonToRow(((i % 24) < 10 ? '0' : '') + (i % 24) + ":30", 'to');
                 message.newRow();
             }
+            message.addButtonToRow("Ende", 'to');
             message.sendUpdatedMessage();
         });
     } else if (message.state === "to") {
