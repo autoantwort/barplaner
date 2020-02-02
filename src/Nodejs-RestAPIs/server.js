@@ -53,6 +53,8 @@ const remoteVolumeControl = require("./app/util/remoteVolumeControl");
 remoteVolumeControl.registerClients(app);
 const remoteControlPane = require("./app/util/remoteControlPane");
 remoteControlPane.registerClients(app);
+const scanner = require("./app/util/scanner");
+scanner.registerClients(app);
 
 const crypto = require('crypto');
 
@@ -135,6 +137,7 @@ app.post('/api/logout', (req, res) => {
 });
 remoteVolumeControl.registerMasters(app);
 remoteControlPane.registerMasters(app);
+scanner.registerMasters(app);
 require('./app/route/user.route.js')(app);
 require('./app/route/bar.route.js')(app);
 require('./app/route/duty.route.js')(app);
