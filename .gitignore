@@ -1,3 +1,6 @@
+# Default folder for files
+webserver/*
+
 # Logs
 logs
 *.log

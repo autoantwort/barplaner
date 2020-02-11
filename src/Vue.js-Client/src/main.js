@@ -11,14 +11,19 @@ Vue.use(require('vue-moment'));
 
 // see https://www.npmjs.com/package/@fortawesome/vue-fontawesome#recommended
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faTrashAlt, faPlay, faPause, faStop, faRedo, faStepForward } from '@fortawesome/free-solid-svg-icons';
+import { faTrashAlt, faPlay, faPause, faStop, faRedo, faStepForward, faImage } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-library.add(faTrashAlt, faPlay, faPause, faStop, faRedo, faStepForward);
+library.add(faTrashAlt, faPlay, faPause, faStop, faRedo, faStepForward, faImage);
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 
 // see https://bootstrap-vue.js.org/docs/#using-module-bundlers
-import { NavPlugin } from 'bootstrap-vue';
+import { NavPlugin, TabsPlugin, CardPlugin, AlertPlugin, ModalPlugin, SpinnerPlugin } from 'bootstrap-vue';
 Vue.use(NavPlugin);
+Vue.use(TabsPlugin);
+Vue.use(CardPlugin);
+Vue.use(AlertPlugin);
+Vue.use(ModalPlugin);
+Vue.use(SpinnerPlugin);
 
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';

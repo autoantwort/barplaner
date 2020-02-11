@@ -6,11 +6,14 @@ var expressWs = require('express-ws')(app);
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 var env = require('./app/config/env');
+const fileUpload = require('express-fileupload');
 
 if (env.staticVue === true)
     app.use(express.static("../Vue.js-Client/dist"));
 
+app.use(fileUpload({ useTempFiles: false, }));
 app.use(bodyParser.json());
+app.use(bodyParser.text());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 const cors = require('cors');
@@ -143,6 +146,14 @@ require('./app/route/bar.route.js')(app);
 require('./app/route/duty.route.js')(app);
 require('./app/route/setting.route.js')(app);
 require('./app/route/survey.route.js')(app);
+require('./app/route/position.route')(app);
+require('./app/route/file.route')(app);
+require('./app/route/item.route')(app);
+require('./app/route/itemGroup.route')(app);
+
+// distribute files from file db
+console.log("Store at and load files from: ", env.fileStoragePath);
+app.use('/api/file/', express.static(env.fileStoragePath, { maxAge: 1000 * 60 * 60 * 24 * 365 * 10 /*10 years*/ , index: false }));
 
 // Create a Server
 var server = app.listen(8080, function() {

@@ -47,6 +47,14 @@
           <li class="nav-item">
             <router-link class="nav-link" to="/remoteControlPane">Remote Control Pane</router-link>
           </li>
+          <b-nav-item-dropdown text="Lager" right>            
+            <b-dropdown-item to="/addItem">Add Item</b-dropdown-item>
+            <b-dropdown-item to="/addPosition">Add Position</b-dropdown-item>
+            <b-dropdown-item to="/addItemGroup">Add ItemGroup</b-dropdown-item>
+            <b-dropdown-item to="/items">Items</b-dropdown-item>
+            <b-dropdown-item to="/positions">Positions</b-dropdown-item>
+            <b-dropdown-item to="/itemGroups">ItemGroups</b-dropdown-item>
+          </b-nav-item-dropdown>          
           <li class="nav-item">
             <router-link class="nav-link" to="/account">Account</router-link>
           </li>
@@ -72,7 +80,7 @@ export default {
       showNav: true,
       cleaningAdmin: false,
       userAdmin: false,
-      barAdmin: false,
+      barAdmin: false
     };
   },
   mounted() {

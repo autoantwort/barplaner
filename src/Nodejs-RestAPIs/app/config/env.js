@@ -33,6 +33,7 @@ const env = {
         host: '***',
         dialect: 'mysql',
     },
+    fileStoragePath: __dirname + '/../../../../webserver/files/',
 };
 
 module.exports = env;
