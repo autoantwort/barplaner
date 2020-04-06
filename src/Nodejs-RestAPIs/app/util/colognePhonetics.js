@@ -163,8 +163,8 @@ const convert = s => {
 
     let l = 0;
     let wasNull = false;
-    let inString = false;
-    let newCode = code[0];
+    let inString = code[0] === "'";
+    let newCode = inString ? "" : code[0];
     for (let i = 1; i < code.length; i++) {
         if (code[i] === "'") {
             inString = !inString;
