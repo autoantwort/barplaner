@@ -90,7 +90,7 @@
 
 <script>
 import http from "../../http-common";
-import phonetics from "../../../../Nodejs-RestAPIs/app/util/colognePhonetics";
+import phoneticsFilter from "../../phoneticsFilter";
 import PositionImage from "./PositionImage";
 
 export default {
@@ -111,15 +111,7 @@ export default {
   methods: {
     /* eslint-disable no-console */
     filter(event) {
-      const v = phonetics.convert(event.target.value).split(" ");
-      this.filteredItems = this.items.filter(p => {
-        for (let s of v) {
-          if (p.nameColognePhonetics.indexOf(s) === -1) {
-            return false;
-          }
-        }
-        return true;
-      });
+      this.filteredItems = phoneticsFilter(this.items, event.target.value);
     },
     openModal(position) {
       this.selectedPosition = position;

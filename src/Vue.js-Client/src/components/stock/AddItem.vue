@@ -74,7 +74,13 @@
                 </b-tab>
                 <b-tab title="Existing" lazy>
                   <b-card-text>
-                    <v-select class="border-primary" :searchable="true" :options="existingPositions" v-model="item.selectedPosition" />
+                    <v-select
+                      class="border-primary"
+                      :searchable="true"
+                      :options="existingPositions"
+                      v-model="item.selectedPosition"
+                      :filterFunction="phoneticsFilter"
+                    />
                   </b-card-text>
                 </b-tab>
                 <b-tab title="New" lazy>
@@ -115,6 +121,7 @@
                       :searchable="true"
                       :options="existingItemGroups"
                       v-model="item.itemGroup.selectedItemGroup"
+                      :filterFunction="phoneticsFilter"
                       required
                     />
                   </b-card-text>
@@ -147,6 +154,7 @@
                                 :searchable="true"
                                 :options="existingPositions"
                                 v-model="item.itemGroup.selectedPosition"
+                                :filterFunction="phoneticsFilter"
                               />
                             </b-card-text>
                           </b-tab>
@@ -189,7 +197,8 @@
 <script>
 import http from "../../http-common";
 import smoothScroll from "../../smoothScroll";
-import VSelect from "@alfsnd/vue-bootstrap-select";
+import VSelect from "./../vue-bootstrap-select";
+import phoneticsFilter from "./../../phoneticsFilter";
 
 import AddPosition from "./AddPosition";
 
@@ -235,7 +244,7 @@ export default {
   },
   methods: {
     /* eslint-disable no-console */
-
+    phoneticsFilter,
     loadImageFromFile(event) {
       this.item.imageURL = URL.createObjectURL(event.target.files[0]);
       this.item.imageBlob = event.target.files[0];

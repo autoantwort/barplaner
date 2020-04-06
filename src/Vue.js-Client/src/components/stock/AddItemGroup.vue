@@ -28,6 +28,7 @@
                       class="border-primary"
                       :searchable="true"
                       :options="internalExistingPositions"
+                      :filterFunction="phoneticsFilter"
                       v-model="itemGroup.selectedPosition"
                     />
                   </b-card-text>
@@ -55,8 +56,8 @@
 
 <script>
 import http from "../../http-common";
-import VSelect from "@alfsnd/vue-bootstrap-select";
-
+import VSelect from "./../vue-bootstrap-select";
+import phoneticsFilter from "./../../phoneticsFilter";
 import AddPosition from "./AddPosition";
 
 export default {
@@ -87,7 +88,7 @@ export default {
   },
   methods: {
     /* eslint-disable no-console */
-
+    phoneticsFilter,
     async addItemGroup(redirectAfter) {
       //check if form is valid
       if (this.$refs.form.checkValidity() === false) {

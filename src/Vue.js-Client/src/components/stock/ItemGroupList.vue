@@ -56,7 +56,7 @@
 <script>
 import http from "../../http-common";
 import PositionImage from "./PositionImage";
-import phonetics from "../../../../Nodejs-RestAPIs/app/util/colognePhonetics";
+import phoneticsFilter  from "../../phoneticsFilter";
 
 export default {
   name: "itemGroup-list",
@@ -73,15 +73,10 @@ export default {
   methods: {
     /* eslint-disable no-console */
     filter(event) {
-      const v = phonetics.convert(event.target.value).split(" ");
-      this.filteredItemGroups = this.itemGroups.filter(p => {
-        for (let s of v) {
-          if (p.nameColognePhonetics.indexOf(s) === -1) {
-            return false;
-          }
-        }
-        return true;
-      });
+      this.filteredItemGroups = phoneticsFilter(
+        this.itemGroups,
+        event.target.value
+      );
     },
     openModal(position) {
       this.selectedPosition = position;

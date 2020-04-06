@@ -37,7 +37,7 @@
 
 <script>
 import http from "../../http-common";
-import phonetics from "../../../../Nodejs-RestAPIs/app/util/colognePhonetics";
+import phoneticsFilter from "../../phoneticsFilter";
 
 export default {
   name: "position-list",
@@ -50,15 +50,10 @@ export default {
   methods: {
     /* eslint-disable no-console */
     filter(event) {
-      const v = phonetics.convert(event.target.value).split(" ");
-      this.filteredPositions = this.positions.filter(p => {
-        for (let s of v) {
-          if (p.nameColognePhonetics.indexOf(s) === -1) {
-            return false;
-          }
-        }
-        return true;
-      });
+      this.filteredPositions = phoneticsFilter(
+        this.positions,
+        event.target.value
+      );
     },
     retrievePositions() {
       http
