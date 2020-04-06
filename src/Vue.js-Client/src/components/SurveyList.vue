@@ -10,7 +10,7 @@
           <div class="card mt-3 mb-3">
             <div
               class="card-header text-center"
-            >{{survey.question}} ({{ survey.end | moment("DD.MM.YYYY") }})</div>
+            >{{survey.question}} ({{ survey.end | asDate }})</div>
             <div class="card-body">
               <div class="table-responsive">
                 <table class="table table-sm">

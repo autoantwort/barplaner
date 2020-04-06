@@ -7,7 +7,10 @@ import VueCollapse from 'vue2-collapse';
 import Roles from './roles';
 
 Vue.use(VueCollapse);
-Vue.use(require('vue-moment'));
+import { printDate, printDateTime, printDayDateTime } from './dateFilters';
+Vue.filter('asDate', printDate);
+Vue.filter('asDateTime', printDateTime);
+Vue.filter('asDayDateTime', printDayDateTime);
 
 // see https://www.npmjs.com/package/@fortawesome/vue-fontawesome#recommended
 import { library } from '@fortawesome/fontawesome-svg-core';

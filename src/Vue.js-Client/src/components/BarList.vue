@@ -11,7 +11,7 @@
                 v-collapse-toggle
                 class="card-header text-center"
                 v-bind:class="{ pressable: bar.hide,'text-primary': bar.hide }"
-              >{{bar.name}} ({{ bar.start | moment("DD.MM.YYYY") }})</div>
+              >{{bar.name}} ({{ bar.start | asDate }})</div>
               <div>
                 <div v-collapse-content>
                   <div class="card-body">
@@ -171,7 +171,7 @@
           <div class="card mt-3 mb-3">
             <div
               class="card-header text-center"
-            >{{bar.name}} ({{ bar.start | moment("DD.MM.YYYY") }})</div>
+            >{{bar.name}} ({{ bar.start | asDate }})</div>
             <div class="card-body">
               <div class="table-responsive">
                 <table class="table">
