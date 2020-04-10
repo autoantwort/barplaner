@@ -58,7 +58,7 @@
             <div class="form-check mb-2">
               <input class="form-check-input" type="radio" v-model="reason" name="reason" id="iPC" value="internalPayedConsumption" />
               <label class="form-check-label" for="iPC">
-                <strong>Interner bezahler Verbrauch:</strong> Wenn man sich privat Getränke nimmt und diese bezahlt
+                <strong>Interner bezahlter Verbrauch:</strong> Wenn man sich privat Getränke nimmt und diese bezahlt
               </label>
             </div>
             <div class="form-check mb-2">
@@ -98,6 +98,30 @@
               </label>
             </div>
             <div v-if="reason === null" class="invalid-feedback" style="display:block">Please select an reason.</div>
+            <div v-if="filteredChanges && filteredChanges.length!==0" class="table-responsive mt-3">
+              <table class="table table-sm">
+                <thead>
+                  <tr>
+                    <th scope="col">Date</th>
+                    <th scope="col">#</th>
+                    <th scope="col">Reason</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">User</th>
+                    <th scope="col">Note</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="change in filteredChanges" :key="change.id">
+                    <td class="text-nowrap">{{change.date | asDateTime}}</td>
+                    <td class="text-right">{{change.amount}}</td>
+                    <td>{{change.germanReason}}</td>
+                    <td>{{change.brottoPrice?change.brottoPrice + ' €' : null}}</td>
+                    <td>{{change.user ? change.user.name : ''}}</td>
+                    <td>{{change.note}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
           <div class="form-group was-validated">
             <label for="itemGroupName">Notiz</label>
@@ -318,8 +342,9 @@ import http from "../../http-common";
 import VSelect from "./../vue-bootstrap-select";
 import phoneticsFilter from "./../../phoneticsFilter";
 import AddPosition from "./AddPosition";
-
+import { getGermanReason, getFilterFunction } from "./changeUtil";
 const round = v => Math.round(v * 1000) / 1000;
+
 export default {
   name: "add-stockChange",
   components: {
@@ -329,6 +354,7 @@ export default {
   data() {
     return {
       item: null,
+      lastChanges: null,
       existingItems: [],
       errorString: "",
       reason: null,
@@ -367,6 +393,11 @@ export default {
     },
     priceInputDisabled() {
       return this.change === null || this.priceAccuracy === "unknown";
+    },
+    filteredChanges() {      
+      return this.lastChanges === null
+        ? null
+        : this.lastChanges.filter(getFilterFunction(this.reason));
     }
   },
   watch: {
@@ -419,7 +450,7 @@ export default {
       }
     },
     item: function() {
-      if (this.item)
+      if (this.item) {
         http
           .get("/item/" + this.item.value + "/stock")
           .then(response => {
@@ -429,6 +460,17 @@ export default {
             this.currentItemStock = e.toString();
             console.log(e);
           });
+        http
+          .get("/item/" + this.item.value + "/stockChanges")
+          .then(response => {
+            response.data.forEach(c => {
+              c.germanReason = getGermanReason(c.reason);              
+              c.date = new Date(c.date);
+            });
+            this.lastChanges = response.data;
+          })
+          .catch(console.log);
+      }
     },
     reason: function() {
       if (
@@ -574,6 +616,7 @@ export default {
                 this.tax = null;
                 this.ownTax = null;
                 this.taxPlaceholder = "Eigener";
+                this.lastChanges = null;
               }
               this.errorString = "Change added";
             } else {
