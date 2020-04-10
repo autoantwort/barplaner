@@ -79,6 +79,22 @@ exports.getAll = (req, res) => {
     });
 };
 
+// get all items for select
+exports.getAllForSelect = (req, res) => {
+    Item.findAll({
+        attributes: [
+            ['id', 'value'],
+            ['name', 'text'],
+            'nameColognePhonetics',
+            'barcode',
+        ],
+    }).then(items => {
+        res.send(items);
+    }).catch(err => {
+        res.status(500).send("Error -> " + err);
+    });
+};
+
 exports.getAllWithGroupsAndPositions = (req, res) => {
     Item.findAll({
         include: [{
@@ -100,6 +116,9 @@ exports.findById = (req, res) => {
         include: [{
             model: Position,
             include: [{ model: Image }]
+        }, {
+            model: ItemGroup,
+            include: [{ model: Position }],
         }]
     }).then(item => {
         res.send(item);

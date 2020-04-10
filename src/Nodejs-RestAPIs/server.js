@@ -150,6 +150,7 @@ require('./app/route/position.route')(app);
 require('./app/route/file.route')(app);
 require('./app/route/item.route')(app);
 require('./app/route/itemGroup.route')(app);
+require('./app/route/stockChanges.route')(app);
 
 // distribute files from file db
 console.log("Store at and load files from: ", env.fileStoragePath);

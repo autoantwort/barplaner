@@ -14,11 +14,7 @@
       >
         <span class="navbar-toggler-icon"></span>
       </button>
-      <div
-        class="collapse navbar-collapse"
-        id="navbarSupportedContent"
-        v-bind:class="{ 'show': showNav }"
-      >
+      <div class="collapse navbar-collapse" id="navbarSupportedContent" v-bind:class="{ 'show': showNav }">
         <ul class="navbar-nav mx-auto">
           <li v-if="barAdmin" class="nav-item">
             <router-link class="nav-link" to="/addBar">Add Bar</router-link>
@@ -47,14 +43,19 @@
           <li class="nav-item">
             <router-link class="nav-link" to="/remoteControlPane">Remote Control Pane</router-link>
           </li>
-          <b-nav-item-dropdown text="Lager" right>            
+          <b-nav-item-dropdown text="Lager" right>
             <b-dropdown-item to="/addItem">Add Item</b-dropdown-item>
             <b-dropdown-item to="/addPosition">Add Position</b-dropdown-item>
             <b-dropdown-item to="/addItemGroup">Add ItemGroup</b-dropdown-item>
+            <div class="dropdown-divider"></div>
             <b-dropdown-item to="/items">Items</b-dropdown-item>
             <b-dropdown-item to="/positions">Positions</b-dropdown-item>
             <b-dropdown-item to="/itemGroups">ItemGroups</b-dropdown-item>
-          </b-nav-item-dropdown>          
+            <div class="dropdown-divider"></div>
+            <b-dropdown-item to="/itemStock">ItemStock</b-dropdown-item>
+            <b-dropdown-item to="/itemGroupStock">ItemGroupStock</b-dropdown-item>
+            <b-dropdown-item to="/stockChanges">StockChanges</b-dropdown-item>
+          </b-nav-item-dropdown>
           <li class="nav-item">
             <router-link class="nav-link" to="/account">Account</router-link>
           </li>

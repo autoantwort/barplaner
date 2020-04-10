@@ -24,7 +24,13 @@
         </div>
         <div class="form-group row">
           <label class="col-4">ItemGroup</label>
-          <label class="col-8">{{realItem.itemGroup?realItem.itemGroup.name:'None'}}</label>
+          <label class="col-8">
+            <router-link
+              v-if="realItem.itemGroup"
+              :to="{ name: 'itemGroup',params:{ itemGroupId: realItem.itemGroup.id , itemGroup: realItem.itemGroup} }"
+            >{{realItem.itemGroup.name}}</router-link>
+            <template v-else>None</template>
+          </label>
         </div>
         <div class="form-group row">
           <label class="col-4">Image</label>
@@ -67,6 +73,28 @@
             <span v-else>None</span>
           </label>
         </div>
+        <div class="form-group row">
+          <label class="col-4">In Stock</label>
+          <label class="col-8">{{stock === undefined ? "Loading..." : stock ? stock.inStock : "0"}}</label>
+        </div>
+        <div class="row" v-if="stockChanges && stockChanges.length > 0">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th scope="col">Date</th>
+                <th scope="col">Amount</th>
+                <th scope="col">Brotto Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="change in stockChanges" :key="change.id">
+                <td>{{change.date | asDateTime}}</td>
+                <td>{{change.amount}}</td>
+                <td>{{change.brottoPrice}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
         <b-modal ref="modal" hide-footer no-fade centered :title="selectedPosition && selectedPosition.name">
           <positionImage :position="selectedPosition"></positionImage>
         </b-modal>
@@ -99,10 +127,11 @@ export default {
   data() {
     return {
       selectedPosition: null,
-      items: "",
       realItem: null,
       imageId: null,
-      loading: false
+      loading: false,
+      stock: undefined,
+      stockChanges: null
     };
   },
   methods: {
@@ -132,6 +161,27 @@ export default {
         .catch(e => {
           console.log(e);
         });
+    },
+    retrieveStock() {
+      const itemId =
+        this.item === null ? this.$route.params.itemId : this.item.id;
+      http
+        .get("/item/" + itemId + "/stock")
+        .then(response => {
+          this.stock = response.data;
+          console.log(this.stock);
+        })
+        .catch(console.error);
+    },
+    retrieveStockChanges() {
+      const itemId =
+        this.item === null ? this.$route.params.itemId : this.item.id;
+      http
+        .get("/item/" + itemId + "/stockChanges")
+        .then(response => {
+          this.stockChanges = response.data;
+        })
+        .catch(console.error);
     }
   },
   created() {
@@ -143,6 +193,8 @@ export default {
     } else {
       this.realItem = this.item;
     }
+    this.retrieveStock();
+    this.retrieveStockChanges();
   }
   /* eslint-enable no-console */
 };

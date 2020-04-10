@@ -19,6 +19,10 @@ import ItemList from "./components/stock/ItemList.vue";
 import ItemGroupList from "./components/stock/ItemGroupList.vue";
 import AddItem from "./components/stock/AddItem.vue";
 import Item from "./components/stock/Item.vue";
+import StockChanges from "./components/stock/StockChangesList.vue";
+import ItemGroupStockList from "./components/stock/ItemGroupStockList.vue";
+import ItemStockList from "./components/stock/ItemStockList.vue";
+import AddStockChange from "./components/stock/AddStockChange.vue";
 import Account from "./components/Account.vue";
 import Settings from "./components/Settings.vue";
 import RemoteVolumeControl from "./components/RemoteVolumeControl.vue";
@@ -137,6 +141,22 @@ export default new Router({
                 path: "/addItem",
                 name: "addItem",
                 component: AddItem,
+            }, {
+                path: "/stockChanges",
+                name: "stockChanges",
+                component: StockChanges,
+            }, {
+                path: "/itemGroupStock",
+                name: "itemGroupStock",
+                component: ItemGroupStockList,
+            }, {
+                path: "/itemStock",
+                name: "itemStock",
+                component: ItemStockList,
+            }, {
+                path: "/addStockChange",
+                name: "addStockChange",
+                component: AddStockChange,
             }, {
                 path: "/settings",
                 name: "settings",

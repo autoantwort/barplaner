@@ -20,13 +20,15 @@ library.add(faTrashAlt, faPlay, faPause, faStop, faRedo, faStepForward, faImage)
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 
 // see https://bootstrap-vue.js.org/docs/#using-module-bundlers
-import { NavPlugin, TabsPlugin, CardPlugin, AlertPlugin, ModalPlugin, SpinnerPlugin } from 'bootstrap-vue';
+import { NavPlugin, TabsPlugin, CardPlugin, AlertPlugin, ModalPlugin, SpinnerPlugin, FormDatepickerPlugin, ToastPlugin } from 'bootstrap-vue';
 Vue.use(NavPlugin);
 Vue.use(TabsPlugin);
 Vue.use(CardPlugin);
 Vue.use(AlertPlugin);
 Vue.use(ModalPlugin);
 Vue.use(SpinnerPlugin);
+Vue.use(FormDatepickerPlugin);
+Vue.use(ToastPlugin);
 
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';

@@ -37,7 +37,8 @@ exports.getAllForSelect = (req, res) => {
     ItemGroup.findAll({
         attributes: [
             ['id', 'value'],
-            ['name', 'text']
+            ['name', 'text'],
+            'nameColognePhonetics'
         ],
     }).then(itemGroups => {
         res.send(itemGroups);
@@ -72,4 +73,13 @@ exports.findById = (req, res) => {
     }).catch(err => {
         res.status(500).send("Error -> " + err);
     });
+};
+
+// get all Item Groups for a position
+exports.getAllItemGroupsAtPosition = (req, res) => {
+    ItemGroup.findAll({
+        where: {
+            stockPositionId: req.params.positionId,
+        },
+    }).then(groups => res.send(groups)).catch(e => res.status(500).send("Err" + e));
 };

@@ -72,7 +72,8 @@ exports.getAllForSelect = (req, res) => {
     Position.findAll({
         attributes: [
             ['id', 'value'],
-            ['name', 'text']
+            ['name', 'text'],
+            "nameColognePhonetics",
         ],
     }).then(positions => {
         res.send(positions);
