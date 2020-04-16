@@ -38,17 +38,12 @@
               :id="key+ikey+'Root'"
               v-on:dragstart="handleDragStart($event,client.name+'.'+ikey+'.')"
               draggable="true"
+              v-on:mouseover="handleMouseOver"
               v-on:touchstart="handleTouchStart($event,client.name+'.'+ikey+'.')"
             >
-              <h5
-                class="text-center"
-                v-bind:class="{'vertical-name':item.type !== 'DIMMER_GROUP'}"
-              >{{item.name}}</h5>
+              <h5 class="text-center pb-4" v-bind:class="{'vertical-name':item.type !== 'DIMMER_GROUP'}">{{item.name}}</h5>
 
-              <div
-                v-if="item.type === 'DIMMER_GROUP'"
-                style="top:25%; position:absolute;width:100%;height:75%"
-              >
+              <div v-if="item.type === 'DIMMER_GROUP'" style="top:25%; position:absolute;width:100%;height:75%">
                 <input
                   type="range"
                   orient="vertical"
@@ -152,6 +147,19 @@ export default {
   },
   methods: {
     /* eslint-disable no-console */
+    handleMouseOver(e) {
+      if (e.target.tagName === "H5") {
+        e.target.parentElement.setAttribute("draggable", "true");
+      } else {
+        let s = e.target;
+        while (s && !s.classList.contains("item")) {
+          s = s.parentElement;
+        }
+        if (s) {
+          s.removeAttribute("draggable");
+        }
+      }
+    },
     handleTouchStart(e, item) {
       if (this.enableMove) {
         let target = e.target;
@@ -332,7 +340,7 @@ export default {
   },
   created() {
     this.webSocket = new WebSocket(
-      "wss://orga.symposion.hilton.rwth-aachen.de/controlPaneMaster"      
+      "wss://orga.symposion.hilton.rwth-aachen.de/controlPaneMaster"
     );
     this.initialize();
     this.isTouch = "ontouchstart" in window;
