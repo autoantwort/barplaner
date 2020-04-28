@@ -7,10 +7,21 @@ const sharp = require('sharp');
 
 fs.mkdir(env.fileStoragePath, { recursive: true });
 
+exports.getFilePathForId = id => env.fileStoragePath + '/' + file.id;
+
 exports.coreCreateFile = async(buffer, mimeType, filename = null, md5) => {
     const file = await File.create({ filename: filename, mimeType: mimeType, id: md5 });
-    await fs.writeFile(env.fileStoragePath + '/' + file.id, buffer);
+    await fs.writeFile(exports.getFilePathForId(file.id), buffer);
     return file;
+};
+
+/**
+ * Returns a File object or throws a error. Function is async
+ * @param {object} file A file object from the req.files object
+ * @returns {object} The created db.File object
+ */
+exports.coreCreateFileFromReqFile = async(file) => {
+    return await exports.coreCreateFile(file.data, file.mimetype, file.name, file.md5);
 };
 
 exports.coreCreateImage = async(titel, filename, buffer, mimeType, md5) => {
