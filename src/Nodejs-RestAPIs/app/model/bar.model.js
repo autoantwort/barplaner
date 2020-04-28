@@ -12,6 +12,10 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.BOOLEAN,
             defaultValue: true,
         },
+        canceled: {
+            type: Sequelize.BOOLEAN,
+            defaultValue: false,
+        },
         start: {
             type: Sequelize.DATE
         },

@@ -130,7 +130,8 @@ function replacePlaceholders(text, barObject, defaultImageURL) {
 }
 
 /**
- * creates a newsletter in the wp_2_newsletter_emails table based on the newsletter wth the given id
+ * creates a newsletter in the wp_2_newsletter_emails table based on the newsletter wth the given id.
+ * if a newsletter for the bar already exists, the newsletter gets updated
  * 
  * @param {Bar} barObject the bar object with all nessesary information
  * @param {Number} newsletterId the id of the template newsletter
@@ -141,47 +142,66 @@ function sendNewsletter(barObject, newsletterId, sendTime) {
     if (barObject.description.length === 0) {
         return;
     }
-    // only create one newsletter per bar
-    Wordpress.query("Select id from wp_2_newsletter_emails where barId = ?", { replacements: [barObject.id], type: Wordpress.QueryTypes.SELECT }).then(bars => {
-        // when there is no newsletter for the bar
-        if (bars.length === 0) {
-            // get template newsletter
-            Wordpress.query("Select * from wp_2_newsletter_emails where id = 61", { replacements: [newsletterId], type: Wordpress.QueryTypes.SELECT }).then(rows => {
-                if (rows.length === 1) {
-                    DefaultImageURL.reload().then(() => {
-                        const nl = rows[0];
-                        nl.message = replacePlaceholders(nl.message, barObject, DefaultImageURL.value);
-                        nl.subject = replacePlaceholders(nl.subject, barObject, DefaultImageURL.value);
+    // get template newsletter
+    Wordpress.query("Select * from wp_2_newsletter_emails where id = ?", { replacements: [newsletterId], type: Wordpress.QueryTypes.SELECT }).then(rows => {
+        if (rows.length === 1) {
+            const template = rows[0];
+            // only create one newsletter per bar, update old one
+            Wordpress.query("Select id from wp_2_newsletter_emails where barId = ?", { replacements: [barObject.id], type: Wordpress.QueryTypes.SELECT }).then(bars => {
+                DefaultImageURL.reload().then(() => {
+                    // when there is no newsletter for the bar
+                    if (bars.length === 0) {
+                        template.message = replacePlaceholders(template.message, barObject, DefaultImageURL.value);
+                        template.subject = replacePlaceholders(template.subject, barObject, DefaultImageURL.value);
                         const now = new Date();
                         now.setMinutes(now.getMinutes() + now.getTimezoneOffset());
-                        nl.send_on = Number((sendTime / 1000).toFixed(0));
-                        nl.created = now;
-                        nl.status = 'sending';
-                        nl.barId = barObject.id;
-                        delete nl.id;
+                        template.send_on = Number((sendTime / 1000).toFixed(0));
+                        template.created = now;
+                        template.status = 'sending';
+                        template.barId = barObject.id;
+                        delete template.id;
                         let sql = "Insert into wp_2_newsletter_emails ";
-                        sql += '(' + Object.getOwnPropertyNames(nl).join(', ') + ')';
+                        sql += '(' + Object.getOwnPropertyNames(template).join(', ') + ')';
                         sql += " VALUES ";
-                        sql += '(' + Object.getOwnPropertyNames(nl).map(n => ":" + n).join(', ') + ')';
-                        Wordpress.query(sql, { replacements: nl, type: Wordpress.QueryTypes.INSERT }).catch(console.error);
-                    }).catch(console.error);
-                } else {
-                    console.error("The newsletterId " + newsletterId + " is not a valid newsletterId");
-                }
+                        sql += '(' + Object.getOwnPropertyNames(template).map(n => ":" + n).join(', ') + ')';
+                        Wordpress.query(sql, { replacements: template, type: Wordpress.QueryTypes.INSERT }).catch(console.error);
+                    } else {
+                        // update existing newsletters
+                        for (let newsletter in bars) {
+                            // we don't want to change newsletters that are already sent
+                            if (newsletter.status !== "sent") {
+                                let update = {};
+                                update.message = replacePlaceholders(template.message, barObject, DefaultImageURL.value);
+                                update.subject = replacePlaceholders(template.subject, barObject, DefaultImageURL.value);
+                                const now = new Date();
+                                now.setMinutes(now.getMinutes() + now.getTimezoneOffset());
+                                update.send_on = Number((sendTime / 1000).toFixed(0));
+                                let sql = "Update wp_2_newsletter_emails SET ";
+                                sql += Object.getOwnPropertyNames(update).map(p => p + " = :" + p).join(', '); /* message = :message, ... */
+                                sql += " WHERE :id";
+                                update.id = newsletter.id;
+                                Wordpress.query(sql, { replacements: update, type: Wordpress.QueryTypes.UPDATE }).catch(console.error);
+                            }
+                        }
+                    }
+                }).catch(console.error);
             }).catch(console.error);
+        } else {
+            console.error("There is no newsletter for the given template newsletter id ", newsletterId);
         }
     }).catch(console.error);
 }
 
 /**
- * creates a newsletter in the wordpress database, you can only create one newsletter per bar
+ * creates a newsletter in the wordpress database, you can only create one newsletter per bar.
+ * if a newsletter for the bar already exists, the newsletter gets updated
  * 
  * @param {Bar} barData the bar model object 
  */
 exports.sendEmailForBar = (barData) => {
     TemplateNewsletterId.reload().then(id => {
         computeSendTime(barData.start).then(time => {
-            sendNewsletter(barData, id, time);
+            sendNewsletter(barData, id.value, time);
         }).catch(console.error);
     }).catch(console.error);
 };
