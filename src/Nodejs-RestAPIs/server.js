@@ -151,10 +151,25 @@ require('./app/route/file.route')(app);
 require('./app/route/item.route')(app);
 require('./app/route/itemGroup.route')(app);
 require('./app/route/stockChanges.route')(app);
+require('./app/route/invoice.route')(app);
 
 // distribute files from file db
 console.log("Store at and load files from: ", env.fileStoragePath);
-app.use('/api/file/', express.static(env.fileStoragePath, { maxAge: 1000 * 60 * 60 * 24 * 365 * 10 /*10 years*/ , index: false }));
+app.use('/api/file/:fileId', (req, res, next) => {
+    // set the Content-Type header, we have this information in our database        
+    db.File.findByPk(req.params.fileId).then(file => {
+        if (file === null) {
+            res.status(404).send("The file with id " + req.params.fileId + " does not exists");
+        } else {
+            res.setHeader("Content-Type", file.mimeType);
+            next();
+        }
+    });
+});
+app.use('/api/file/', express.static(env.fileStoragePath, {
+    maxAge: 1000 * 60 * 60 * 24 * 365 * 10 /*10 years*/ ,
+    index: false,
+}));
 
 // Create a Server
 var server = app.listen(8080, function() {

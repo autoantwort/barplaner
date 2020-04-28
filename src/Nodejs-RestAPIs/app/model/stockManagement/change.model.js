@@ -1,4 +1,4 @@
-module.exports = (sequelize, Sequelize, Item, User) => {
+module.exports = (sequelize, Sequelize, Item, User, InvoiceEntry) => {
     const StockChange = sequelize.define('stockChange', {
         date: {
             type: Sequelize.DATE,
@@ -41,6 +41,9 @@ module.exports = (sequelize, Sequelize, Item, User) => {
 
     StockChange.belongsTo(User);
     User.hasMany(StockChange);
+
+    StockChange.belongsTo(InvoiceEntry);
+    InvoiceEntry.hasOne(StockChange);
 
     return StockChange;
 };

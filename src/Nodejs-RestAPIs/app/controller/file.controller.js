@@ -7,7 +7,7 @@ const sharp = require('sharp');
 
 fs.mkdir(env.fileStoragePath, { recursive: true });
 
-exports.getFilePathForId = id => env.fileStoragePath + '/' + file.id;
+exports.getFilePathForId = id => env.fileStoragePath + '/' + id;
 
 exports.coreCreateFile = async(buffer, mimeType, filename = null, md5) => {
     const file = await File.create({ filename: filename, mimeType: mimeType, id: md5 });

@@ -23,6 +23,8 @@ import StockChanges from "./components/stock/StockChangesList.vue";
 import ItemGroupStockList from "./components/stock/ItemGroupStockList.vue";
 import ItemStockList from "./components/stock/ItemStockList.vue";
 import AddStockChange from "./components/stock/AddStockChange.vue";
+import Invoice from "./components/stock/Invoice.vue";
+import InvoiceList from "./components/stock/InvoiceList.vue";
 import Account from "./components/Account.vue";
 import Settings from "./components/Settings.vue";
 import RemoteVolumeControl from "./components/RemoteVolumeControl.vue";
@@ -157,6 +159,15 @@ export default new Router({
                 path: "/addStockChange",
                 name: "addStockChange",
                 component: AddStockChange,
+            }, {
+                path: "/invoice/:invoiceId",
+                name: "invoice",
+                component: Invoice,
+                props: true,
+            }, {
+                path: "/invoices",
+                name: "invoiceList",
+                component: InvoiceList,
             }, {
                 path: "/settings",
                 name: "settings",

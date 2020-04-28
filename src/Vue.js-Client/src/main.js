@@ -11,6 +11,7 @@ import { printDate, printDateTime, printDayDateTime } from './dateFilters';
 Vue.filter('asDate', printDate);
 Vue.filter('asDateTime', printDateTime);
 Vue.filter('asDayDateTime', printDayDateTime);
+Vue.filter('asEuro', n => n === null ? "" : n.toLocaleString("de-DE", { maximumFractionDigits: 2 }) + " €");
 
 // see https://www.npmjs.com/package/@fortawesome/vue-fontawesome#recommended
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -20,7 +21,7 @@ library.add(faTrashAlt, faPlay, faPause, faStop, faRedo, faStepForward, faImage)
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 
 // see https://bootstrap-vue.js.org/docs/#using-module-bundlers
-import { NavPlugin, TabsPlugin, CardPlugin, AlertPlugin, ModalPlugin, SpinnerPlugin, FormDatepickerPlugin, ToastPlugin } from 'bootstrap-vue';
+import { NavPlugin, TabsPlugin, CardPlugin, AlertPlugin, ModalPlugin, SpinnerPlugin, FormDatepickerPlugin, ToastPlugin, FormFilePlugin } from 'bootstrap-vue';
 Vue.use(NavPlugin);
 Vue.use(TabsPlugin);
 Vue.use(CardPlugin);
@@ -29,6 +30,7 @@ Vue.use(ModalPlugin);
 Vue.use(SpinnerPlugin);
 Vue.use(FormDatepickerPlugin);
 Vue.use(ToastPlugin);
+Vue.use(FormFilePlugin);
 
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';

@@ -59,7 +59,9 @@ db.stock = {};
 db.stock.Position = require('../model/stockManagement/position.model')(sequelize, Sequelize, db.Image);
 db.stock.ItemGroup = require('../model/stockManagement/itemGroup.model')(sequelize, Sequelize, db.stock.Position);
 db.stock.Item = require('../model/stockManagement/item.model')(sequelize, Sequelize, db.Image, db.stock.ItemGroup, db.stock.Position);
-db.stock.Change = require('../model/stockManagement/change.model')(sequelize, Sequelize, db.stock.Item, db.User);
+db.stock.Invoice = require('../model/stockManagement/invoice.model')(sequelize, Sequelize, db.File);
+db.stock.InvoiceEntry = require('../model/stockManagement/invoiceEntry.model')(sequelize, Sequelize, db.stock.Invoice, db.stock.Item);
+db.stock.Change = require('../model/stockManagement/change.model')(sequelize, Sequelize, db.stock.Item, db.User, db.stock.InvoiceEntry);
 
 
 let funcArray = [];

@@ -277,3 +277,25 @@ exports.getAllChangesAtDay = (req, res) => {
         res.status(500).send("Error -> " + err);
     });
 };
+
+exports.getAllChangesFromInvoice = (req, res) => {
+    StockChange.findAll({
+        where: {
+            invoiceId: req.params.invoiceId,
+        },
+        include: [{
+            model: User,
+            attributes: ['id', 'name'],
+        }, {
+            model: Item,
+            attributes: ['id', 'name'],
+        }],
+        order: [
+            ['date', "DESC"],
+        ],
+    }).then(changes => {
+        res.send(changes);
+    }).catch(err => {
+        res.status(500).send("Error -> " + err);
+    });
+};

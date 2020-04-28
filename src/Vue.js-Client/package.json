@@ -15,7 +15,7 @@
         "axios": "^0.18.1",
         "bootstrap": "^4.4.1",
         "bootstrap-vue": "^2.9.0",
-        "node-sass": "^4.13.1",
+        "node-sass": "^4.14.1",
         "sass-loader": "^8.0.2",
         "vue": "^2.6.11",
         "vue-clickaway": "^2.2.2",

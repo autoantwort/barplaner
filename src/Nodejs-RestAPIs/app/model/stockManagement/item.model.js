@@ -12,6 +12,7 @@ module.exports = (sequelize, Sequelize, Image, ItemGroup, Position) => {
             type: Sequelize.STRING,
             allowNull: true,
             defaultValue: null,
+            unique: 'uniqueBarcodeAtSeller'
         },
         articleNumber: {
             type: Sequelize.STRING,
@@ -30,7 +31,7 @@ module.exports = (sequelize, Sequelize, Image, ItemGroup, Position) => {
         seller: {
             type: Sequelize.ENUM,
             values: ['Amazon', 'Metro', 'Aldi', 'Conalco', 'Rewe', 'Netto', 'Donation', 'Other'],
-            defaultValue: 'other',
+            unique: 'uniqueBarcodeAtSeller'
         },
         amount: {
             type: Sequelize.INTEGER,
