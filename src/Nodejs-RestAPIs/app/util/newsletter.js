@@ -151,6 +151,10 @@ function sendNewsletter(barObject, newsletterId, sendTime) {
                 DefaultImageURL.reload().then(() => {
                     // when there is no newsletter for the bar
                     if (bars.length === 0) {
+                        if (barObject.canceled) {
+                            // don't create a newsletter if event is cancelled
+                            return;
+                        }
                         template.message = replacePlaceholders(template.message, barObject, DefaultImageURL.value);
                         template.subject = replacePlaceholders(template.subject, barObject, DefaultImageURL.value);
                         const now = new Date();
@@ -170,6 +174,12 @@ function sendNewsletter(barObject, newsletterId, sendTime) {
                         for (let newsletter in bars) {
                             // we don't want to change newsletters that are already sent
                             if (newsletter.status !== "sent") {
+                                if (barObject.canceled) {
+                                    // delete existing newsletter
+                                    let sql = "Delete from wp_2_newsletter_emails WHERE id = ?";
+                                    Wordpress.query(sql, { replacements: [newsletter.id], type: Wordpress.QueryTypes.DELETE }).catch(console.error);
+                                    return;
+                                }
                                 let update = {};
                                 update.message = replacePlaceholders(template.message, barObject, DefaultImageURL.value);
                                 update.subject = replacePlaceholders(template.subject, barObject, DefaultImageURL.value);
