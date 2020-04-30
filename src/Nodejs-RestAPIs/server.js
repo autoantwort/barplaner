@@ -54,6 +54,9 @@ remoteVolumeControl.registerClients(app);
 const remoteControlPane = require("./app/util/remoteControlPane");
 remoteControlPane.registerClients(app);
 
+const ical = require("./app/util/icalCalendar");
+app.get(env.ical.urlPath, (req, res) => ical.serve(res));
+
 const crypto = require('crypto');
 
 const User = db.User;

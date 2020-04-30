@@ -12,6 +12,9 @@ const Setting = db.Setting;
 const Op = db.Sequelize.Op;
 const Util = require('../util/cleaning');
 
+const barAddedListener = [];
+const barChangedListener = [];
+
 exports.addBar = (barData, numberOfPersonsToClean) => {
     return new Promise((resolve, reject) => {
         Bar.create(barData).then(bar => {
@@ -38,6 +41,7 @@ exports.addBar = (barData, numberOfPersonsToClean) => {
                             .catch(reject);
                     } else {
                         TelegramBarFeedback.barAdded(bar);
+                        barAddedListener.forEach(c => c(bar));
                         resolve(bar);
                     }
                 }).catch(err => {
@@ -51,6 +55,8 @@ exports.addBar = (barData, numberOfPersonsToClean) => {
         });
     });
 };
+
+exports.onBarAdded = callback => barAddedListener.push(callback);
 
 /**
  * Must be called to change a bar object. Checks if there are changes and do 
@@ -79,5 +85,8 @@ exports.changeBar = (barObject, newBarData) => {
         barObject.save();
         // update the email newsletter
         Newsletter.sendEmailForBar(barObject);
+        barChangedListener.forEach(c => c(barObject));
     }
 };
+
+exports.onBarChanged = callback => barChangedListener.push(callback);

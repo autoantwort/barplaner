@@ -33,6 +33,32 @@ const env = {
         host: '***',
         dialect: 'mysql',
     },
+    ical: {
+        urlPath: '/publicEvents.ics', // the path on the server
+        domain: 'symposion-aachen.com',
+        prodId: { company: 'hilton.rwth-aachen.de', product: 'Symposion Bar' },
+        name: 'Symposion Bar Events',
+        ttl: 60 * 60 * 24, // time to live: one day
+        oldestEvent: 90, // days, the oldest event in the calendar is x days in the past
+        organizer: { // organizer of the events
+            name: 'Symposion BarAG',
+            email: 'bar@hilton.rwth-aachen.de',
+        },
+        geo: { // position of the events
+            lat: 50.78254777841156,
+            lon: 6.076405048370362,
+        },
+        // location: "Turmstraße 1, 52072 Aachen, Germany", // or use appleLocation
+        appleLocation: { // or use location
+            title: "Symposion",
+            address: "Turmstraße 1, 52072 Aachen, Germany",
+            radius: 10,
+            geo: {
+                lat: 50.78254777841156,
+                lon: 6.076405048370362,
+            },
+        },
+    },
 };
 
 module.exports = env;
