@@ -60,7 +60,7 @@ BarUtil.onBarAdded(bar => {
 });
 
 BarUtil.onBarChanged(event => {
-    for (let e of ical.events()) {
+    for (let e of cal.events()) {
         if (e.uid() == event.id) {
             e.start(event.start);
             e.end(event.end);
