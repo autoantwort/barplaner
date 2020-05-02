@@ -57,6 +57,10 @@ remoteControlPane.registerClients(app);
 const ical = require("./app/util/icalCalendar");
 app.get(env.ical.urlPath, (req, res) => ical.serve(res));
 
+if (env.webDavCalendars && env.webDavCalendars.length > 0) {
+    require("./app/util/webDavCalendar");
+}
+
 const crypto = require('crypto');
 
 const User = db.User;

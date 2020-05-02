@@ -59,6 +59,14 @@ const env = {
             },
         },
     },
+    /*webDavCalendars: [{ // you can add multiple accounts
+        url: "https://cloud.hilton.rwth-aachen.de/remote.php/dav/calendars/symposion",
+        calendarName: "Personal",
+        auth: {
+            username: "symposion",
+            password: "",
+        }
+    }],*/
 };
 
 module.exports = env;
