@@ -171,7 +171,7 @@ function sendNewsletter(barObject, newsletterId, sendTime) {
                         Wordpress.query(sql, { replacements: template, type: Wordpress.QueryTypes.INSERT }).catch(console.error);
                     } else {
                         // update existing newsletters
-                        for (let newsletter in bars) {
+                        for (let newsletter of bars) {
                             // we don't want to change newsletters that are already sent
                             if (newsletter.status !== "sent") {
                                 if (barObject.canceled) {
