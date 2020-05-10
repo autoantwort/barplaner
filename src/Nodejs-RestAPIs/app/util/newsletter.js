@@ -188,7 +188,7 @@ function sendNewsletter(barObject, newsletterId, sendTime) {
                                 update.send_on = Number((sendTime / 1000).toFixed(0));
                                 let sql = "Update wp_2_newsletter_emails SET ";
                                 sql += Object.getOwnPropertyNames(update).map(p => p + " = :" + p).join(', '); /* message = :message, ... */
-                                sql += " WHERE :id";
+                                sql += " WHERE id = :id";
                                 update.id = newsletter.id;
                                 Wordpress.query(sql, { replacements: update, type: Wordpress.QueryTypes.UPDATE }).catch(console.error);
                             }
