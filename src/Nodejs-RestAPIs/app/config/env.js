@@ -67,6 +67,15 @@ const env = {
             password: "",
         }
     }],*/
+    webNotifications: {
+        contact: "mailto:bar@hilton.rwth-aachen.de",
+        vapidKeys: { // in the src/Nodejs-RestAPIs folder execute "node_modules/web-push/src/cli.js generate-vapid-keys --json" to generate the keys
+            "publicKey": "",
+            "privateKey": ""
+        },
+        sendDaysBefore: [0, 1], // wie viel Tage vorher senden
+        sendTime: 20, // um wie viel Uhr senden
+    },
 };
 
 module.exports = env;
