@@ -91,7 +91,7 @@ exports.getFacebookEvents = () => {
                 PageID.reload().then(() => {
                     axios.get(PageID.value + "/events?fields=start_time,end_time,description,id,interested_count,is_canceled,is_draft,maybe_count,name,declined_count,noreply_count,type,cover&include_canceled=true&access_token=" + AccessToken.value).then(response => {
                         resolve(response.data.data); // the events array in saved in a data property
-                    }).catch(err => reject(err.response.data));
+                    }).catch(err => reject(err.response));
                 });
             });
         }
