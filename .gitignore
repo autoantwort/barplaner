@@ -1,5 +1,8 @@
 # Default folder for files
 webserver/*
+# database
+*.sqlite
+
 
 # Logs
 logs
