@@ -4,12 +4,16 @@ const File = db.File;
 const Image = db.Image;
 const env = require('../config/env');
 const sharp = require('sharp');
+const crypto = require('crypto');
 
 fs.mkdir(env.fileStoragePath, { recursive: true });
 
 exports.getFilePathForId = id => env.fileStoragePath + '/' + id;
 
 exports.coreCreateFile = async(buffer, mimeType, filename = null, md5) => {
+    if (md5 === undefined) {
+        md5 = crypto.createHash('md5').update(buffer).digest('hex');
+    }
     const file = await File.create({ filename: filename, mimeType: mimeType, id: md5 });
     await fs.writeFile(exports.getFilePathForId(file.id), buffer);
     return file;
