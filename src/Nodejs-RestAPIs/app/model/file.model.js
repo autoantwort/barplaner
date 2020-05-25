@@ -6,6 +6,7 @@ module.exports = (sequelize, Sequelize) => {
             // should / must be the md5 file hash
             type: Sequelize.STRING(32),
             primaryKey: true,
+            allowNull: false,
         },
         filename: {
             type: Sequelize.STRING,
