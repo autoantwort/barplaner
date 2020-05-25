@@ -9,7 +9,7 @@ module.exports = (sequelize, Sequelize, File) => {
         validate: {
             imageFileMustExists() {
                 if ((this.original === null) && (this.compressed === null)) {
-                    throw new Error('A image must exists. The optional and the compressed reference are null.');
+                    throw new Error('A image must exists. The original and the compressed reference are null.');
                 }
             }
         },
