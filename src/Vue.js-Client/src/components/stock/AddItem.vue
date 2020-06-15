@@ -54,7 +54,7 @@
           </div>
           <div class="form-group">
             <label for="seller">Seller</label>
-            <select class="form-control" id="seller" v-model="item.seller" required>
+            <select class="form-control" id="seller" v-model="item.seller">
               <option>Amazon</option>
               <option>Metro</option>
               <option>Aldi</option>
@@ -63,6 +63,7 @@
               <option>Netto</option>
               <option>Donation</option>
               <option>Other</option>
+              <option>Unknown</option>
             </select>
           </div>
           <div class="form-group">
@@ -218,7 +219,7 @@ export default {
         name: "",
         barcode: null,
         articleNumber: null,
-        seller: "Other",
+        seller: "Unknown",
         positionTabIndex: 1,
         selectedPosition: null,
         amount: null,
@@ -270,7 +271,9 @@ export default {
       if (this.item.articleNumber !== null) {
         formData.set("articleNumber", this.item.articleNumber);
       }
-      formData.set("seller", this.item.seller);
+      if (this.item.seller !== "Unknown") {
+        formData.set("seller", this.item.seller);
+      }
       if (this.item.amount !== null) formData.set("amount", this.item.amount);
       if (this.item.unit !== "Units") {
         formData.set("unit", this.item.unit.toLowerCase());
