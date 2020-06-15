@@ -8,12 +8,12 @@ const Image = db.Image;
 const sequelize = db.sequelize;
 
 // Post a Item
-exports.create = async(req, res) => {
+createOrUpdate = create => async(req, res) => {
     let response = { created: {} };
     const errorHandler = e => res.status(e.name === "SequelizeValidationError" || e.name === "SequelizeUniqueConstraintError" ? 400 : 500).send("Error: " + e.name + ": " + e.errors[0].message);
 
     // first handle the possible creation of a item group
-    let itemGroupId = null;
+    let itemGroupId;
     if (req.body['itemGroup.name'] !== undefined) {
         try {
             itemGroupId = (await ItemGroup.create({
@@ -32,7 +32,7 @@ exports.create = async(req, res) => {
         itemGroupId = req.body['itemGroup.id'];
     }
     // handle image
-    let imageId = null;
+    let imageId;
     if (req.body.itemImageId !== undefined) {
         imageId = req.body.itemImageId;
     } else if (req.files && req.files.itemImage !== undefined) {
@@ -56,19 +56,40 @@ exports.create = async(req, res) => {
         }
     }
 
-    const create = {
+    const values = {
         ...req.body,
-        image: imageId,
+        imageId,
         itemGroupId,
         stockPositionId: req.body.itemPosition,
     };
-    Item.create(create).then(item => {
-        res.status(201).send(item);
-    }).catch(error => {
-        response.error = "Can't create an item: " + JSON.stringify(error);
-        res.status(400).send(response);
-    });
+    if (create) {
+        Item.create(values).then(item => {
+            if (response.created.image) {
+                item.image = response.created.image;
+            }
+            res.status(201).send(item);
+        }).catch(error => {
+            response.error = "Can't create an item: " + JSON.stringify(error);
+            res.status(400).send(response);
+        });
+    } else {
+        Item.update(values, { where: { id: req.params.id } }).then(async(affected_) => {
+            const affected = affected_[0];
+            if (affected === 0) {
+                response.error = "Item with id " + req.params.id + " does not exist";
+                return res.status(404).send(response);
+            }
+            res.status(200).send(await Item.findByPk(req.params.id, { include: [{ model: Image }, { model: ItemGroup }] }));
+        }).catch(error => {
+            console.error(error)
+            response.error = "Can't update item: " + JSON.stringify(error);
+            res.status(400).send(response);
+        });
+    }
 };
+
+exports.create = createOrUpdate(true);
+exports.update = createOrUpdate(false);
 
 // get all items
 exports.getAll = (req, res) => {
@@ -102,6 +123,18 @@ exports.getAllWithGroupsAndPositions = (req, res) => {
             include: [{ model: Position }]
         }, {
             model: Position
+        }]
+    }).then(items => {
+        res.send(items);
+    }).catch(err => {
+        res.status(500).send("Error -> " + err);
+    });
+};
+
+exports.getAllWithImage = (req, res) => {
+    Item.findAll({
+        include: [{
+            model: Image
         }]
     }).then(items => {
         res.send(items);

@@ -1,8 +1,8 @@
 <template>
-  <div class="container">
+  <div :class="{'container': !fluid, 'container-fluid': fluid }">
     <div class="row mt-3">
-      <div v-if="realInvoice" class="col-12 col-md-10 offset-md-1">
-        <form ref="form" class="was-validated">
+      <template v-if="realInvoice">
+        <form ref="form" class="was-validated col-12 col-lg-8 offset-lg-2 col-md-10 offset-md-1">
           <div class="form-group row mb-2">
             <label class="col-3 col-form-label">From</label>
             <div class="col-9">
@@ -59,50 +59,92 @@
             </div>
           </div>
         </form>
-        <div class="row" v-if="invoiceEntries && invoiceEntries.length > 0">
-          <table class="table table-hover">
-            <thead>
-              <tr>
-                <th scope="col">Item</th>
-                <th scope="col">Change</th>
-                <th scope="col">Designation</th>
-                <th scope="col">Amount</th>
-                <th scope="col">Quantity</th>
-                <th scope="col">Net / Brot Price</th>
-                <th scope="col">Website</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="entry in invoiceEntries" :key="entry.id">
-                <td>
-                  <router-link v-if="entry.item" :to="{ name: 'item',params:{ itemId: entry.item.id } }">{{entry.item.name}}</router-link>
-                </td>
-                <td>
-                  <!--<router-link v-if="entry.item" :to="{ name: 'item',params:{ itemId: entry.item.id } }">{{entry.item.name}}</router-link>-->
-                  <span v-if="entry.change">#{{entry.change.id}}</span>
-                </td>
-                <td>{{entry.itemDescription}}</td>
-                <td>{{entry.amount}} {{entry.unit}}</td>
-                <td>{{entry.quantity}}</td>
-                <td>{{entry.netPrice | asEuro}} / {{entry.brottoPrice | asEuro}}</td>
-                <td>
-                  <a v-if="entry.productSite" target="_blank" :href="entry.productSite">{{realInvoice.seller}}</a>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="col-12" :class="{'col-xxl-6': pdfURL}" v-if="invoiceEntries && invoiceEntries.length > 0">
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th scope="col">Item</th>
+                  <th scope="col">Change</th>
+                  <th scope="col">Designation</th>
+                  <th scope="col">Amount</th>
+                  <th scope="col">Quantity</th>
+                  <th scope="col">Net / Brot Price</th>
+                  <th scope="col">Website</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="entry in invoiceEntries" :key="entry.id">
+                  <td>
+                    <div v-if="entry.stockItem" style="display: inline-flex;">
+                      <router-link
+                        :title="entry.stockItem.name"
+                        class="text-max-width"
+                        :to="{ name: 'item',params:{ itemId: entry.stockItem.id } }"
+                      >{{entry.stockItem.name}}</router-link>
+
+                      <button
+                        style="display: inline-block"
+                        class="ml-2 btn btn-sm btn-sm-flat btn-primary"
+                        type="button"
+                        title="Update existing Item"
+                        v-on:click="editItem(entry)"
+                      >
+                        <font-awesome-icon icon="edit" />
+                      </button>
+                      <button
+                        class="ml-2 btn btn-sm btn-sm-flat btn-danger"
+                        type="button"
+                        title="Unlink entry from Item"
+                        v-on:click="unlinkItem(entry)"
+                      >
+                        <font-awesome-icon icon="unlink" />
+                      </button>
+                    </div>
+                    <div v-else>
+                      <button
+                        class="btn btn-sm btn-sm-flat btn-success px-1 mr-1"
+                        title="Create Item from this Invoice Entry"
+                        v-on:click="newItem(entry)"
+                      >
+                        <font-awesome-icon icon="plus-square" />
+                      </button>
+                      <button
+                        class="btn btn-sm btn-sm-flat btn-primary px-1"
+                        title="Link this Invoice Entry to existing Item"
+                        v-on:click="linkItem(entry)"
+                      >
+                        <font-awesome-icon icon="link" />
+                      </button>
+                    </div>
+                  </td>
+                  <td>
+                    <!--<router-link v-if="entry.item" :to="{ name: 'item',params:{ itemId: entry.item.id } }">{{entry.item.name}}</router-link>-->
+                    <span v-if="entry.change">#{{entry.change.id}}</span>
+                  </td>
+                  <td>{{entry.itemDescription}}</td>
+                  <td>{{entry.amount}} {{entry.unit}}</td>
+                  <td>{{entry.quantity}}</td>
+                  <td>{{entry.netPrice | asEuro}} / {{entry.brottoPrice | asEuro}}</td>
+                  <td>
+                    <a v-if="entry.productSite" target="_blank" :href="entry.productSite">{{realInvoice.seller}}</a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
-        <div v-if="analysing" class="justify-content-center" style="display: flex;">
+        <div v-if="analysing" class="col-12 justify-content-center" style="display: flex;">
           <span class="mt-1">Analysing invoice...</span>
           <b-spinner class="center ml-3"></b-spinner>
         </div>
-        <div v-if="!pdfURL" class="justify-content-center mb-4" style="display: flex;">
+        <div v-if="!pdfURL" class="col-12 justify-content-center mb-4" style="display: flex;">
           <button class="btn btn-primary" v-on:click="showPDF">Show PDF</button>
         </div>
-        <div class="row mb-4" v-if="pdfURL">
+        <div class="col-12 col-xxl-6 mb-4" v-if="pdfURL">
           <iframe :src="pdfURL" style="width: 100%; height:1300px;" frameborder="0"></iframe>
         </div>
-      </div>
+      </template>
     </div>
     <b-modal
       ref="deleteInvoice"
@@ -112,11 +154,194 @@
       ok-variant="danger"
       v-on:ok="deleteInvoice"
     >Could not analyse Invoice. Do you want to delete the invoice? Otherwise you can inset the data manually.</b-modal>
+    <b-modal
+      ref="editInvoice"
+      centered
+      :title="currentItem?'Update Item' : 'Create Item'"
+      :ok-title="currentItem?'Update Item' : 'Create Item'"
+      :ok-variant="currentItem?'primary' : 'success'"
+      lazy
+      :size="modalSize"
+      v-on:ok="updateModalClicked"
+    >
+      <form ref="editForm" class="container-fluid">
+        <div class="row mb-3" v-if="currentItem">
+          <div class="col text-center text-underline">Invoice Entry</div>
+          <div class="col text-center text-underline">Updated Value</div>
+          <div class="col text-center text-underline">Item</div>
+        </div>
+        <div class="form-group">
+          <label for="name">Name</label>
+          <div class="row">
+            <div class="col" v-if="currentEntry">
+              <button class="btn btn-light" v-on:click="updatedItem.name = currentEntry.itemDescription">{{currentEntry.itemDescription}}</button>
+            </div>
+            <div class="col">
+              <input
+                type="text"
+                class="form-control"
+                :class="{'border border-warning': currentEntry && updatedItem.name === currentEntry.itemDescription}"
+                required
+                v-model="updatedItem.name"
+              />
+            </div>
+            <div class="col" v-if="currentItem">
+              <button class="btn btn-light" v-on:click="updatedItem.name = currentItem.name">{{currentItem.name}}</button>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="name">Content</label>
+          <div class="row">
+            <div class="col" v-if="currentEntry">
+              <button
+                v-if="currentEntry.amount"
+                class="btn btn-light"
+                v-on:click="updatedItem.unit = currentEntry.unit;updatedItem.amount = currentEntry.amount;"
+              >{{currentEntry.amount}} {{currentEntry.unit}}</button>
+            </div>
+            <div class="col">
+              <div class="input-group">
+                <input
+                  type="number"
+                  id="unit"
+                  class="form-control"
+                  aria-label="Text input with dropdown button"
+                  v-model="updatedItem.amount"
+                />
+                <div class="input-group-append">
+                  <b-dropdown v-bind:text="updatedItem.unit" v-model="updatedItem.unit">
+                    <b-dropdown-item v-on:click="updatedItem.unit='Units'">Units</b-dropdown-item>
+                    <b-dropdown-item v-on:click="updatedItem.unit='ml'">ml</b-dropdown-item>
+                    <b-dropdown-item v-on:click="updatedItem.unit='Gramm'">Gramm</b-dropdown-item>
+                  </b-dropdown>
+                </div>
+              </div>
+            </div>
+            <div class="col" v-if="currentItem">
+              <button
+                v-if="currentItem.amount"
+                class="btn btn-light"
+                v-on:click="updatedItem.unit = currentItem.unit;updatedItem.amount = currentItem.amount;"
+              >{{currentItem.amount}} {{currentItem.unit}}</button>
+            </div>
+          </div>
+        </div>
+        <div class="row row-cols-1 row-cols-md-2" v-if="currentEntry">
+          <div v-for="(imageUrl, index) of currentEntry.images" :key="index" class="col mb-4">
+            <div
+              class="card"
+              style="border-width: 2px !important"
+              :class="{'border border-success': updatedItem.selectedImageIndex === index}"
+              v-on:click="updatedItem.selectedImageIndex = index"
+            >
+              <img :src="imageUrl" class="card-img-top no-high-images" />
+            </div>
+          </div>
+          <div v-if="currentItem && currentItem.image" class="col mb-4">
+            <div
+              title="Current Image"
+              class="card"
+              style="border-width: 2px !important"
+              :class="{'border border-success': updatedItem.selectedImageIndex === -2}"
+              v-on:click="updatedItem.selectedImageIndex = -2"
+            >
+              <img :src="baseURL + '/file/' + currentItem.image.original" class="card-img-top no-high-images" />
+            </div>
+          </div>
+        </div>
+        <div class="form-group" v-if="currentItem === null">
+          <label>Item Group</label>
+          <v-select
+            :searchable="true"
+            :options="existingItemGroups"
+            v-model="updatedItem.selectedItemGroup"
+            :filterFunction="phoneticsFilter"
+          />
+        </div>
+        <div
+          class="alert alert-warning"
+          role="alert"
+          v-if="currentEntry && currentEntry.images && currentEntry.images.length > 0 && updatedItem.selectedImageIndex === null"
+        >No Image selected. Click on a image to select it.</div>
+        <div
+          class="alert alert-warning"
+          role="alert"
+          v-if="currentEntry && currentEntry.itemDescription ===  updatedItem.name "
+        >The item name has not been changed. It can contain unwanted characters.</div>
+      </form>
+    </b-modal>
+    <b-modal ref="linkModal" centered title="Link Item with existing one" ok-title="Cancel" ok-only ok-variant="secondary" lazy size="lg">
+      <div v-if="filteredItems && currentEntry" class="table-responsive">
+        <p>
+          Entry Name: {{currentEntry.itemDescription}}, {{currentEntry.amount}} {{currentEntry.unit}}, Art.Nr: {{currentEntry.articleNumber}}
+          <button
+            v-for="(url,index) in currentEntry.images"
+            :key="index"
+            class="ml-2 btn btn-sm btn-sm-flat btn-secondary"
+            type="button"
+            v-on:click="openImageModalFromUrl(url)"
+          >
+            <font-awesome-icon icon="image" />
+          </button>
+        </p>
+        <div class="form-group mx-2">
+          <input type="text" class="mt-3 form-control" placeholder="Search" v-on:input="filter" />
+        </div>
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th scope="col">Name</th>
+              <th scope="col">Seller</th>
+              <th scope="col">Content</th>
+              <th scope="col">Article Number</th>
+              <th scope="col"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="item in filteredItems"
+              :key="item.id"
+              :class="{'table-active': (item.seller && item.seller !== realInvoice.seller) || (item.amount && currentEntry.amount && item.amount !== currentEntry.amount )  }"
+            >
+              <td>
+                <router-link :to="{ name: 'item',params:{ itemId: item.id , item: item} }">{{item.name}}</router-link>
+                <button
+                  v-if="item.image !== null"
+                  class="ml-2 btn btn-sm btn-sm-flat btn-secondary"
+                  type="button"
+                  v-on:click="openImageModal(item)"
+                >
+                  <font-awesome-icon icon="image" />
+                </button>
+              </td>
+              <td>{{item.seller}}</td>
+              <td>{{item.amount}} {{item.unit === 'unknown' ? '' : item.unit}}</td>
+              <td>{{item.articleNumber}}</td>
+              <td class="px-0">
+                <button class="ml-2 btn btn-sm btn-sm-flat btn-primary" type="button" v-on:click="linkItemClicked(item)">
+                  Link
+                  <font-awesome-icon icon="link" />
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </b-modal>
+    <b-modal ref="imageModal" hide-footer no-fade centered>
+      <div v-if="loading === true" class="justify-content-center" style="display: flex;">
+        <b-spinner class="center" label="Loading..."></b-spinner>
+      </div>
+      <img v-show="!loading" :src="currentImageURL" style="width:100%" v-on:load="loading = false" />
+    </b-modal>
   </div>
 </template>
 
 <script>
 import http from "../../http-common";
+import phoneticsFilter from "./../../phoneticsFilter";
+import VSelect from "./../vue-bootstrap-select";
 
 function parseDate(input) {
   if (input === undefined) return undefined;
@@ -130,6 +355,9 @@ function parseDate(input) {
 
 export default {
   name: "invoice",
+  components: {
+    VSelect
+  },
   props: {
     invoice: {
       type: Object,
@@ -148,7 +376,22 @@ export default {
       invoiceDate: undefined,
       deliveryDate: undefined,
       analysing: false,
-      pdfURL: null
+      pdfURL: null,
+      currentEntry: null,
+      currentItem: null,
+      modalSize: "lg",
+      updatedItem: {
+        name: null,
+        amount: null,
+        unit: null,
+        selectedImageIndex: null,
+        selectedItemGroup: null
+      },
+      loading: false,
+      currentImageURL: null,
+      existingItemGroups: [],
+      existingItems: [],
+      filteredItems: []
     };
   },
   computed: {
@@ -161,10 +404,183 @@ export default {
           this.realInvoice.deliveryDate === null
         );
       }
+    },
+    fluid() {
+      return this.pdfURL && window.innerWidth >= 1850;
     }
   },
   methods: {
     /* eslint-disable no-console */
+    phoneticsFilter,
+    filter(event) {
+      this.filteredItems = phoneticsFilter(
+        this.existingItems,
+        event.target.value
+      );
+    },
+    linkItem(entry) {
+      this.currentEntry = entry;
+      this.filteredItems = this.existingItems;
+      this.$refs.linkModal.show();
+    },
+    linkItemClicked(item) {
+      const linkItem = () => {
+        this.$refs.linkModal.hide();
+        http
+          .post(`/invoice/entry/${this.currentEntry.id}/itemLink`, {
+            itemId: item.id
+          })
+          .then(() => {
+            this.currentEntry.stockItem = item;
+          })
+          .catch(alert);
+      };
+      let extraText;
+      if (
+        this.currentEntry.amount &&
+        item.amount &&
+        this.currentEntry.amount !== item.amount
+      ) {
+        extraText = `The content of the entry and the item is different!<br>${this.currentEntry.amount} ${this.currentEntry.unit} vs ${item.amount} ${item.unit}<br>`;
+      }
+      if (item.seller && item.seller !== this.realInvoice.seller) {
+        extraText = `The seller of the item and the seller of the invoice is different!<br>${item.seller} vs ${this.realInvoice.seller}`;
+      }
+      if (extraText) {
+        const htmlMessage = this.$createElement("div", {
+          domProps: { innerHTML: extraText }
+        });
+        this.$bvModal
+          .msgBoxConfirm(htmlMessage, {
+            title: "Link Item to Entry Warning",
+            headerBgVariant: "warning",
+            okVariant: "warning",
+            okTitle: "Link item to entry",
+            centered: true
+          })
+          .then(link => {
+            if (link) {
+              linkItem();
+            }
+          })
+          .catch(console.error);
+      } else {
+        linkItem();
+      }
+    },
+    unlinkItem(entry) {
+      let extraText;
+      if (entry.stockItem.barcode === entry.gtin) {
+        extraText = "This will delete the barcode for the item.";
+      }
+      this.$bvModal
+        .msgBoxConfirm(
+          `Do you really want to unlink entry "${entry.itemDescription}", Content: ${entry.amount} ${entry.unit} from Item "${entry.stockItem.name}", Content: ${entry.stockItem.amount} ${entry.stockItem.unit}. ${extraText}`,
+          {
+            title: "Unlink Item",
+            okVariant: "danger",
+            okTitle: "Unlink",
+            centered: true
+          }
+        )
+        .then(unlink => {
+          if (unlink) {
+            http
+              .delete(`/invoice/entry/${entry.id}/itemLink`)
+              .then(() => {
+                entry.stockItem = null;
+              })
+              .catch(alert);
+          }
+        })
+        .catch(console.error);
+    },
+    newItem(entry) {
+      this.modalSize = "lg";
+      this.currentEntry = entry;
+      this.currentItem = null;
+      this.updatedItem.name = entry.itemDescription;
+      this.updatedItem.amount = entry.amount;
+      this.updatedItem.unit = entry.unit || "Units";
+      this.updatedItem.selectedImageIndex = null;
+      this.updatedItem.selectedItemGroup = null;
+      this.$refs.editInvoice.show();
+    },
+    editItem(entry) {
+      this.modalSize = "lg";
+      this.currentEntry = entry;
+      this.currentItem = entry.stockItem;
+      this.updatedItem.name = entry.stockItem.name;
+      if (entry.stockItem.amount) {
+        this.updatedItem.amount = entry.stockItem.amount;
+        this.updatedItem.unit = entry.stockItem.unit;
+      } else {
+        this.updatedItem.amount = entry.amount;
+        this.updatedItem.unit = entry.unit || "Units";
+      }
+      if (this.currentItem.image) {
+        this.updatedItem.selectedImageIndex = -2;
+      } else {
+        this.updatedItem.selectedImageIndex = null;
+      }
+      this.updatedItem.selectedItemGroup = entry.stockItem.itemGroup;
+      this.$refs.editInvoice.show();
+    },
+    updateModalClicked() {
+      if (this.$refs.editForm.checkValidity() === false) {
+        return;
+      }
+      const data = {
+        name: this.updatedItem.name,
+        barcode: this.currentEntry.gtin || this.currentItem.barcode,
+        articleNumber:
+          this.currentEntry.articleNumber || this.currentItem.articleNumber,
+        seller: this.realInvoice.seller,
+        amount: this.updatedItem.amount,
+        unit: this.updatedItem.unit
+      };
+      if (this.updatedItem.selectedImageIndex !== null) {
+        data.itemImageURL = this.currentEntry.images[
+          this.updatedItem.selectedImageIndex
+        ];
+      }
+      if (this.updatedItem.selectedItemGroup) {
+        data["itemGroup.id"] = this.updatedItem.selectedItemGroup.value;
+      }
+      const onError = err => {
+        alert("Fehler: " + err);
+        console.error(err);
+      };
+      if (this.currentItem) {
+        http
+          .put("/item/" + this.currentItem.id, data)
+          .then(response => {
+            this.currentEntry.stockItem = response.data;
+          })
+          .catch(onError);
+      } else {
+        http
+          .post("/item", data)
+          .then(response => {
+            this.currentEntry.stockItem = response.data;
+            this.currentEntry.stockItemId = response.data.id;
+            http.put("/invoiceEntry/" + this.currentEntry.id, {
+              itemId: response.data.id
+            });
+          })
+          .catch(onError);
+      }
+    },
+    openImageModal(item) {
+      this.loading = true;
+      this.currentImageURL = http.getImage(item.image.original);
+      this.$refs.imageModal.show();
+    },
+    openImageModalFromUrl(url) {
+      this.loading = true;
+      this.currentImageURL = url;
+      this.$refs.imageModal.show();
+    },
     showPDF() {
       this.pdfURL = http.defaults.baseURL + "/file/" + this.realInvoice.fileId;
     },
@@ -205,6 +621,11 @@ export default {
         .get("/invoice/" + invoiceId + "/entries")
         .then(response => {
           this.invoiceEntries = response.data;
+          for (const e of this.invoiceEntries) {
+            e.images = JSON.parse(e.images);
+          }
+          // then we need the item groups
+          this.retrieveItemGroups();
         })
         .catch(console.error);
     },
@@ -218,15 +639,37 @@ export default {
           this.analysing = false;
           this.realInvoice = response.data.invoice;
           this.invoiceEntries = response.data.entries;
+          for (const e of this.invoiceEntries) {
+            e.images = JSON.parse(e.images);
+          }
         })
         .catch((/*err*/) => {
           this.analysing = false;
           this.retrieveInvoiceEntries();
           this.$refs.deleteInvoice.show();
         });
+    },
+    retrieveItemGroups() {
+      http
+        .get("/itemGroupsForSelect")
+        .then(response => {
+          this.existingItemGroups = response.data;
+        })
+        .catch(e => {
+          console.log(e);
+        });
+    },
+    retrieveItems() {
+      http
+        .get("/itemsWithImage")
+        .then(response => {
+          this.existingItems = response.data;
+        })
+        .catch(console.error);
     }
   },
   mounted() {
+    this.baseURL = http.defaults.baseURL;
     if (this.invoice === null) {
       this.retrieveinvoice();
     } else {
@@ -237,6 +680,7 @@ export default {
     } else {
       this.retrieveInvoiceEntries();
     }
+    this.retrieveItems();
   },
   beforeDeactivate: async function() {
     if (this.realInvoice && !this.realInvoice.seller) {
@@ -247,5 +691,34 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
+.no-high-images {
+  object-fit: contain;
+  max-height: 240px;
+}
+.btn-sm-flat {
+  padding-top: 0 !important;
+  padding-bottom: 0px !important;
+}
+.text-underline {
+  text-decoration: underline;
+}
+td {
+  white-space: nowrap;
+}
+.text-max-width {
+  display: inline-block;
+  max-width: 90px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media only screen and (min-width: 1850px) {
+  .col-xxl-6 {
+    -webkit-box-flex: 0;
+    flex: 0 0 50%;
+    max-width: 50%;
+  }
+}
 </style>

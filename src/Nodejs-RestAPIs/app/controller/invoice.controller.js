@@ -1,4 +1,5 @@
 const db = require('../config/db.config.js');
+const Image = db.Image;
 const Item = db.stock.Item;
 const StockChange = db.stock.Change;
 const Invoice = db.stock.Invoice;
@@ -80,6 +81,9 @@ exports.getInvoiceEntries = (req, res) => {
         where: { invoiceId: req.params.id },
         include: [{
             model: Item,
+            include: [{
+                model: Image,
+            }],
         }, {
             model: StockChange,
         }],
@@ -106,6 +110,89 @@ exports.deleteInvoice = async(req, res) => {
         }
         await invoice.destroy();
         res.send("Deleted");
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("Error:" + error);
+    }
+};
+
+exports.setItem = async(req, res) => {
+    try {
+        if (req.params.id === undefined) {
+            return res.status(400).send("No id given");
+        }
+        const entries = await InvoiceEntry.update({
+            stockItemId: req.body.itemId,
+        }, {
+            where: {
+                id: req.params.id,
+            },
+        });
+        if (entries[0] === 0) {
+            return res.status(404).send("No Invoice Entry with id " + req.params.id + " found");
+        }
+        res.send();
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("Error:" + error);
+    }
+};
+
+exports.unlinkItemFromEntry = async(req, res) => {
+    try {
+        if (req.params.id === undefined) {
+            return res.status(400).send("No id given");
+        }
+        const entry = await InvoiceEntry.findByPk(req.params.id, { include: [{ model: Item }] });
+        if (entry === null) {
+            return res.status(404).send("No Invoice Entry with id " + req.params.id + " found");
+        }
+        const item = entry.stockItem;
+        if (item === null) {
+            return res.status(200).send("The Invoice Entry has no item.");
+        }
+        entry.stockItemId = null;
+        await entry.save();
+        if (item.barcode === entry.gtin) {
+            item.barcode = null;
+            await item.save();
+        }
+        res.send();
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("Error:" + error);
+    }
+};
+
+exports.linkItemWithEntry = async(req, res) => {
+    try {
+        if (req.params.id === undefined) {
+            return res.status(400).send("No entry id given");
+        }
+        if (req.body.itemId === undefined) {
+            return res.status(400).send("No itemId given");
+        }
+        const entry = await InvoiceEntry.findByPk(req.params.id, { include: [{ model: Item }, { model: Invoice }] });
+        if (entry === null) {
+            return res.status(404).send("No Invoice Entry with id " + req.params.id + " found");
+        }
+        const item = await Item.findByPk(req.body.itemId);
+        if (item === null) {
+            return res.status(404).send("The Item with id" + req.body.itemId + " does not exist.");
+        }
+        entry.stockItemId = req.body.itemId;
+        await entry.save();
+        if (item.barcode === null) {
+            item.barcode = entry.gtin;
+        }
+        if (item.articleNumber === null) {
+            item.articleNumber = entry.articleNumber;
+        }
+        if (item.seller === null) {
+            item.seller = entry.invoice.seller;
+        }
+        await item.save();
+        res.send();
     } catch (error) {
         console.error(error);
         res.status(500).send("Error:" + error);
@@ -220,12 +307,13 @@ const exportForMetro = (invoice, text) => {
                                 seller: "Metro",
                             },
                             require: true,
+                        }, {
+                            model: Item,
                         }]
                     }).then(async entry => {
                         if (entry === null) {
                             // noch gab es kein InvoiceEntry der gemappt wurde, aber vielleicht gibt es ja ein Item von einem Seller mit dem richtigen Barcode
                             const items = await Item.findAll({
-                                attributes: ["id"],
                                 where: {
                                     barcode: item.barcode,
                                     [Op.or]: [{
@@ -236,7 +324,7 @@ const exportForMetro = (invoice, text) => {
                                 }
                             });
                             if (items.length === 1) {
-                                entry = { itemId: items[0].id };
+                                entry = { stockItemId: items[0].id, stockItem: items[0] };
                             }
                         }
                         InvoiceEntry.create({
@@ -249,7 +337,7 @@ const exportForMetro = (invoice, text) => {
                             amount: item.amount,
                             unit: item.unit,
                             invoiceId: invoice.id,
-                            itemId: entry ? entry.stockItemId : null,
+                            stockItemId: entry ? entry.stockItemId : null,
                         }).then(invoiceEntry => {
                             // habe auf der Seite https://produkte.metro.de/shop/search mal geschaut welche Requests so gemacht werden wenn man ein Produkt sucht
                             Axios
@@ -341,6 +429,9 @@ exports.analyseInvoice = (req, res) => {
                         where: {
                             invoiceId: invoice.id,
                         },
+                        include:  [{
+                            model: Item,
+                        }],
                     }).then(entries => {
                         res.send({ invoice, entries });
                     }).catch(error => {

@@ -9,4 +9,8 @@ module.exports = function(app) {
     app.get('/api/invoice/:id/analyse', invoice.analyseInvoice);
 
     app.post('/api/invoice', invoice.create);
+    app.delete('/api/invoice/entry/:id/itemLink', invoice.unlinkItemFromEntry);
+    app.post('/api/invoice/entry/:id/itemLink', invoice.linkItemWithEntry);
+
+    app.put('/api/invoiceEntry/:id', invoice.setItem);
 };
