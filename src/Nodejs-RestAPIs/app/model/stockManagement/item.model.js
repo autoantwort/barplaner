@@ -19,15 +19,6 @@ module.exports = (sequelize, Sequelize, Image, ItemGroup, Position) => {
             allowNull: true,
             defaultValue: null,
         },
-        image: {
-            type: Sequelize.INTEGER,
-            references: {
-                model: Image,
-                key: 'id',
-            },
-            allowNull: true,
-            defaultValue: null,
-        },
         seller: {
             type: Sequelize.ENUM,
             values: ['Amazon', 'Metro', 'Aldi', 'Conalco', 'Rewe', 'Netto', 'Donation', 'Other'],
@@ -60,6 +51,9 @@ module.exports = (sequelize, Sequelize, Image, ItemGroup, Position) => {
 
     Item.belongsTo(Position);
     Position.hasMany(Item);
+
+    Item.belongsTo(Image);
+    Image.hasMany(Item);
 
     return Item;
 };

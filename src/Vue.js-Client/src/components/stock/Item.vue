@@ -35,7 +35,7 @@
         <div class="form-group row">
           <label class="col-4">Image</label>
           <label class="col-8">
-            <button v-if="realItem.image !== null" class="ml-2 btn btn-sm btn-sm-flat btn-secondary" type="button" v-on:click="openImage">
+            <button v-if="realItem.imageId !== null" class="ml-2 btn btn-sm btn-sm-flat btn-secondary" type="button" v-on:click="openImage">
               <font-awesome-icon icon="image" />
             </button>
             <template v-else>None</template>
@@ -143,7 +143,7 @@ export default {
     openImage() {
       this.loading = true;
       http
-        .get("/image/" + this.realItem.image)
+        .get("/image/" + this.realItem.imageId)
         .then(response => {
           this.imageId = response.data.original;
         })

@@ -25,7 +25,7 @@
                   <td>
                     <router-link :to="{ name: 'item',params:{ itemId: item.id , item: item} }">{{item.name}}</router-link>
                     <button
-                      v-if="item.image !== null"
+                      v-if="item.imageId !== null"
                       class="ml-2 btn btn-sm btn-sm-flat btn-secondary"
                       type="button"
                       v-on:click="openImage(item)"
@@ -122,7 +122,7 @@ export default {
       this.selectedItem = item;
       this.loading = true;
       http
-        .get("/image/" + item.image)
+        .get("/image/" + item.imageId)
         .then(response => {
           this.selectedImageId = response.data.original;
         })
