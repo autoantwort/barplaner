@@ -14,9 +14,18 @@ exports.coreCreateFile = async(buffer, mimeType, filename = null, md5) => {
     if (md5 === undefined) {
         md5 = crypto.createHash('md5').update(buffer).digest('hex');
     }
-    const file = await File.create({ filename: filename, mimeType: mimeType, id: md5 });
-    await fs.writeFile(exports.getFilePathForId(file.id), buffer);
-    return file;
+    try {
+        const file = await File.create({ filename: filename, mimeType: mimeType, id: md5 });
+        await fs.writeFile(exports.getFilePathForId(file.id), buffer);
+        return file;
+    } catch (e) {
+        if (e instanceof db.Sequelize.UniqueConstraintError) {
+            // if the file already exists
+            return await File.findByPk(md5);
+        } else {
+            throw e;
+        }
+    }
 };
 
 /**
