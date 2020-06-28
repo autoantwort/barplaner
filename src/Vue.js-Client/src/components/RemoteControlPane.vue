@@ -134,6 +134,8 @@
 </template>
 
 <script>
+import http from "../http-common"
+
 export default {
   name: "remote-control-pane",
   data() {
@@ -332,7 +334,7 @@ export default {
   },
   created() {
     this.webSocket = new WebSocket(
-      "wss://orga.symposion.hilton.rwth-aachen.de/controlPaneMaster"      
+      http.defaults.baseWsURL + "/controlPaneMaster"
     );
     this.initialize();
     this.isTouch = "ontouchstart" in window;

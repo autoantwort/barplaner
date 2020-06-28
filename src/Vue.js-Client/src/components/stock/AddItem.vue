@@ -493,7 +493,7 @@ export default {
   },
   created() {
     this.webSocket = new WebSocket(
-      "wss://orga.symposion.hilton.rwth-aachen.de/scannerConsumer"
+      http.defaults.baseWsURL + "/scannerConsumer"
     );
     this.webSocket.onmessage = e => {
       this.item.barcode = e.data;

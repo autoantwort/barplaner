@@ -7,5 +7,6 @@ let axios = Axios.create({
     }
 });
 axios.defaults.withCredentials = true;
+axios.defaults.baseWsURL = "wss://orga.symposion.hilton.rwth-aachen.de";
 
 export default axios;
