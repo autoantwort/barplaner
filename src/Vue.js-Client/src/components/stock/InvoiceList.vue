@@ -50,6 +50,12 @@ export default {
       uploadedInvoicePdf: null
     };
   },
+  props: {
+    addNew: {
+      type: Boolean,
+      default: false
+    }
+  },
   methods: {
     /* eslint-disable no-console */
     openAddInvoice() {
@@ -113,6 +119,10 @@ export default {
   },
   mounted() {
     this.retrieveInvoices();
+    if (this.addNew) {
+      this.openAddInvoice();
+      this.$router.replace({ path: "/invoices" });
+    }
     /* eslint-enable no-console */
   }
 };

@@ -56,7 +56,7 @@
             <b-dropdown-item to="/itemGroupStock">ItemGroupStock</b-dropdown-item>
             <b-dropdown-item to="/stockChanges">StockChanges</b-dropdown-item>
             <div class="dropdown-divider"></div>
-            <b-dropdown-item to="/invoices">Add Invoice</b-dropdown-item>
+            <b-dropdown-item to="/addInvoice">Add Invoice</b-dropdown-item>
             <b-dropdown-item to="/invoices">Invoices</b-dropdown-item>
           </b-nav-item-dropdown>
           <li class="nav-item">

@@ -169,6 +169,13 @@ export default new Router({
                 name: "invoiceList",
                 component: InvoiceList,
             }, {
+                path: "/addInvoice",
+                name: "invoiceList",
+                component: InvoiceList,
+                props: {
+                    addNew: true,
+                },
+            }, {
                 path: "/settings",
                 name: "settings",
                 component: Settings,
