@@ -209,6 +209,12 @@ export default {
     VSelect,
     AddPosition
   },
+  props: {
+    initialItem: {
+      type: Object,
+      default: null
+    }
+  },
   data() {
     return {
       item: {
@@ -484,12 +490,16 @@ export default {
         };
       }
     }
-    /* eslint-enable no-console */
   },
   mounted() {
     this.setupImagePaste();
     this.retrievePositions();
     this.retrieveItemGroups();
+    if (this.initialItem !== null) {
+      for (let p in this.initialItem) {
+        this.item[p] = this.initialItem[p];
+      }
+    }
   },
   created() {
     this.webSocket = new WebSocket(
@@ -503,6 +513,7 @@ export default {
     this.webSocket.close();
   }
 };
+/* eslint-enable no-console */
 </script>
 
 <style>

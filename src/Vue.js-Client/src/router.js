@@ -143,6 +143,7 @@ export default new Router({
                 path: "/addItem",
                 name: "addItem",
                 component: AddItem,
+                props: true,
             }, {
                 path: "/stockChanges",
                 name: "stockChanges",

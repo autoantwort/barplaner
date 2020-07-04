@@ -394,7 +394,7 @@ export default {
     priceInputDisabled() {
       return this.change === null || this.priceAccuracy === "unknown";
     },
-    filteredChanges() {      
+    filteredChanges() {
       return this.lastChanges === null
         ? null
         : this.lastChanges.filter(getFilterFunction(this.reason));
@@ -464,7 +464,7 @@ export default {
           .get("/item/" + this.item.value + "/stockChanges")
           .then(response => {
             response.data.forEach(c => {
-              c.germanReason = getGermanReason(c.reason);              
+              c.germanReason = getGermanReason(c.reason);
               c.date = new Date(c.date);
             });
             this.lastChanges = response.data;
@@ -640,7 +640,28 @@ export default {
       const barcode = e.data.trim();
       const item = this.existingItems.find(i => i.barcode === barcode);
       if (item === undefined) {
-        this.$bvToast.toast(`No Item found for barcode "${barcode}"`, {
+        const h = this.$createElement;
+        const vNodesMsg = h("p", [
+          h(
+            "span",
+            { class: ["mr-2"] },
+            `No Item found for barcode "${barcode}"`
+          ),
+          h(
+            "router-link",
+            {
+              class: ["btn", "btn-sm", "btn-success"],
+              props: {
+                to: {
+                  name: "addItem",
+                  params: { initialItem: { barcode: barcode } }
+                }
+              }
+            },
+            "Create Item"
+          )
+        ]);
+        this.$bvToast.toast([vNodesMsg], {
           title: "No item selected!",
           solid: true,
           toaster: "b-toaster-bottom-center",
