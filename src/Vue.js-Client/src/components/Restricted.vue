@@ -47,6 +47,7 @@
             <b-dropdown-item to="/addItem">Add Item</b-dropdown-item>
             <b-dropdown-item to="/addPosition">Add Position</b-dropdown-item>
             <b-dropdown-item to="/addItemGroup">Add ItemGroup</b-dropdown-item>
+            <b-dropdown-item to="/addStockChange">Add Change</b-dropdown-item>
             <div class="dropdown-divider"></div>
             <b-dropdown-item to="/items">Items</b-dropdown-item>
             <b-dropdown-item to="/positions">Positions</b-dropdown-item>
