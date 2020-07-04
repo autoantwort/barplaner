@@ -351,6 +351,12 @@ export default {
     VSelect,
     AddPosition
   },
+  props: {
+    itemId: {
+      type: Number,
+      default: null
+    }
+  },
   data() {
     return {
       item: null,
@@ -564,6 +570,14 @@ export default {
         .get("/itemsForSelect")
         .then(response => {
           this.existingItems = response.data;
+          if (this.itemId !== null) {
+            for (let item of this.existingItems) {
+              if (item.value === this.itemId) {
+                this.item = item;
+                break;
+              }
+            }
+          }
         })
         .catch(e => {
           console.log(e);

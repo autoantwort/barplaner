@@ -187,8 +187,11 @@
             <button type="button" class="btn btn-success btn-sm" style="float: right;" v-on:click="scrollToTitel">Set Titel</button>
           </div>
           <div class="my-2 text-danger" v-if="errorString.length !== 0">{{errorString}}</div>
-          <button type="button" class="btn btn-success my-3" v-on:click="addPosition">Add and add another</button>
-          <button type="button" class="btn btn-success ml-3 my-3" v-on:click="addPosition('items')">Add and view item list</button>
+          <div class="my-3">
+            <button type="button" class="btn btn-success mr-2 mb-2" v-on:click="addPosition">Add and add another</button>
+            <button type="button" class="btn btn-success mr-2 mb-2" v-on:click="addPosition('items')">Add and view item list</button>
+            <button type="button" class="btn btn-success mr-2" v-on:click="addPosition('addStockChange')">Add and add change</button>
+          </div>
         </form>
       </div>
     </div>
@@ -398,7 +401,14 @@ export default {
           if (response !== undefined) {
             if (response.status === 201) {
               if (redirectAfter !== undefined) {
-                this.$router.push(redirectAfter);
+                if (redirectAfter === "addStockChange") {
+                  this.$router.push({
+                    name: "addStockChange",
+                    params: { itemId: response.data.id }
+                  });
+                } else {
+                  this.$router.push(redirectAfter);
+                }
               }
               this.errorString = "Item created";
               if (this.item.itemGroupIndex === 3 /* New */) {

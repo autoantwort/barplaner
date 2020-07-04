@@ -160,6 +160,7 @@ export default new Router({
                 path: "/addStockChange",
                 name: "addStockChange",
                 component: AddStockChange,
+                props: true,
             }, {
                 path: "/invoice/:invoiceId",
                 name: "invoice",
