@@ -15,9 +15,9 @@ Vue.filter('asEuro', n => n === null ? "" : n.toLocaleString("de-DE", { maximumF
 
 // see https://www.npmjs.com/package/@fortawesome/vue-fontawesome#recommended
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faTrashAlt, faPlay, faPause, faStop, faRedo, faStepForward, faImage, faLink, faPlusSquare, faEdit, faUnlink } from '@fortawesome/free-solid-svg-icons';
+import { faTrashAlt, faPlay, faPause, faStop, faRedo, faStepForward, faImage, faLink, faPlusSquare, faEdit, faUnlink, faTimes, faSave } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-library.add(faTrashAlt, faPlay, faPause, faStop, faRedo, faStepForward, faImage, faLink, faPlusSquare, faEdit, faUnlink);
+library.add(faTrashAlt, faPlay, faPause, faStop, faRedo, faStepForward, faImage, faLink, faPlusSquare, faEdit, faUnlink, faTimes, faSave);
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 
 // see https://bootstrap-vue.js.org/docs/#using-module-bundlers

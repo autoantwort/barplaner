@@ -1,40 +1,34 @@
 <template>
   <div class="container">
     <div class="row mt-3">
-      <div v-if="realItem" class="col-12 col-md-8 offset-md-2">
+      <div v-if="realItem" class="col-12 col-md-8 offset-md-2 was-validated">
         <div class="form-group row">
-          <label class="col-4">Name</label>
-          <label class="col-8">{{realItem.name}}</label>
+          <label class="col-3">Name</label>
+          <generic-input-component :object="realItem" property="name" endpoint="/item/:id" required :minLength="4" />
         </div>
         <div class="form-group row">
-          <label class="col-4">Barcode</label>
-          <label class="col-8">{{realItem.barcode}}</label>
+          <label class="col-3">Barcode</label>
+          <edit-barcode-component :object="realItem" property="barcode" endpoint="/item/:id" />
         </div>
         <div class="form-group row">
-          <label class="col-4">Article Number</label>
-          <label class="col-8">{{realItem.articleNumber}}</label>
+          <label class="col-3">Article Number</label>
+          <generic-input-component :object="realItem" property="articleNumber" endpoint="/item/:id" />
         </div>
         <div class="form-group row">
-          <label class="col-4">Seller</label>
-          <label class="col-8">{{realItem.seller}}</label>
+          <label class="col-3">Seller</label>
+          <label class="col-9">{{realItem.seller}}</label>
         </div>
         <div class="form-group row">
-          <label class="col-4">Content</label>
-          <label class="col-8">{{realItem.amount}} {{realItem.unit?realItem.unit:''}}</label>
+          <label class="col-3">Content</label>
+          <edit-content-component :object="realItem" />
         </div>
         <div class="form-group row">
-          <label class="col-4">ItemGroup</label>
-          <label class="col-8">
-            <router-link
-              v-if="realItem.itemGroup"
-              :to="{ name: 'itemGroup',params:{ itemGroupId: realItem.itemGroup.id , itemGroup: realItem.itemGroup} }"
-            >{{realItem.itemGroup.name}}</router-link>
-            <template v-else>None</template>
-          </label>
+          <label class="col-3">ItemGroup</label>
+          <edit-item-group-component :object="realItem" />
         </div>
         <div class="form-group row">
-          <label class="col-4">Image</label>
-          <label class="col-8">
+          <label class="col-3">Image</label>
+          <label class="col-9">
             <button v-if="realItem.imageId !== null" class="ml-2 btn btn-sm btn-sm-flat btn-secondary" type="button" v-on:click="openImage">
               <font-awesome-icon icon="image" />
             </button>
@@ -42,40 +36,12 @@
           </label>
         </div>
         <div class="form-group row">
-          <label class="col-4">Position</label>
-          <label class="col-8">
-            <template v-if="realItem.stockPosition">
-              <router-link
-                :to="{ name: 'position',params:{ positionId: realItem.stockPosition.id , position: realItem.stockPosition} }"
-              >{{realItem.stockPosition.name}}</router-link>
-              <button
-                v-if="realItem.stockPosition.imageId !== null"
-                class="ml-2 btn btn-sm btn-sm-flat btn-secondary"
-                type="button"
-                v-on:click="openModal(realItem.stockPosition)"
-              >
-                <font-awesome-icon icon="image" />
-              </button>
-            </template>
-            <template v-else-if="realItem.itemGroup && realItem.itemGroup.stockPosition">
-              <router-link
-                :to="{ name: 'position',params:{ positionId: realItem.itemGroup.stockPosition.id , position: realItem.itemGroup.stockPosition} }"
-              >{{realItem.itemGroup.stockPosition.name}}</router-link>
-              <button
-                v-if="realItem.itemGroup.stockPosition.imageId !== null"
-                class="ml-2 btn btn-sm btn-sm-flat btn-secondary"
-                type="button"
-                v-on:click="openModal(realItem.itemGroup.stockPosition)"
-              >
-                <font-awesome-icon icon="image" />
-              </button>
-            </template>
-            <span v-else>None</span>
-          </label>
+          <label class="col-3">Position</label>
+          <edit-position-component :object="realItem" endpoint="/item/:id" :usedForItem="true" />
         </div>
         <div class="form-group row">
-          <label class="col-4">In Stock</label>
-          <label class="col-8">{{stock === undefined ? "Loading..." : stock ? stock.inStock : "0"}}</label>
+          <label class="col-3">In Stock</label>
+          <label class="col-9">{{stock === undefined ? "Loading..." : stock ? stock.inStock : "0"}}</label>
         </div>
         <div class="row" v-if="stockChanges && stockChanges.length > 0">
           <table class="table table-hover">
@@ -95,9 +61,6 @@
             </tbody>
           </table>
         </div>
-        <b-modal ref="modal" hide-footer no-fade centered :title="selectedPosition && selectedPosition.name">
-          <positionImage :position="selectedPosition"></positionImage>
-        </b-modal>
         <b-modal ref="image" hide-footer no-fade centered :title="realItem && realItem.name">
           <div v-if="loading === true" class="justify-content-center" style="display: flex;">
             <b-spinner class="center" label="Loading..."></b-spinner>
@@ -111,43 +74,46 @@
 
 <script>
 import http from "../../http-common";
-import PositionImage from "./PositionImage";
+import GenericInputComponent from "./components/GenericInputComponent";
+import EditPositionComponent from "./components/EditPositionComponent";
+import EditBarcodeComponent from "./components/EditBarcodeComponent";
+import EditContentComponent from "./components/EditContentComponent";
+import EditItemGroupComponent from "./components/EditItemGroupComponent";
 
 export default {
   name: "item",
   props: {
     item: {
       type: Object,
-      default: null
-    }
+      default: null,
+    },
   },
   components: {
-    PositionImage
+    GenericInputComponent,
+    EditPositionComponent,
+    EditBarcodeComponent,
+    EditContentComponent,
+    EditItemGroupComponent,
   },
   data() {
     return {
-      selectedPosition: null,
       realItem: null,
       imageId: null,
       loading: false,
       stock: undefined,
-      stockChanges: null
+      stockChanges: null,
     };
   },
   methods: {
     /* eslint-disable no-console */
-    openModal(position) {
-      this.selectedPosition = position;
-      this.$refs.modal.show();
-    },
     openImage() {
       this.loading = true;
       http
         .get("/image/" + this.realItem.imageId)
-        .then(response => {
+        .then((response) => {
           this.imageId = response.data.original;
         })
-        .catch(e => {
+        .catch((e) => {
           console.log(e);
         });
       this.$refs.image.show();
@@ -155,10 +121,10 @@ export default {
     retrieveItem() {
       http
         .get("/item/" + this.$route.params.itemId)
-        .then(response => {
+        .then((response) => {
           this.realItem = response.data;
         })
-        .catch(e => {
+        .catch((e) => {
           console.log(e);
         });
     },
@@ -167,7 +133,7 @@ export default {
         this.item === null ? this.$route.params.itemId : this.item.id;
       http
         .get("/item/" + itemId + "/stock")
-        .then(response => {
+        .then((response) => {
           this.stock = response.data;
           console.log(this.stock);
         })
@@ -178,11 +144,11 @@ export default {
         this.item === null ? this.$route.params.itemId : this.item.id;
       http
         .get("/item/" + itemId + "/stockChanges")
-        .then(response => {
+        .then((response) => {
           this.stockChanges = response.data;
         })
         .catch(console.error);
-    }
+    },
   },
   created() {
     this.baseURL = http.defaults.baseURL + "/file/";
@@ -195,7 +161,7 @@ export default {
     }
     this.retrieveStock();
     this.retrieveStockChanges();
-  }
+  },
   /* eslint-enable no-console */
 };
 </script>

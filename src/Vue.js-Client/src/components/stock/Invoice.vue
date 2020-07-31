@@ -201,22 +201,7 @@
               >{{currentEntry.amount}} {{currentEntry.unit}}</button>
             </div>
             <div class="col">
-              <div class="input-group">
-                <input
-                  type="number"
-                  id="unit"
-                  class="form-control"
-                  aria-label="Text input with dropdown button"
-                  v-model="updatedItem.amount"
-                />
-                <div class="input-group-append">
-                  <b-dropdown v-bind:text="updatedItem.unit" v-model="updatedItem.unit">
-                    <b-dropdown-item v-on:click="updatedItem.unit='Units'">Units</b-dropdown-item>
-                    <b-dropdown-item v-on:click="updatedItem.unit='ml'">ml</b-dropdown-item>
-                    <b-dropdown-item v-on:click="updatedItem.unit='Gramm'">Gramm</b-dropdown-item>
-                  </b-dropdown>
-                </div>
-              </div>
+              <content-input :object="updatedItem" />
             </div>
             <div class="col" v-if="currentItem">
               <button
@@ -342,10 +327,11 @@
 import http from "../../http-common";
 import phoneticsFilter from "./../../phoneticsFilter";
 import VSelect from "./../vue-bootstrap-select";
+import ContentInput from "./components/ContentInput";
 
 function parseDate(input) {
   if (input === undefined) return undefined;
-  let sub = function(start) {
+  let sub = function (start) {
     return input.substring(start, start + 2);
   };
   //"dd.mm.yy hh:mm"
@@ -356,17 +342,18 @@ function parseDate(input) {
 export default {
   name: "invoice",
   components: {
-    VSelect
+    VSelect,
+    ContentInput,
   },
   props: {
     invoice: {
       type: Object,
-      default: null
+      default: null,
     },
     isNew: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   data() {
     return {
@@ -385,17 +372,17 @@ export default {
         amount: null,
         unit: null,
         selectedImageIndex: null,
-        selectedItemGroup: null
+        selectedItemGroup: null,
       },
       loading: false,
       currentImageURL: null,
       existingItemGroups: [],
       existingItems: [],
-      filteredItems: []
+      filteredItems: [],
     };
   },
   computed: {
-    canSave: function() {
+    canSave: function () {
       if (this.realInvoice === null) return false;
       else {
         return (
@@ -407,7 +394,7 @@ export default {
     },
     fluid() {
       return this.pdfURL && window.innerWidth >= 1850;
-    }
+    },
   },
   methods: {
     /* eslint-disable no-console */
@@ -428,7 +415,7 @@ export default {
         this.$refs.linkModal.hide();
         http
           .post(`/invoice/entry/${this.currentEntry.id}/itemLink`, {
-            itemId: item.id
+            itemId: item.id,
           })
           .then(() => {
             this.currentEntry.stockItem = item;
@@ -448,7 +435,7 @@ export default {
       }
       if (extraText) {
         const htmlMessage = this.$createElement("div", {
-          domProps: { innerHTML: extraText }
+          domProps: { innerHTML: extraText },
         });
         this.$bvModal
           .msgBoxConfirm(htmlMessage, {
@@ -456,9 +443,9 @@ export default {
             headerBgVariant: "warning",
             okVariant: "warning",
             okTitle: "Link item to entry",
-            centered: true
+            centered: true,
           })
-          .then(link => {
+          .then((link) => {
             if (link) {
               linkItem();
             }
@@ -480,10 +467,10 @@ export default {
             title: "Unlink Item",
             okVariant: "danger",
             okTitle: "Unlink",
-            centered: true
+            centered: true,
           }
         )
-        .then(unlink => {
+        .then((unlink) => {
           if (unlink) {
             http
               .delete(`/invoice/entry/${entry.id}/itemLink`)
@@ -537,7 +524,7 @@ export default {
           this.currentEntry.articleNumber || this.currentItem.articleNumber,
         seller: this.realInvoice.seller,
         amount: this.updatedItem.amount,
-        unit: this.updatedItem.unit
+        unit: this.updatedItem.unit,
       };
       if (this.updatedItem.selectedImageIndex !== null) {
         data.itemImageURL = this.currentEntry.images[
@@ -547,25 +534,25 @@ export default {
       if (this.updatedItem.selectedItemGroup) {
         data["itemGroup.id"] = this.updatedItem.selectedItemGroup.value;
       }
-      const onError = err => {
+      const onError = (err) => {
         alert("Fehler: " + err);
         console.error(err);
       };
       if (this.currentItem) {
         http
           .put("/item/" + this.currentItem.id, data)
-          .then(response => {
+          .then((response) => {
             this.currentEntry.stockItem = response.data;
           })
           .catch(onError);
       } else {
         http
           .post("/item", data)
-          .then(response => {
+          .then((response) => {
             this.currentEntry.stockItem = response.data;
             this.currentEntry.stockItemId = response.data.id;
             http.put("/invoiceEntry/" + this.currentEntry.id, {
-              itemId: response.data.id
+              itemId: response.data.id,
             });
           })
           .catch(onError);
@@ -598,19 +585,19 @@ export default {
         .put("/invoice/" + this.realInvoice.id, {
           seller: this.seller,
           invoiceDate: parseDate(this.invoiceDate),
-          deliveryDate: parseDate(this.deliveryDate)
+          deliveryDate: parseDate(this.deliveryDate),
         })
-        .then(res => {
+        .then((res) => {
           this.realInvoice = res.data;
         });
     },
     retrieveinvoice() {
       http
         .get("/invoice/" + this.$route.params.invoiceId)
-        .then(response => {
+        .then((response) => {
           this.realInvoice = response.data;
         })
-        .catch(e => {
+        .catch((e) => {
           console.log(e);
         });
     },
@@ -619,7 +606,7 @@ export default {
         this.invoice !== null ? this.invoice.id : this.$route.params.invoiceId;
       http
         .get("/invoice/" + invoiceId + "/entries")
-        .then(response => {
+        .then((response) => {
           this.invoiceEntries = response.data;
           for (const e of this.invoiceEntries) {
             e.images = JSON.parse(e.images);
@@ -635,7 +622,7 @@ export default {
         this.invoice !== null ? this.invoice.id : this.$route.params.invoiceId;
       http
         .get("/invoice/" + invoiceId + "/analyse")
-        .then(response => {
+        .then((response) => {
           this.analysing = false;
           this.realInvoice = response.data.invoice;
           this.invoiceEntries = response.data.entries;
@@ -652,21 +639,21 @@ export default {
     retrieveItemGroups() {
       http
         .get("/itemGroupsForSelect")
-        .then(response => {
+        .then((response) => {
           this.existingItemGroups = response.data;
         })
-        .catch(e => {
+        .catch((e) => {
           console.log(e);
         });
     },
     retrieveItems() {
       http
         .get("/itemsWithImage")
-        .then(response => {
+        .then((response) => {
           this.existingItems = response.data;
         })
         .catch(console.error);
-    }
+    },
   },
   mounted() {
     this.baseURL = http.defaults.baseURL;
@@ -682,11 +669,11 @@ export default {
     }
     this.retrieveItems();
   },
-  beforeDeactivate: async function() {
+  beforeDeactivate: async function () {
     if (this.realInvoice && !this.realInvoice.seller) {
       await http.delete("/invoice/" + this.realInvoice.id);
     }
-  }
+  },
   /* eslint-enable no-console */
 };
 </script>

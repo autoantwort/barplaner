@@ -48,19 +48,17 @@ exports.getAllForSelect = (req, res) => {
 };
 
 
-exports.update = (req, res) => {
-    if (req.params.id !== undefined) {
+exports.update = async(req, res) => {
+    if (req.params.id === undefined) {
         res.status(400).send("The request does not contains a id parameter");
     } else {
-        ItemGroup.update(req.body, {
-            where: {
-                id: req.params.id,
-            }
-        }).spread((affectedCount, affectedRows) => {
-            res.status(200).send(JSON.stringify(affectedCount));
-        }).catch(err => {
+        try {
+            await ItemGroup.update(req.body, { where: { id: req.params.id } });
+            const itemGroup = await ItemGroup.findByPk(req.params.id, { include: [{ model: Position }] });
+            res.status(200).send(itemGroup);
+        } catch (error) {
             res.status(500).send("Error -> " + err);
-        });
+        }
     }
 };
 

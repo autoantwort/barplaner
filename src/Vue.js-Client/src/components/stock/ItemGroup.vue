@@ -1,22 +1,36 @@
 <template>
   <div class="container">
     <div class="row mt-3">
-      <div v-if="realItemGroup" class="col-12 col-md-8 offset-md-2">
+      <div v-if="realItemGroup" class="col-12 col-md-8 offset-md-2 was-validated">
         <div class="form-group row">
-          <label class="col-4">Name</label>
-          <label class="col-8">{{realItemGroup.name}}</label>
+          <label class="col-3">Name</label>
+          <generic-input-component :object="realItemGroup" property="name" endpoint="/itemGroup/:id" required :minLength="4" />
         </div>
         <div class="form-group row">
-          <label class="col-4">Minimum Count</label>
-          <label class="col-8">{{realItemGroup.minimumCount}}</label>
+          <label class="col-3">Minimum Count</label>
+          <generic-input-component
+            :object="realItemGroup"
+            property="minimumCount"
+            type="number"
+            :min="0"
+            :max="realItemGroup.idealCount"
+            :required="realItemGroup.idealCount !== null"
+            endpoint="/itemGroup/:id"
+          />
         </div>
         <div class="form-group row">
-          <label class="col-4">Ideal Count</label>
-          <label class="col-8">{{realItemGroup.idealCount}}</label>
+          <label class="col-3">Ideal Count</label>
+          <generic-input-component
+            :object="realItemGroup"
+            property="idealCount"
+            type="number"
+            :min="realItemGroup.minimumCount"
+            endpoint="/itemGroup/:id"
+          />
         </div>
         <div class="form-group row">
-          <label class="col-4">In Stock</label>
-          <label class="col-8">
+          <label class="col-3">In Stock</label>
+          <label class="col-9">
             {{inStock}}
             <span
               v-if="inStock && inStock<realItemGroup.idealCount"
@@ -27,14 +41,8 @@
           </label>
         </div>
         <div class="form-group row">
-          <label class="col-4">Position</label>
-          <label class="col-8">
-            <router-link
-              v-if="realItemGroup.stockPosition"
-              :to="{ name: 'position',params:{ positionId: realItemGroup.stockPosition.id , position:realItemGroup.stockPosition} }"
-            >{{realItemGroup.stockPosition.name}}</router-link>
-            <span v-else>None</span>
-          </label>
+          <label class="col-3">Position</label>
+          <edit-position-component :object="realItemGroup" endpoint="/itemGroup/:id" :usedForItem="false" />
         </div>
         <div class="row" v-if="itemStock && itemStock.length > 0">
           <table class="table table-hover">
@@ -69,21 +77,27 @@
 
 <script>
 import http from "../../http-common";
+import GenericInputComponent from "./components/GenericInputComponent";
+import EditPositionComponent from "./components/EditPositionComponent";
 
 export default {
   name: "itemGroup",
   props: {
     itemGroup: {
       type: Object,
-      default: null
-    }
+      default: null,
+    },
+  },
+  components: {
+    GenericInputComponent,
+    EditPositionComponent,
   },
   data() {
     return {
       items: "",
       realItemGroup: null,
       itemStock: [],
-      inStock: null
+      inStock: null,
     };
   },
   methods: {
@@ -92,10 +106,20 @@ export default {
     retrieveitemGroup() {
       http
         .get("/itemGroup/" + this.$route.params.itemGroupId)
-        .then(response => {
+        .then((response) => {
           this.realItemGroup = response.data;
         })
-        .catch(e => {
+        .catch((e) => {
+          console.log(e);
+        });
+    },
+    retrievePosition() {
+      http
+        .get("/position/" + this.itemGroup.stockPositionId)
+        .then((response) => {
+          this.itemGroup.stockPosition = response.data;
+        })
+        .catch((e) => {
           console.log(e);
         });
     },
@@ -106,7 +130,7 @@ export default {
           : this.$route.params.itemGroupId;
       http
         .get("/itemGroup/" + itemGroupId + "/itemStock")
-        .then(response => {
+        .then((response) => {
           this.itemStock = response.data;
           let inStock = 0;
           for (let i of this.itemStock) {
@@ -115,16 +139,22 @@ export default {
           this.inStock = inStock;
         })
         .catch(console.error);
-    }
+    },
   },
   mounted() {
     if (this.itemGroup === null) {
       this.retrieveitemGroup();
     } else {
       this.realItemGroup = this.itemGroup;
+      if (
+        this.itemGroup.stockPositionId !== null &&
+        this.itemGroup.stockPosition === undefined
+      ) {
+        this.retrievePosition();
+      }
     }
     this.retrieveItemStock();
-  }
+  },
   /* eslint-enable no-console */
 };
 </script>

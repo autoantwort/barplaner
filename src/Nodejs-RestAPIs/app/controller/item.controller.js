@@ -13,7 +13,7 @@ createOrUpdate = create => async(req, res) => {
     const errorHandler = e => res.status(e.name === "SequelizeValidationError" || e.name === "SequelizeUniqueConstraintError" ? 400 : 500).send("Error: " + e.name + ": " + e.errors[0].message);
 
     // first handle the possible creation of a item group
-    let itemGroupId;
+    let itemGroupId = req.body.itemGroupId;
     if (req.body['itemGroup.name'] !== undefined) {
         try {
             itemGroupId = (await ItemGroup.create({
@@ -62,6 +62,9 @@ createOrUpdate = create => async(req, res) => {
         itemGroupId,
         stockPositionId: req.body.itemPosition,
     };
+    if (req.body.stockPositionId !== undefined) {
+        values.stockPositionId = req.body.stockPositionId;
+    }
     if (create) {
         Item.create(values).then(item => {
             if (response.created.image) {
@@ -79,7 +82,7 @@ createOrUpdate = create => async(req, res) => {
                 response.error = "Item with id " + req.params.id + " does not exist";
                 return res.status(404).send(response);
             }
-            res.status(200).send(await Item.findByPk(req.params.id, { include: [{ model: Image }, { model: ItemGroup }] }));
+            res.status(200).send(await Item.findByPk(req.params.id, { include: [{ model: Image }, { model: ItemGroup }, { model: Position }] }));
         }).catch(error => {
             console.error(error)
             response.error = "Can't update item: " + JSON.stringify(error);

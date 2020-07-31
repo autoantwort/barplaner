@@ -3,20 +3,20 @@
     <div class="row mt-3">
       <div v-if="realPosition" class="col-12 col-md-8 offset-md-2">
         <div class="form-group row">
-          <label class="col-4">Name</label>
-          <label class="col-8">{{realPosition.name}}</label>
+          <label class="col-3">Name</label>
+          <label class="col-9">{{realPosition.name}}</label>
         </div>
         <div class="form-group row">
-          <label class="col-4">Description</label>
-          <label class="col-8">{{realPosition.description}}</label>
+          <label class="col-3">Description</label>
+          <label class="col-9">{{realPosition.description}}</label>
         </div>
         <div class="form-group row">
-          <label class="col-4">Room</label>
-          <label class="col-8">{{realPosition.room}}</label>
+          <label class="col-3">Room</label>
+          <label class="col-9">{{realPosition.room}}</label>
         </div>
         <div class="form-group row">
-          <label class="col-4">Item Groups</label>
-          <label class="col-8">
+          <label class="col-3">Item Groups</label>
+          <label class="col-9">
             <router-link
               v-for="group in itemGroups"
               :key="group.id"
