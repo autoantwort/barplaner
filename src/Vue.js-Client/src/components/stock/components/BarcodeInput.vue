@@ -19,7 +19,7 @@ export default {
   props: ["value"],
   methods: {
     onInput(e) {
-      this.$emit("input", e.target.value);
+      this.$emit("input", e.target.value.trim());
     },
   },
   created() {
@@ -28,7 +28,7 @@ export default {
     );
     this.webSocket.onmessage = (e) => {
       this.$refs.barcode.value = e.data;
-      this.$emit("input", e.data);
+      this.$emit("input", e.data.trim());
       this.$emit("enter");
     };
   },
