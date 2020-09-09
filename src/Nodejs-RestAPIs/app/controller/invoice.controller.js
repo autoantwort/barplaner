@@ -215,6 +215,7 @@ const exportForMetro = (invoice, text) => {
         const grammRegex = /([0-9]+)g/;
         const packRegex = /([0-9]+)x([0-9]+)g/;
         const alkRegex = /[0-9]{2},[0-9]$/;
+        const stückRegex = /ES\s+([0-9]+)\s*$/;
         const lines = text.split('\n');
         const taxRegex = /([A-Z])= ?([0-9]{1,2},[0-9]{2})/g;
         const taxMap = {}; // a mapping from tax A, B, ... to values 19%, 7% (tax can change)    
@@ -272,6 +273,9 @@ const exportForMetro = (invoice, text) => {
                         bez = bez.replace(result[0], '');
                     } else if (pack === "PA" && (result = packRegex.exec(bez))) {
                         item.amount = toNumber(result[1]) * toNumber(result[2]);
+                        bez = bez.replace(result[0], '');
+                    } else if (pack === "ST" && (result = stückRegex.exec(bez))) {
+                        item.amount = toNumber(result[1]);
                         bez = bez.replace(result[0], '');
                     }
                 }
