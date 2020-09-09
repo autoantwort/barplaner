@@ -33,6 +33,9 @@ module.exports = (sequelize, Sequelize, Invoice, Item) => {
         productSite: { // the website for this product
             type: Sequelize.STRING,
         },
+        alcoholByVolume:  {
+            type: Sequelize.DECIMAL(2, 2),
+        },
     });
 
     InvoiceEntry.belongsTo(Invoice);

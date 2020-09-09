@@ -342,6 +342,7 @@ const exportForMetro = (invoice, text) => {
                             unit: item.unit,
                             invoiceId: invoice.id,
                             stockItemId: entry ? entry.stockItemId : null,
+                            alcoholByVolume: item.alk,
                         }).then(invoiceEntry => {
                             // habe auf der Seite https://produkte.metro.de/shop/search mal geschaut welche Requests so gemacht werden wenn man ein Produkt sucht
                             Axios
