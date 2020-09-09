@@ -2,7 +2,7 @@
   <edit-component ref="edit" :onSave="save" :onEdit="edit">
     <label>{{object.amount}} {{object.unit}}</label>
     <template v-slot:edit>
-      <content-input :object="content" v-on:enter="$refs.edit.save" />
+      <content-input ref="input" :object="content" v-on:enter="$refs.edit.save" />
     </template>
   </edit-component>
 </template>
@@ -34,6 +34,9 @@ export default {
   },
   methods: {
     save() {
+      if (!this.$refs.input.isValid()) {
+        return false;
+      }
       const isNotNull = this.content.amount !== null;
       const amount = isNotNull ? this.content.amount : null;
       const unit = isNotNull ? this.content.unit : null;

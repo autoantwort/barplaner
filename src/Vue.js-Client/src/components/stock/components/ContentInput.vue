@@ -1,6 +1,7 @@
 <template>
   <div class="input-group">
     <input
+      ref="input"
       type="number"
       id="unit"
       class="form-control"
@@ -25,6 +26,11 @@ export default {
   props: {
     object: {
       type: Object,
+    },
+  },
+  methods: {
+    isValid() {
+      return this.$refs.input.checkValidity();
     },
   },
 };

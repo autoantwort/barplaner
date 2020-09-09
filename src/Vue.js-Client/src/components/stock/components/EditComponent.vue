@@ -41,8 +41,10 @@ export default {
     },
     async editSaveClicked() {
       if (this.editMode) {
-        await this.onSave();
-        this.editMode = false;
+        const success = await this.onSave();
+        if (success !== false) {
+          this.editMode = false;
+        }
       } else {
         this.editMode = true;
         this.$nextTick(async () => await this.onEdit());

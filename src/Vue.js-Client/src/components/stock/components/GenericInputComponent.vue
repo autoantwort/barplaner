@@ -70,7 +70,7 @@ export default {
   methods: {
     save() {
       if (this.$refs.input.checkValidity() === false) {
-        return;
+        return false;
       }
       const obj = {};
       const value = this.$refs.input.value;
