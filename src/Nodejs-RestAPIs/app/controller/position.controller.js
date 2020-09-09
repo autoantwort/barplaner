@@ -8,9 +8,7 @@ const sequelize = db.sequelize;
 
 // Post a Position
 exports.create = (req, res) => {
-    const errorHandler = e =>
-        res.status(e.name === "SequelizeValidationError" || e.name === "SequelizeUniqueConstraintError" ? 400 : 500).send("Error: " + e.name + ": " + e.errors[0].message);
-
+    const errorHandler = e => res.status(e.name === "SequelizeValidationError" || e.name === "SequelizeUniqueConstraintError" ? 400 : 500).send("Error: " + e.name + ": " + e.errors[0].message);
     // a already existing image is used
     if (req.body.imageId) {
         Position.create(req.body)
@@ -38,6 +36,28 @@ exports.create = (req, res) => {
                     .catch(errorHandler);
             }).catch(errorHandler);
         }
+    }
+};
+
+exports.update = async(req, res) => {
+    try {
+        if (req.files && Object.keys(req.files).length > 0) {
+            const keys = Object.keys(req.files);
+            if (keys.length > 1) {
+                return res.status(400).send("More than one image was uploaded");
+            }
+            req.body.imageId = (await File.coreCreateImageFromRequest(req, req.body.titel, keys[0])).id;
+        }
+        const affected = await Position.update({
+            ...req.body,
+            imageId: image.id,
+        }, { where: { id: req.params.id } });
+        if (affected[0] === 0) {
+            return res.status(404).send("Position with id " + req.params.id + " does not exist");
+        }
+        res.status(200).send(await Position.findByPk(req.params.id, { include: [{ model: Image }] }));
+    } catch (e) {
+        res.status(e.name === "SequelizeValidationError" || e.name === "SequelizeUniqueConstraintError" ? 400 : 500).send("Error: " + e.name + ": " + e.errors[0].message);
     }
 };
 
