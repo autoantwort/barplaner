@@ -42,6 +42,18 @@
             <content-input :object="item" />
           </div>
           <div class="form-group">
+            <label>Alcohol by volume</label>
+            <percent-input v-model="item.alcoholByVolume" />
+          </div>
+          <div class="form-group">
+            <label>Website URL</label>
+            <input class="form-control" type="url" v-model="item.website" />
+          </div>
+          <div class="form-group">
+            <label>Internal Note</label>
+            <textarea class="form-control" rows="2" v-model="item.internalNote" />
+          </div>
+          <div class="form-group">
             <item-group-card ref="itemGroup" />
           </div>
           <div class="my-2 text-danger" v-if="errorString.length !== 0">{{errorString}}</div>
@@ -64,6 +76,7 @@ import ImageInput from "./components/ImageInput";
 import ContentInput from "./components/ContentInput";
 import PositionCard from "./components/PositionCard";
 import ItemGroupCard from "./components/ItemGroupCard";
+import PercentInput from "./components/PercentInput";
 
 export default {
   name: "add-item",
@@ -73,6 +86,7 @@ export default {
     ContentInput,
     PositionCard,
     ItemGroupCard,
+    PercentInput,
   },
   props: {
     initialItem: {
@@ -90,6 +104,9 @@ export default {
         seller: "Unknown",
         amount: null,
         unit: "Units",
+        alcoholByVolume: null,
+        website: null,
+        internalNote: null,
       },
       errorString: "",
     };
@@ -121,6 +138,9 @@ export default {
       if (this.item.unit !== "Units") {
         formData.set("unit", this.item.unit.toLowerCase());
       }
+      formData.set("alcoholByVolume", this.item.alcoholByVolume);
+      formData.set("website", this.item.website);
+      formData.set("internalNote", this.item.internalNote);
 
       // handle item position
       let result = await this.$refs.position.savePosition();

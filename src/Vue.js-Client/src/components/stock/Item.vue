@@ -23,6 +23,10 @@
           <edit-content-component :object="realItem" />
         </div>
         <div class="form-group row">
+          <label class="col-3">Alcohol by volume</label>
+          <edit-percent-component :object="realItem" property="alcoholByVolume" endpoint="/item/:id" />
+        </div>
+        <div class="form-group row">
           <label class="col-3">ItemGroup</label>
           <edit-item-group-component :object="realItem" />
         </div>
@@ -42,6 +46,14 @@
         <div class="form-group row">
           <label class="col-3">In Stock</label>
           <label class="col-9">{{stock === undefined ? "Loading..." : stock ? stock.inStock : "0"}}</label>
+        </div>
+        <div class="form-group row">
+          <label class="col-3">Website</label>
+          <edit-url-component :object="realItem" property="website" />
+        </div>
+        <div class="form-group row">
+          <label class="col-3">Interal Note</label>
+          <edit-textarea-component :object="realItem" property="internalNote" endpoint="/item/:id" />
         </div>
         <div class="row" v-if="stockChanges && stockChanges.length > 0">
           <table class="table table-hover">
@@ -79,6 +91,9 @@ import EditPositionComponent from "./components/EditPositionComponent";
 import EditBarcodeComponent from "./components/EditBarcodeComponent";
 import EditContentComponent from "./components/EditContentComponent";
 import EditItemGroupComponent from "./components/EditItemGroupComponent";
+import EditTextareaComponent from "./components/EditTextareaComponent";
+import EditUrlComponent from "./components/EditUrlComponent";
+import EditPercentComponent from "./components/EditPercentComponent";
 
 export default {
   name: "item",
@@ -94,6 +109,9 @@ export default {
     EditBarcodeComponent,
     EditContentComponent,
     EditItemGroupComponent,
+    EditTextareaComponent,
+    EditUrlComponent,
+    EditPercentComponent,
   },
   data() {
     return {

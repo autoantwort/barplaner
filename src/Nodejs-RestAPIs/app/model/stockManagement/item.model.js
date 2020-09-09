@@ -35,6 +35,15 @@ module.exports = (sequelize, Sequelize, Image, ItemGroup, Position) => {
             allowNull: true,
             defaultValue: null,
         },
+        internalNote: {
+            type: Sequelize.TEXT,
+        },
+        website: {
+            type: Sequelize.STRING(1024),
+        },
+        alcoholByVolume:  {
+            type: Sequelize.DECIMAL(2, 2),
+        }
     }, {
         hooks: {
             beforeSave: (item, options) => {

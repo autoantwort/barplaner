@@ -212,6 +212,28 @@
             </div>
           </div>
         </div>
+        <div class="form-group">
+          <label for="name">Alcohol by volume</label>
+          <div class="row">
+            <div class="col" v-if="currentEntry">
+              <button
+                v-if="currentEntry.alcoholByVolume"
+                class="btn btn-light"
+                v-on:click="updatedItem.alcoholByVolume = currentEntry.alcoholByVolume;"
+              >{{currentEntry.alcoholByVolume}} %</button>
+            </div>
+            <div class="col">
+              <percent-input v-model="updatedItem.alcoholByVolume"/>
+            </div>
+            <div class="col" v-if="currentItem">
+              <button
+                v-if="currentItem.alcoholByVolume"
+                class="btn btn-light"
+                v-on:click="updatedItem.alcoholByVolume = currentItem.alcoholByVolume;"
+              >{{currentItem.alcoholByVolume}} %</button>
+            </div>
+          </div>
+        </div>
         <div class="row row-cols-1 row-cols-md-2" v-if="currentEntry">
           <div v-for="(imageUrl, index) of currentEntry.images" :key="index" class="col mb-4">
             <div
@@ -328,6 +350,7 @@ import http from "../../http-common";
 import phoneticsFilter from "./../../phoneticsFilter";
 import VSelect from "./../vue-bootstrap-select";
 import ContentInput from "./components/ContentInput";
+import PercentInput from "./components/PercentInput";
 
 function parseDate(input) {
   if (input === undefined) return undefined;
@@ -344,6 +367,7 @@ export default {
   components: {
     VSelect,
     ContentInput,
+    PercentInput,
   },
   props: {
     invoice: {
@@ -371,6 +395,7 @@ export default {
         name: null,
         amount: null,
         unit: null,
+        alcoholByVolume: null,
         selectedImageIndex: null,
         selectedItemGroup: null,
       },
@@ -489,6 +514,7 @@ export default {
       this.updatedItem.name = entry.itemDescription;
       this.updatedItem.amount = entry.amount;
       this.updatedItem.unit = entry.unit || "Units";
+      this.updatedItem.alcoholByVolume = entry.alcoholByVolume;
       this.updatedItem.selectedImageIndex = null;
       this.updatedItem.selectedItemGroup = null;
       this.$refs.editInvoice.show();
@@ -510,6 +536,11 @@ export default {
       } else {
         this.updatedItem.selectedImageIndex = null;
       }
+      if (entry.stockItem.alcoholByVolume) {
+        this.updatedItem.alcoholByVolume = entry.stockItem.alcoholByVolume;
+      } else {
+        this.updatedItem.alcoholByVolume = entry.alcoholByVolume;
+      }
       this.updatedItem.selectedItemGroup = entry.stockItem.itemGroup;
       this.$refs.editInvoice.show();
     },
@@ -525,6 +556,8 @@ export default {
         seller: this.realInvoice.seller,
         amount: this.updatedItem.amount,
         unit: this.updatedItem.unit,
+        alcoholByVolume: this.updatedItem.alcoholByVolume,
+        website: this.currentEntry.productSite,
       };
       if (this.updatedItem.selectedImageIndex !== null) {
         data.itemImageURL = this.currentEntry.images[
