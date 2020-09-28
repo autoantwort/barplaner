@@ -29,8 +29,7 @@ export default {
   methods: {
     save() {
       let value = this.$refs.input.value;
-      const startRight =
-        value.startsWith("http://") || value.startsWith("https://");
+      const startRight = value.startsWith("http://") || value.startsWith("https://");
       if (this.$refs.input.checkValidity() && startRight) {
         const obj = {};
         const value = this.$refs.input.value;

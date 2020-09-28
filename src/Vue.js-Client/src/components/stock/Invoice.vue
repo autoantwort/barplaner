@@ -1,5 +1,5 @@
 <template>
-  <div :class="{'container': !fluid, 'container-fluid': fluid }">
+  <div :class="{ container: !fluid, 'container-fluid': fluid }">
     <div class="row mt-3">
       <template v-if="realInvoice">
         <form ref="form" class="was-validated col-12 col-lg-8 offset-lg-2 col-md-10 offset-md-1">
@@ -51,7 +51,7 @@
           </div>
           <div class="form-group row" v-if="realInvoice.extraCostsDescription">
             <label class="col-4">Extra Costs</label>
-            <label class="col-8">{{realInvoice.extraCostsAmount}} für {{realInvoice.extraCostsDescription}}</label>
+            <label class="col-8">{{ realInvoice.extraCostsAmount }} für {{ realInvoice.extraCostsDescription }}</label>
           </div>
           <div class="form-group row" v-if="canSave">
             <div class="col-5 offset-3">
@@ -59,7 +59,7 @@
             </div>
           </div>
         </form>
-        <div class="col-12" :class="{'col-xxl-6': pdfURL}" v-if="invoiceEntries && invoiceEntries.length > 0">
+        <div class="col-12" :class="{ 'col-xxl-6': pdfURL }" v-if="invoiceEntries && invoiceEntries.length > 0">
           <div class="table-responsive">
             <table class="table table-hover">
               <thead>
@@ -76,12 +76,13 @@
               <tbody>
                 <tr v-for="entry in invoiceEntries" :key="entry.id">
                   <td>
-                    <div v-if="entry.stockItem" style="display: inline-flex;">
+                    <div v-if="entry.stockItem" style="display: inline-flex">
                       <router-link
                         :title="entry.stockItem.name"
                         class="text-max-width"
-                        :to="{ name: 'item',params:{ itemId: entry.stockItem.id } }"
-                      >{{entry.stockItem.name}}</router-link>
+                        :to="{ name: 'item', params: { itemId: entry.stockItem.id } }"
+                        >{{ entry.stockItem.name }}</router-link
+                      >
 
                       <button
                         style="display: inline-block"
@@ -120,29 +121,29 @@
                   </td>
                   <td>
                     <!--<router-link v-if="entry.item" :to="{ name: 'item',params:{ itemId: entry.item.id } }">{{entry.item.name}}</router-link>-->
-                    <span v-if="entry.change">#{{entry.change.id}}</span>
+                    <span v-if="entry.change">#{{ entry.change.id }}</span>
                   </td>
-                  <td>{{entry.itemDescription}}</td>
-                  <td>{{entry.amount}} {{entry.unit}}</td>
-                  <td>{{entry.quantity}}</td>
-                  <td>{{entry.netPrice | asEuro}} / {{entry.brottoPrice | asEuro}}</td>
+                  <td>{{ entry.itemDescription }}</td>
+                  <td>{{ entry.amount }} {{ entry.unit }}</td>
+                  <td>{{ entry.quantity }}</td>
+                  <td>{{ entry.netPrice | asEuro }} / {{ entry.brottoPrice | asEuro }}</td>
                   <td>
-                    <a v-if="entry.productSite" target="_blank" :href="entry.productSite">{{realInvoice.seller}}</a>
+                    <a v-if="entry.productSite" target="_blank" :href="entry.productSite">{{ realInvoice.seller }}</a>
                   </td>
                 </tr>
               </tbody>
             </table>
           </div>
         </div>
-        <div v-if="analysing" class="col-12 justify-content-center" style="display: flex;">
+        <div v-if="analysing" class="col-12 justify-content-center" style="display: flex">
           <span class="mt-1">Analysing invoice...</span>
           <b-spinner class="center ml-3"></b-spinner>
         </div>
-        <div v-if="!pdfURL" class="col-12 justify-content-center mb-4" style="display: flex;">
+        <div v-if="!pdfURL" class="col-12 justify-content-center mb-4" style="display: flex">
           <button class="btn btn-primary" v-on:click="showPDF">Show PDF</button>
         </div>
         <div class="col-12 col-xxl-6 mb-4" v-if="pdfURL">
-          <iframe :src="pdfURL" style="width: 100%; height:1300px;" frameborder="0"></iframe>
+          <iframe :src="pdfURL" style="width: 100%; height: 1300px" frameborder="0"></iframe>
         </div>
       </template>
     </div>
@@ -153,13 +154,14 @@
       ok-title="Delete Invoice"
       ok-variant="danger"
       v-on:ok="deleteInvoice"
-    >Could not analyse Invoice. Do you want to delete the invoice? Otherwise you can inset the data manually.</b-modal>
+      >Could not analyse Invoice. Do you want to delete the invoice? Otherwise you can inset the data manually.</b-modal
+    >
     <b-modal
       ref="editInvoice"
       centered
-      :title="currentItem?'Update Item' : 'Create Item'"
-      :ok-title="currentItem?'Update Item' : 'Create Item'"
-      :ok-variant="currentItem?'primary' : 'success'"
+      :title="currentItem ? 'Update Item' : 'Create Item'"
+      :ok-title="currentItem ? 'Update Item' : 'Create Item'"
+      :ok-variant="currentItem ? 'primary' : 'success'"
       lazy
       :size="modalSize"
       v-on:ok="updateModalClicked"
@@ -174,19 +176,21 @@
           <label for="name">Name</label>
           <div class="row">
             <div class="col" v-if="currentEntry">
-              <button class="btn btn-light" v-on:click="updatedItem.name = currentEntry.itemDescription">{{currentEntry.itemDescription}}</button>
+              <button class="btn btn-light" v-on:click="updatedItem.name = currentEntry.itemDescription">
+                {{ currentEntry.itemDescription }}
+              </button>
             </div>
             <div class="col">
               <input
                 type="text"
                 class="form-control"
-                :class="{'border border-warning': currentEntry && updatedItem.name === currentEntry.itemDescription}"
+                :class="{ 'border border-warning': currentEntry && updatedItem.name === currentEntry.itemDescription }"
                 required
                 v-model="updatedItem.name"
               />
             </div>
             <div class="col" v-if="currentItem">
-              <button class="btn btn-light" v-on:click="updatedItem.name = currentItem.name">{{currentItem.name}}</button>
+              <button class="btn btn-light" v-on:click="updatedItem.name = currentItem.name">{{ currentItem.name }}</button>
             </div>
           </div>
         </div>
@@ -197,8 +201,13 @@
               <button
                 v-if="currentEntry.amount"
                 class="btn btn-light"
-                v-on:click="updatedItem.unit = currentEntry.unit;updatedItem.amount = currentEntry.amount;"
-              >{{currentEntry.amount}} {{currentEntry.unit}}</button>
+                v-on:click="
+                  updatedItem.unit = currentEntry.unit;
+                  updatedItem.amount = currentEntry.amount;
+                "
+              >
+                {{ currentEntry.amount }} {{ currentEntry.unit }}
+              </button>
             </div>
             <div class="col">
               <content-input :object="updatedItem" />
@@ -207,8 +216,13 @@
               <button
                 v-if="currentItem.amount"
                 class="btn btn-light"
-                v-on:click="updatedItem.unit = currentItem.unit;updatedItem.amount = currentItem.amount;"
-              >{{currentItem.amount}} {{currentItem.unit}}</button>
+                v-on:click="
+                  updatedItem.unit = currentItem.unit;
+                  updatedItem.amount = currentItem.amount;
+                "
+              >
+                {{ currentItem.amount }} {{ currentItem.unit }}
+              </button>
             </div>
           </div>
         </div>
@@ -219,18 +233,22 @@
               <button
                 v-if="currentEntry.alcoholByVolume"
                 class="btn btn-light"
-                v-on:click="updatedItem.alcoholByVolume = currentEntry.alcoholByVolume;"
-              >{{currentEntry.alcoholByVolume}} %</button>
+                v-on:click="updatedItem.alcoholByVolume = currentEntry.alcoholByVolume"
+              >
+                {{ currentEntry.alcoholByVolume }} %
+              </button>
             </div>
             <div class="col">
-              <percent-input v-model="updatedItem.alcoholByVolume"/>
+              <percent-input v-model="updatedItem.alcoholByVolume" />
             </div>
             <div class="col" v-if="currentItem">
               <button
                 v-if="currentItem.alcoholByVolume"
                 class="btn btn-light"
-                v-on:click="updatedItem.alcoholByVolume = currentItem.alcoholByVolume;"
-              >{{currentItem.alcoholByVolume}} %</button>
+                v-on:click="updatedItem.alcoholByVolume = currentItem.alcoholByVolume"
+              >
+                {{ currentItem.alcoholByVolume }} %
+              </button>
             </div>
           </div>
         </div>
@@ -239,7 +257,7 @@
             <div
               class="card"
               style="border-width: 2px !important"
-              :class="{'border border-success': updatedItem.selectedImageIndex === index}"
+              :class="{ 'border border-success': updatedItem.selectedImageIndex === index }"
               v-on:click="updatedItem.selectedImageIndex = index"
             >
               <img :src="imageUrl" class="card-img-top no-high-images" />
@@ -250,7 +268,7 @@
               title="Current Image"
               class="card"
               style="border-width: 2px !important"
-              :class="{'border border-success': updatedItem.selectedImageIndex === -2}"
+              :class="{ 'border border-success': updatedItem.selectedImageIndex === -2 }"
               v-on:click="updatedItem.selectedImageIndex = -2"
             >
               <img :src="baseURL + '/file/' + currentItem.image.original" class="card-img-top no-high-images" />
@@ -269,21 +287,37 @@
         <div
           class="alert alert-warning"
           role="alert"
-          v-if="currentEntry && currentEntry.images && currentEntry.images.length > 0 && updatedItem.selectedImageIndex === null"
-        >No Image selected. Click on a image to select it.</div>
+          v-if="
+            currentEntry && currentEntry.images && currentEntry.images.length > 0 && updatedItem.selectedImageIndex === null
+          "
+        >
+          No Image selected. Click on a image to select it.
+        </div>
         <div
           class="alert alert-warning"
           role="alert"
-          v-if="currentEntry && currentEntry.itemDescription ===  updatedItem.name "
-        >The item name has not been changed. It can contain unwanted characters.</div>
+          v-if="currentEntry && currentEntry.itemDescription === updatedItem.name"
+        >
+          The item name has not been changed. It can contain unwanted characters.
+        </div>
       </form>
     </b-modal>
-    <b-modal ref="linkModal" centered title="Link Item with existing one" ok-title="Cancel" ok-only ok-variant="secondary" lazy size="lg">
+    <b-modal
+      ref="linkModal"
+      centered
+      title="Link Item with existing one"
+      ok-title="Cancel"
+      ok-only
+      ok-variant="secondary"
+      lazy
+      size="lg"
+    >
       <div v-if="filteredItems && currentEntry" class="table-responsive">
         <p>
-          Entry Name: {{currentEntry.itemDescription}}, {{currentEntry.amount}} {{currentEntry.unit}}, Art.Nr: {{currentEntry.articleNumber}}
+          Entry Name: {{ currentEntry.itemDescription }}, {{ currentEntry.amount }} {{ currentEntry.unit }}, Art.Nr:
+          {{ currentEntry.articleNumber }}
           <button
-            v-for="(url,index) in currentEntry.images"
+            v-for="(url, index) in currentEntry.images"
             :key="index"
             class="ml-2 btn btn-sm btn-sm-flat btn-secondary"
             type="button"
@@ -309,10 +343,14 @@
             <tr
               v-for="item in filteredItems"
               :key="item.id"
-              :class="{'table-active': (item.seller && item.seller !== realInvoice.seller) || (item.amount && currentEntry.amount && item.amount !== currentEntry.amount )  }"
+              :class="{
+                'table-active':
+                  (item.seller && item.seller !== realInvoice.seller) ||
+                  (item.amount && currentEntry.amount && item.amount !== currentEntry.amount),
+              }"
             >
               <td>
-                <router-link :to="{ name: 'item',params:{ itemId: item.id , item: item} }">{{item.name}}</router-link>
+                <router-link :to="{ name: 'item', params: { itemId: item.id, item: item } }">{{ item.name }}</router-link>
                 <button
                   v-if="item.image !== null"
                   class="ml-2 btn btn-sm btn-sm-flat btn-secondary"
@@ -322,9 +360,9 @@
                   <font-awesome-icon icon="image" />
                 </button>
               </td>
-              <td>{{item.seller}}</td>
-              <td>{{item.amount}} {{item.unit === 'unknown' ? '' : item.unit}}</td>
-              <td>{{item.articleNumber}}</td>
+              <td>{{ item.seller }}</td>
+              <td>{{ item.amount }} {{ item.unit === "unknown" ? "" : item.unit }}</td>
+              <td>{{ item.articleNumber }}</td>
               <td class="px-0">
                 <button class="ml-2 btn btn-sm btn-sm-flat btn-primary" type="button" v-on:click="linkItemClicked(item)">
                   Link
@@ -337,10 +375,10 @@
       </div>
     </b-modal>
     <b-modal ref="imageModal" hide-footer no-fade centered>
-      <div v-if="loading === true" class="justify-content-center" style="display: flex;">
+      <div v-if="loading === true" class="justify-content-center" style="display: flex">
         <b-spinner class="center" label="Loading..."></b-spinner>
       </div>
-      <img v-show="!loading" :src="currentImageURL" style="width:100%" v-on:load="loading = false" />
+      <img v-show="!loading" :src="currentImageURL" style="width: 100%" v-on:load="loading = false" />
     </b-modal>
   </div>
 </template>
@@ -411,9 +449,7 @@ export default {
       if (this.realInvoice === null) return false;
       else {
         return (
-          this.realInvoice.seller === null ||
-          this.realInvoice.invoiceDate === null ||
-          this.realInvoice.deliveryDate === null
+          this.realInvoice.seller === null || this.realInvoice.invoiceDate === null || this.realInvoice.deliveryDate === null
         );
       }
     },
@@ -425,10 +461,7 @@ export default {
     /* eslint-disable no-console */
     phoneticsFilter,
     filter(event) {
-      this.filteredItems = phoneticsFilter(
-        this.existingItems,
-        event.target.value
-      );
+      this.filteredItems = phoneticsFilter(this.existingItems, event.target.value);
     },
     linkItem(entry) {
       this.currentEntry = entry;
@@ -448,11 +481,7 @@ export default {
           .catch(alert);
       };
       let extraText;
-      if (
-        this.currentEntry.amount &&
-        item.amount &&
-        this.currentEntry.amount !== item.amount
-      ) {
+      if (this.currentEntry.amount && item.amount && this.currentEntry.amount !== item.amount) {
         extraText = `The content of the entry and the item is different!<br>${this.currentEntry.amount} ${this.currentEntry.unit} vs ${item.amount} ${item.unit}<br>`;
       }
       if (item.seller && item.seller !== this.realInvoice.seller) {
@@ -551,8 +580,7 @@ export default {
       const data = {
         name: this.updatedItem.name,
         barcode: this.currentEntry.gtin || this.currentItem.barcode,
-        articleNumber:
-          this.currentEntry.articleNumber || this.currentItem.articleNumber,
+        articleNumber: this.currentEntry.articleNumber || this.currentItem.articleNumber,
         seller: this.realInvoice.seller,
         amount: this.updatedItem.amount,
         unit: this.updatedItem.unit,
@@ -560,9 +588,7 @@ export default {
         website: this.currentEntry.productSite,
       };
       if (this.updatedItem.selectedImageIndex !== null) {
-        data.itemImageURL = this.currentEntry.images[
-          this.updatedItem.selectedImageIndex
-        ];
+        data.itemImageURL = this.currentEntry.images[this.updatedItem.selectedImageIndex];
       }
       if (this.updatedItem.selectedItemGroup) {
         data["itemGroup.id"] = this.updatedItem.selectedItemGroup.value;
@@ -635,8 +661,7 @@ export default {
         });
     },
     retrieveInvoiceEntries() {
-      const invoiceId =
-        this.invoice !== null ? this.invoice.id : this.$route.params.invoiceId;
+      const invoiceId = this.invoice !== null ? this.invoice.id : this.$route.params.invoiceId;
       http
         .get("/invoice/" + invoiceId + "/entries")
         .then((response) => {
@@ -651,8 +676,7 @@ export default {
     },
     retrieveAnalysis() {
       this.analysing = true;
-      const invoiceId =
-        this.invoice !== null ? this.invoice.id : this.$route.params.invoiceId;
+      const invoiceId = this.invoice !== null ? this.invoice.id : this.$route.params.invoiceId;
       http
         .get("/invoice/" + invoiceId + "/analyse")
         .then((response) => {

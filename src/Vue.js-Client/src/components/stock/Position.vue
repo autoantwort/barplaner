@@ -4,15 +4,15 @@
       <div v-if="realPosition" class="col-12 col-md-8 offset-md-2">
         <div class="form-group row">
           <label class="col-3">Name</label>
-          <label class="col-9">{{realPosition.name}}</label>
+          <label class="col-9">{{ realPosition.name }}</label>
         </div>
         <div class="form-group row">
           <label class="col-3">Description</label>
-          <label class="col-9">{{realPosition.description}}</label>
+          <label class="col-9">{{ realPosition.description }}</label>
         </div>
         <div class="form-group row">
           <label class="col-3">Room</label>
-          <label class="col-9">{{realPosition.room}}</label>
+          <label class="col-9">{{ realPosition.room }}</label>
         </div>
         <div class="form-group row">
           <label class="col-3">Item Groups</label>
@@ -20,9 +20,10 @@
             <router-link
               v-for="group in itemGroups"
               :key="group.id"
-              :to="{ name: 'itemGroup',params:{ itemGroupId: group.id, itemGroup: group } }"
-            >{{group.name}}</router-link>
-            {{itemGroups.length === 0 ? "None": ""}}
+              :to="{ name: 'itemGroup', params: { itemGroupId: group.id, itemGroup: group } }"
+              >{{ group.name }}</router-link
+            >
+            {{ itemGroups.length === 0 ? "None" : "" }}
           </label>
         </div>
         <positionImage ref="image" v-bind:position="realPosition"></positionImage>
@@ -43,20 +44,21 @@
             <tbody>
               <tr v-for="item in itemStock" :key="item.id">
                 <td>
-                  <router-link :to="{ name: 'item',params:{ itemId: item.id } }">{{item.name}}</router-link>
+                  <router-link :to="{ name: 'item', params: { itemId: item.id } }">{{ item.name }}</router-link>
                 </td>
                 <td>
                   <router-link
                     v-if="item.itemGroupId !== null"
-                    :to="{ name: 'itemGroup',params:{ itemGroupId: item.itemGroupId } }"
-                  >{{item.itemGroupName}}</router-link>
+                    :to="{ name: 'itemGroup', params: { itemGroupId: item.itemGroupId } }"
+                    >{{ item.itemGroupName }}</router-link
+                  >
                 </td>
-                <td>{{item.itemPos?"From Item":"From Item Group"}}</td>
-                <td>{{item.amount}} {{item.unit}}</td>
-                <td>{{item.inStock}}</td>
-                <td>{{item.minBrottoPrice}}</td>
-                <td>{{item.avgBrottoPrice}}</td>
-                <td>{{item.maxBrottoPrice}}</td>
+                <td>{{ item.itemPos ? "From Item" : "From Item Group" }}</td>
+                <td>{{ item.amount }} {{ item.unit }}</td>
+                <td>{{ item.inStock }}</td>
+                <td>{{ item.minBrottoPrice }}</td>
+                <td>{{ item.avgBrottoPrice }}</td>
+                <td>{{ item.maxBrottoPrice }}</td>
               </tr>
             </tbody>
           </table>
@@ -75,8 +77,8 @@ export default {
   props: {
     position: {
       type: Object,
-      default: null
-    }
+      default: null,
+    },
   },
   components: { PositionImage },
   data() {
@@ -84,7 +86,7 @@ export default {
       items: "",
       realPosition: null,
       itemStock: [],
-      itemGroups: []
+      itemGroups: [],
     };
   },
   methods: {
@@ -92,17 +94,17 @@ export default {
     retrievePosition() {
       http
         .get("/position/" + this.$route.params.positionId)
-        .then(response => {
+        .then((response) => {
           this.realPosition = response.data;
         })
-        .catch(e => {
+        .catch((e) => {
           console.log(e);
         });
     },
     retrieveItemStock(positionId) {
       http
         .get("/position/" + positionId + "/itemStock")
-        .then(response => {
+        .then((response) => {
           this.itemStock = response.data;
         })
         .catch(console.error);
@@ -110,11 +112,11 @@ export default {
     retrieveItemGroups(positionId) {
       http
         .get("/position/" + positionId + "/itemGroups")
-        .then(response => {
+        .then((response) => {
           this.itemGroups = response.data;
         })
         .catch(console.error);
-    }
+    },
   },
   mounted() {
     if (this.realPosition === null) {
@@ -122,11 +124,10 @@ export default {
     } else {
       this.realPosition = this.position;
     }
-    const positionId =
-      this.position !== null ? this.position.id : this.$route.params.positionId;
+    const positionId = this.position !== null ? this.position.id : this.$route.params.positionId;
     this.retrieveItemStock(positionId);
     this.retrieveItemGroups(positionId);
-  }
+  },
   /* eslint-enable no-console */
 };
 </script>

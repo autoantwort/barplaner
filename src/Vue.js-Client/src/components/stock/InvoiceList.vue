@@ -6,7 +6,7 @@
           <button class="btn btn-success mt-3 mr-3" v-on:click="openAddInvoice">Add Invoice</button>
         </div>
         <div class="mt-3 mb-3">
-          <div v-if="invoices.length!==0" class="table-responsive">
+          <div v-if="invoices.length !== 0" class="table-responsive">
             <table class="table table-hover">
               <thead>
                 <tr>
@@ -16,9 +16,9 @@
               <tbody>
                 <tr v-for="invoice in invoices" :key="invoice.id">
                   <td>
-                    <router-link
-                      :to="{ name: 'invoice',params:{ invoiceId: invoice.id , invoice: invoice} }"
-                    >{{invoice.seller}} Rechnung vom {{invoice.invoiceDate | asDate}}</router-link>
+                    <router-link :to="{ name: 'invoice', params: { invoiceId: invoice.id, invoice: invoice } }"
+                      >{{ invoice.seller }} Rechnung vom {{ invoice.invoiceDate | asDate }}</router-link
+                    >
                   </td>
                 </tr>
               </tbody>
@@ -47,14 +47,14 @@ export default {
   data() {
     return {
       invoices: [],
-      uploadedInvoicePdf: null
+      uploadedInvoicePdf: null,
     };
   },
   props: {
     addNew: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   methods: {
     /* eslint-disable no-console */
@@ -73,18 +73,18 @@ export default {
       http
         .post("/invoice", formData, {
           headers: {
-            "Content-Type": "multipart/form-data"
+            "Content-Type": "multipart/form-data",
           },
-          validateStatus: () => true
+          validateStatus: () => true,
         })
-        .then(response => {
+        .then((response) => {
           if (response.status === 409) {
             this.$router.push({
               name: "invoice",
               params: {
                 invoiceId: response.data.invoice.id,
-                invoice: response.data.invoice
-              }
+                invoice: response.data.invoice,
+              },
             });
           } else if (response.status === 201) {
             this.$router.push({
@@ -92,13 +92,13 @@ export default {
               params: {
                 invoiceId: response.data.id,
                 invoice: response.data,
-                isNew: true
-              }
+                isNew: true,
+              },
             });
           } else {
             this.$bvModal.msgBoxOk(response.data, {
               title: "Error",
-              centered: true
+              centered: true,
             });
           }
         });
@@ -106,16 +106,16 @@ export default {
     retrieveInvoices() {
       http
         .get("/invoices")
-        .then(response => {
+        .then((response) => {
           // maybe the user click back on the Invoice View with a invoice that should
           // be deleted, but the deletion take place after this method call, so filter
           // the invoice that should be deleted out here
-          this.invoices = response.data.filter(i => i.seller !== null);
+          this.invoices = response.data.filter((i) => i.seller !== null);
         })
-        .catch(e => {
+        .catch((e) => {
           console.log(e);
         });
-    }
+    },
   },
   mounted() {
     this.retrieveInvoices();
@@ -124,7 +124,7 @@ export default {
       this.$router.replace({ path: "/invoices" });
     }
     /* eslint-enable no-console */
-  }
+  },
 };
 </script>
 

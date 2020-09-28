@@ -1,6 +1,6 @@
 <template>
   <edit-component ref="edit" :onSave="save" :onEdit="edit">
-    <label>{{object[property]}}</label>
+    <label>{{ object[property] }}</label>
     <template v-slot:edit>
       <input
         :type="type"
@@ -12,7 +12,7 @@
         :min="min"
         :max="max"
       />
-      <div class="invalid-feedback">{{errorText}}</div>
+      <div class="invalid-feedback">{{ errorText }}</div>
     </template>
   </edit-component>
 </template>

@@ -12,9 +12,9 @@
     />
     <div class="input-group-append">
       <b-dropdown v-bind:text="object.unit" v-model="object.unit">
-        <b-dropdown-item v-on:click="object.unit='Units'">Units</b-dropdown-item>
-        <b-dropdown-item v-on:click="object.unit='ml'">ml</b-dropdown-item>
-        <b-dropdown-item v-on:click="object.unit='gramm'">gramm</b-dropdown-item>
+        <b-dropdown-item v-on:click="object.unit = 'Units'">Units</b-dropdown-item>
+        <b-dropdown-item v-on:click="object.unit = 'ml'">ml</b-dropdown-item>
+        <b-dropdown-item v-on:click="object.unit = 'gramm'">gramm</b-dropdown-item>
       </b-dropdown>
     </div>
   </div>

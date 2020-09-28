@@ -9,7 +9,7 @@
           <input type="text" class="mt-3 form-control" placeholder="Search" v-on:input="filter" />
         </div>
         <div class="mt-3 mb-3">
-          <div v-if="positions.length!==0" class="table-responsive">
+          <div v-if="positions.length !== 0" class="table-responsive">
             <table class="table table-hover">
               <thead>
                 <tr>
@@ -21,10 +21,12 @@
               <tbody>
                 <tr v-for="position in filteredPositions" :key="position.id">
                   <td>
-                    <router-link :to="{ name: 'position',params:{ positionId: position.id , position} }">{{position.name}}</router-link>
+                    <router-link :to="{ name: 'position', params: { positionId: position.id, position } }">{{
+                      position.name
+                    }}</router-link>
                   </td>
-                  <td>{{position.room}}</td>
-                  <td>{{position.description}}</td>
+                  <td>{{ position.room }}</td>
+                  <td>{{ position.description }}</td>
                 </tr>
               </tbody>
             </table>
@@ -44,32 +46,29 @@ export default {
   data() {
     return {
       positions: [],
-      filteredPositions: []
+      filteredPositions: [],
     };
   },
   methods: {
     /* eslint-disable no-console */
     filter(event) {
-      this.filteredPositions = phoneticsFilter(
-        this.positions,
-        event.target.value
-      );
+      this.filteredPositions = phoneticsFilter(this.positions, event.target.value);
     },
     retrievePositions() {
       http
         .get("/positionsWithImages")
-        .then(response => {
+        .then((response) => {
           this.filteredPositions = this.positions = response.data;
         })
-        .catch(e => {
+        .catch((e) => {
           console.log(e);
         });
-    }
+    },
     /* eslint-enable no-console */
   },
   mounted() {
     this.retrievePositions();
-  }
+  },
 };
 </script>
 

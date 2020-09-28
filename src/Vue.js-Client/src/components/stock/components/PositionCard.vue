@@ -26,12 +26,14 @@
       </b-tab>
     </b-tabs>
     <b-card-footer class="bg-info border-info">
-      <template
-        v-if="usedForItem"
-      >Every item (e.g. banana juice from one brand) can have a specific position. If a item has no position, the position of the item group (e.g. banana juice) is used.</template>
-      <template
-        v-else
-      >Every item group can have a position. If a item group has no position, all items in the group has no position by default. Items can have a own position.</template>
+      <template v-if="usedForItem"
+        >Every item (e.g. banana juice from one brand) can have a specific position. If a item has no position, the position
+        of the item group (e.g. banana juice) is used.</template
+      >
+      <template v-else
+        >Every item group can have a position. If a item group has no position, all items in the group has no position by
+        default. Items can have a own position.</template
+      >
     </b-card-footer>
   </b-card>
 </template>
@@ -116,9 +118,7 @@ export default {
             // select the new position, maybe there are other errors and when
             // the user press 'add item' again, the user wants to use the created position
             this.positionTabIndex = 2 /* Existing */;
-            this.selectedPosition = this.realExistingPositions[
-              this.realExistingPositions.length - 1
-            ]; // v-model of the select
+            this.selectedPosition = this.realExistingPositions[this.realExistingPositions.length - 1]; // v-model of the select
             return response.data.id;
           }
         } catch (error) {
@@ -152,9 +152,7 @@ export default {
           const value = input.value.trim();
           for (let obj of this.existingPositions) {
             if (obj.text === value) {
-              input.setCustomValidity(
-                'A position with the name "' + obj.text + '" already exists.'
-              );
+              input.setCustomValidity('A position with the name "' + obj.text + '" already exists.');
               return;
             }
           }

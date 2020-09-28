@@ -5,7 +5,7 @@
         <slot v-if="!editMode"></slot>
         <slot v-else name="edit"></slot>
       </div>
-      <div class="col-3" style="text-align: right;">
+      <div class="col-3" style="text-align: right">
         <button v-if="editMode" class="btn btn-light" v-on:click="cancelClicked">
           <font-awesome-icon icon="times" />
         </button>

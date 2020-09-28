@@ -20,7 +20,9 @@
               <b-tabs card v-model="itemGroup.positionTabIndex">
                 <b-tab title="Position:" title-link-class="text-dark" disabled></b-tab>
                 <b-tab title="None" active>
-                  <b-card-text>The item group, respectively the items in the group have no position or a own position.</b-card-text>
+                  <b-card-text
+                    >The item group, respectively the items in the group have no position or a own position.</b-card-text
+                  >
                 </b-tab>
                 <b-tab title="Existing" lazy>
                   <b-card-text>
@@ -35,19 +37,26 @@
                 </b-tab>
                 <b-tab title="New" lazy>
                   <b-card-text>
-                    <add-position ref="itemGroupPosition" :embedded="true" :existingPositions="existingPositions"></add-position>
+                    <add-position
+                      ref="itemGroupPosition"
+                      :embedded="true"
+                      :existingPositions="existingPositions"
+                    ></add-position>
                   </b-card-text>
                 </b-tab>
               </b-tabs>
-              <b-card-footer
-                class="bg-info border-info"
-              >Every item group can have a position. If a item group has no position, the position of a item is used.</b-card-footer>
+              <b-card-footer class="bg-info border-info"
+                >Every item group can have a position. If a item group has no position, the position of a item is
+                used.</b-card-footer
+              >
             </b-card>
           </div>
 
-          <div class="mt-2 mb-2 text-danger" v-if="errorString.length !== 0">{{errorString}}</div>
+          <div class="mt-2 mb-2 text-danger" v-if="errorString.length !== 0">{{ errorString }}</div>
           <button type="button" class="btn btn-success my-4" v-on:click="addItemGroup">Add ItemGroup and add another</button>
-          <button type="button" class="btn btn-success my-4 ml-2" v-on:click="addItemGroup('itemGroups')">Add ItemGroup and view list</button>
+          <button type="button" class="btn btn-success my-4 ml-2" v-on:click="addItemGroup('itemGroups')">
+            Add ItemGroup and view list
+          </button>
         </form>
       </div>
     </div>
@@ -64,13 +73,13 @@ export default {
   name: "add-itemGroup",
   components: {
     VSelect,
-    AddPosition
+    AddPosition,
   },
   props: {
     existingPositions: {
       type: Array,
-      default: null
-    }
+      default: null,
+    },
   },
   data() {
     return {
@@ -80,10 +89,10 @@ export default {
         idealCount: null,
         positionTabIndex: 1,
         selectedPosition: null,
-        selectedItemGroup: null
+        selectedItemGroup: null,
       },
       internalExistingPositions: null,
-      errorString: ""
+      errorString: "",
     };
   },
   methods: {
@@ -100,7 +109,7 @@ export default {
       const data = {
         name: this.itemGroup.name,
         minimumCount: this.itemGroup.minimumCount,
-        idealCount: this.itemGroup.idealCount
+        idealCount: this.itemGroup.idealCount,
       };
       // handle itemGroup position
       if (this.itemGroup.positionTabIndex === 3 /* new position */) {
@@ -108,41 +117,36 @@ export default {
         try {
           const response = await result;
           if (response.status !== 201) {
-            this.errorString =
-              "Error while creating position for itemGroup: " + response.data;
+            this.errorString = "Error while creating position for itemGroup: " + response.data;
             return;
           } else {
             // add position to the existing ones
             this.internalExistingPositions.push({
               value: response.data.id,
-              text: response.data.name
+              text: response.data.name,
             });
             // select the new position, maybe there are other errors and when
             // the user press 'add item group' again, the user wants to use the created position
             this.itemGroup.positionTabIndex = 2 /* Existing */;
-            this.itemGroup.selectedPosition = this.internalExistingPositions[
-              this.internalExistingPositions.length - 1
-            ]; // v-model of the select
+            this.itemGroup.selectedPosition = this.internalExistingPositions[this.internalExistingPositions.length - 1]; // v-model of the select
           }
         } catch (error) {
-          this.errorString =
-            "Error while creating position for itemGroup: " + error;
+          this.errorString = "Error while creating position for itemGroup: " + error;
           return;
         }
       }
       if (this.itemGroup.positionTabIndex === 2 /* existing position*/) {
         if (this.itemGroup.selectedPosition === null) {
-          this.errorString =
-            "If you don't want to select a position, select the 'None' tab.";
+          this.errorString = "If you don't want to select a position, select the 'None' tab.";
           return;
         }
         data["stockPositionId"] = this.itemGroup.selectedPosition.value;
       }
       http
         .post("/itemGroup", data, {
-          validateStatus: () => true
+          validateStatus: () => true,
         })
-        .then(response => {
+        .then((response) => {
           if (response !== undefined) {
             if (response.status === 201) {
               if (redirectAfter !== undefined) {
@@ -158,25 +162,22 @@ export default {
         });
     },
     retrieveExistingPositions() {
-      if (
-        this.existingPositions === null &&
-        this.internalExistingPositions === null
-      ) {
+      if (this.existingPositions === null && this.internalExistingPositions === null) {
         http
           .get("/positionsForSelect")
-          .then(response => {
+          .then((response) => {
             this.internalExistingPositions = response.data;
           })
           .catch(console.log);
       } else {
         this.internalExistingPositions = this.existingPositions;
       }
-    }
+    },
     /* eslint-enable no-console */
   },
   mounted() {
     this.retrieveExistingPositions();
-  }
+  },
 };
 </script>
 

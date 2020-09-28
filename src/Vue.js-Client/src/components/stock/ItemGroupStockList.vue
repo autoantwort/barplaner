@@ -6,7 +6,7 @@
           <input type="text" class="mt-3 form-control" placeholder="Search" v-on:input="filter" />
         </div>
         <div class="mt-3 mb-3">
-          <div v-if="itemGroups.length!==0" class="table-responsive">
+          <div v-if="itemGroups.length !== 0" class="table-responsive">
             <table class="table table-hover">
               <thead>
                 <tr>
@@ -20,12 +20,14 @@
               <tbody>
                 <tr v-for="itemGroup in filteredItemGroups" :key="itemGroup.id" :class="itemGroup.class">
                   <td>
-                    <router-link :to="{ name: 'itemGroup',params:{ itemGroupId: itemGroup.id , itemGroup} }">{{itemGroup.name}}</router-link>
+                    <router-link :to="{ name: 'itemGroup', params: { itemGroupId: itemGroup.id, itemGroup } }">{{
+                      itemGroup.name
+                    }}</router-link>
                   </td>
-                  <td>{{itemGroup.minimumCount}}</td>
-                  <td>{{itemGroup.inStock}}</td>
-                  <td>{{itemGroup.idealCount}}</td>
-                  <td>{{itemGroup.buy}}</td>
+                  <td>{{ itemGroup.minimumCount }}</td>
+                  <td>{{ itemGroup.inStock }}</td>
+                  <td>{{ itemGroup.idealCount }}</td>
+                  <td>{{ itemGroup.buy }}</td>
                 </tr>
               </tbody>
             </table>
@@ -46,21 +48,18 @@ export default {
     return {
       itemGroups: [],
       filteredItemGroups: [],
-      selectedPosition: null
+      selectedPosition: null,
     };
   },
   methods: {
     /* eslint-disable no-console */
     filter(event) {
-      this.filteredItemGroups = phoneticsFilter(
-        this.itemGroups,
-        event.target.value
-      );
+      this.filteredItemGroups = phoneticsFilter(this.itemGroups, event.target.value);
     },
     retrieveItemGroupStock() {
       http
         .get("/itemGroupStock")
-        .then(response => {
+        .then((response) => {
           this.itemGroups = response.data;
           for (let i of this.itemGroups) {
             if (i.inStock < i.minimumCount) {
@@ -79,15 +78,15 @@ export default {
           }
           this.filteredItemGroups = this.itemGroups;
         })
-        .catch(e => {
+        .catch((e) => {
           console.log(e);
         });
-    }
+    },
     /* eslint-enable no-console */
   },
   mounted() {
     this.retrieveItemGroupStock();
-  }
+  },
 };
 </script>
 

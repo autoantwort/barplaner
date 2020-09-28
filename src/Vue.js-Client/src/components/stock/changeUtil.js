@@ -40,8 +40,7 @@ const getFilterFunction = reason => {
         return i => (i.reason === "consumedDuringBar" || i.reason === "correctedConsumptionDuringBar") && now - i.date < days15;
     } else if (reason === "internalFreeConsumption" || reason === "internalPayedConsumption") {
         return i => (i.reason === "internalFreeConsumption" || i.reason === "internalPayedConsumption") && now - i.date < day;
-    } else
-    if (reason === "bought") {
+    } else if (reason === "bought") {
         return i => i.reason === "bought";
     } else if (reason === "receivedDonation") {
         return i => i.reason === "receivedDonation" && now - i.date < days30;

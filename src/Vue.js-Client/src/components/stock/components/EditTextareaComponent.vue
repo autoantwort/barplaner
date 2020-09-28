@@ -1,6 +1,6 @@
 <template>
   <edit-component ref="edit" :onSave="save" :onEdit="edit">
-    <label style="white-space: pre-line">{{object[property]}}</label>
+    <label style="white-space: pre-line">{{ object[property] }}</label>
     <template v-slot:edit>
       <textarea class="form-control" ref="input" v-on:keyup.enter="enterPressed" spellcheck="true" rows="5" />
     </template>

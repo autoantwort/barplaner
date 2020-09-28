@@ -2,8 +2,9 @@
   <edit-component ref="edit" :onSave="save" :onEdit="edit">
     <router-link
       v-if="object.itemGroup"
-      :to="{ name: 'itemGroup',params:{ itemGroupId: object.itemGroup.id , itemGroup: object.itemGroup} }"
-    >{{object.itemGroup.name}}</router-link>
+      :to="{ name: 'itemGroup', params: { itemGroupId: object.itemGroup.id, itemGroup: object.itemGroup } }"
+      >{{ object.itemGroup.name }}</router-link
+    >
     <template v-else>None</template>
     <template v-slot:edit>
       <item-group-card ref="input" />

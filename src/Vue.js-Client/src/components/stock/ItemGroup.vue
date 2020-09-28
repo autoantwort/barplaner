@@ -4,7 +4,13 @@
       <div v-if="realItemGroup" class="col-12 col-md-8 offset-md-2 was-validated">
         <div class="form-group row">
           <label class="col-3">Name</label>
-          <generic-input-component :object="realItemGroup" property="name" endpoint="/itemGroup/:id" required :minLength="4" />
+          <generic-input-component
+            :object="realItemGroup"
+            property="name"
+            endpoint="/itemGroup/:id"
+            required
+            :minLength="4"
+          />
         </div>
         <div class="form-group row">
           <label class="col-3">Minimum Count</label>
@@ -31,13 +37,14 @@
         <div class="form-group row">
           <label class="col-3">In Stock</label>
           <label class="col-9">
-            {{inStock}}
+            {{ inStock }}
             <span
-              v-if="inStock && inStock<realItemGroup.idealCount"
+              v-if="inStock && inStock < realItemGroup.idealCount"
               class="badge ml-2 vert"
-              style="vertical-align: text-top;"
-              v-bind:class="[inStock<realItemGroup.minimumCount ? 'badge-danger' : 'badge-warning']"
-            >Buy {{realItemGroup.idealCount - inStock}} item{{(realItemGroup.idealCount - inStock)>1?'s':''}}</span>
+              style="vertical-align: text-top"
+              v-bind:class="[inStock < realItemGroup.minimumCount ? 'badge-danger' : 'badge-warning']"
+              >Buy {{ realItemGroup.idealCount - inStock }} item{{ realItemGroup.idealCount - inStock > 1 ? "s" : "" }}</span
+            >
           </label>
         </div>
         <div class="form-group row">
@@ -59,13 +66,13 @@
             <tbody>
               <tr v-for="item in itemStock" :key="item.id">
                 <td>
-                  <router-link :to="{ name: 'item',params:{ itemId: item.id } }">{{item.name}}</router-link>
+                  <router-link :to="{ name: 'item', params: { itemId: item.id } }">{{ item.name }}</router-link>
                 </td>
-                <td>{{item.seller}}</td>
-                <td>{{item.amount}} {{item.unit}}</td>
-                <td>{{item.inStock}}</td>
-                <td>{{item.minBrottoPrice}}</td>
-                <td>{{item.avgBrottoPrice}}</td>
+                <td>{{ item.seller }}</td>
+                <td>{{ item.amount }} {{ item.unit }}</td>
+                <td>{{ item.inStock }}</td>
+                <td>{{ item.minBrottoPrice }}</td>
+                <td>{{ item.avgBrottoPrice }}</td>
               </tr>
             </tbody>
           </table>
@@ -124,10 +131,7 @@ export default {
         });
     },
     retrieveItemStock() {
-      const itemGroupId =
-        this.itemGroup !== null
-          ? this.itemGroup.id
-          : this.$route.params.itemGroupId;
+      const itemGroupId = this.itemGroup !== null ? this.itemGroup.id : this.$route.params.itemGroupId;
       http
         .get("/itemGroup/" + itemGroupId + "/itemStock")
         .then((response) => {
@@ -146,10 +150,7 @@ export default {
       this.retrieveitemGroup();
     } else {
       this.realItemGroup = this.itemGroup;
-      if (
-        this.itemGroup.stockPositionId !== null &&
-        this.itemGroup.stockPosition === undefined
-      ) {
+      if (this.itemGroup.stockPositionId !== null && this.itemGroup.stockPosition === undefined) {
         this.retrievePosition();
       }
     }

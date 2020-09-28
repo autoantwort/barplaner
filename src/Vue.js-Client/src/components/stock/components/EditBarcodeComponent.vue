@@ -1,6 +1,6 @@
 <template>
   <edit-component ref="edit" :onSave="save" :onEdit="edit">
-    <label>{{object.barcode}}</label>
+    <label>{{ object.barcode }}</label>
     <template v-slot:edit>
       <barcode-input v-model="barcodeValue" v-on:enter="$refs.edit.save" />
     </template>

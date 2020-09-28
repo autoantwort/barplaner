@@ -10,25 +10,24 @@
         onkeypress="return false;"
       />
       <div class="input-group-append">
-        <input type="file" accept="image/*" id="uploadImage" v-on:change="loadImageFromFile" style="display: none;" />
+        <input type="file" accept="image/*" id="uploadImage" v-on:change="loadImageFromFile" style="display: none" />
         <label class="btn btn-outline-secondary" for="uploadImage" style="cursor: pointer" role="button">Upload Image</label>
       </div>
     </div>
-    <b-alert
-      :show="imageError"
-      v-on:dismissed="imageError = false"
-      dismissible
-      fade
-      variant="danger"
-    >The pasted URL does not point to an image!</b-alert>
+    <b-alert :show="imageError" v-on:dismissed="imageError = false" dismissible fade variant="danger"
+      >The pasted URL does not point to an image!</b-alert
+    >
     <div v-if="imageURL !== null" class="col mb-4 text-center">
       <img
         class="border border-success rounded no-high-images"
         :src="imageURL"
         v-on:load="imageError = false"
-        v-on:error="imageError = true; imageURL = null"
+        v-on:error="
+          imageError = true;
+          imageURL = null;
+        "
       />
-      <div class="text-center text-danger" style="text-decoration: underline;cursor:pointer" v-on:click="imageURL = null">
+      <div class="text-center text-danger" style="text-decoration: underline; cursor: pointer" v-on:click="imageURL = null">
         Delete Image
         <font-awesome-icon icon="trash-alt" />
       </div>

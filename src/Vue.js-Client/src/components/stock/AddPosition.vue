@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <div class="row mt-2">
-      <div v-bind:class="{'col-12 col-md-8 offset-md-2 col-lg-6 offset-lg-3':!this.embedded}">
+      <div v-bind:class="{ 'col-12 col-md-8 offset-md-2 col-lg-6 offset-lg-3': !this.embedded }">
         <label>Optional: Select an image and a position on the image</label>
         <br />
         <div class="row row-cols-1 row-cols-md-2">
@@ -9,7 +9,7 @@
             <div class="card" :imageId="image.id">
               <img :src="baseURL + image.compressed" :original="image.original" class="card-img-top no-high-images" />
               <div class="card-body">
-                <p class="card-text">{{image.titel?image.titel:"No name"}}</p>
+                <p class="card-text">{{ image.titel ? image.titel : "No name" }}</p>
                 <button type="button" class="btn btn-success" v-on:click="selectCard">Select</button>
               </div>
             </div>
@@ -23,28 +23,36 @@
                   class="form-control"
                   placeholder="Image Titel"
                   v-model.trim="titelOfNewImage"
-                  v-bind:class="{ 'is-invalid': titelOfNewImage !==null ? titelOfNewImage.length === 0 : false }"
+                  v-bind:class="{ 'is-invalid': titelOfNewImage !== null ? titelOfNewImage.length === 0 : false }"
                 />
 
                 <div>
-                  <label class="btn btn-primary mt-2" ref="forFile" style="cursor: pointer;width:60%" role="button">Upload Image</label>
+                  <label class="btn btn-primary mt-2" ref="forFile" style="cursor: pointer; width: 60%" role="button"
+                    >Upload Image</label
+                  >
                   <button
                     ref="buttonSelectUploaded"
                     class="btn btn-success"
-                    style="width:38%;margin-left:2%;display:none"
+                    style="width: 38%; margin-left: 2%; display: none"
                     type="button"
                     v-on:click="selectCard"
-                  >Select</button>
+                  >
+                    Select
+                  </button>
                 </div>
               </div>
             </div>
           </div>
         </div>
         <form class="was-validated" ref="form">
-          <div ref="positionDiv" v-show="selectedCard!==null" class="form-group">
+          <div ref="positionDiv" v-show="selectedCard !== null" class="form-group">
             <div class="row">
               <label ref="scrollTo" class="col-4">Position auf dem Bild</label>
-              <div class="col-8 text-right text-danger" style="text-decoration: underline;cursor:pointer" v-on:click="unselectCard">
+              <div
+                class="col-8 text-right text-danger"
+                style="text-decoration: underline; cursor: pointer"
+                v-on:click="unselectCard"
+              >
                 Keine Position auf dem Bild festlegen
                 <font-awesome-icon icon="trash-alt" />
               </div>
@@ -55,7 +63,7 @@
             </div>
             <div
               id="selector"
-              style="position: relative;width:100%"
+              style="position: relative; width: 100%"
               v-on:mousemove="changeHoverPosition"
               v-on:drag="changePosition"
               v-on:click="changePosition"
@@ -65,23 +73,36 @@
               v-on:mouseover="hoverPosition.visible = true"
             >
               <div
-                style="height:1px; width: 100%; background:gray;position: absolute;"
+                style="height: 1px; width: 100%; background: gray; position: absolute"
                 v-show="hoverPosition.visible"
-                v-bind:style="{top: hoverPosition.relativeYPosition}"
+                v-bind:style="{ top: hoverPosition.relativeYPosition }"
               ></div>
               <div
-                style="width:1px; height: 100%; background:gray;position: absolute;"
+                style="width: 1px; height: 100%; background: gray; position: absolute"
                 v-show="hoverPosition.visible"
-                v-bind:style="{left: hoverPosition.relativeXPosition}"
+                v-bind:style="{ left: hoverPosition.relativeXPosition }"
               ></div>
-              <div style="height:1px; width: 100%; background:red;position: absolute;" v-bind:style="{top: position.relativeYPosition}"></div>
-              <div style="width:1px; height: 100%; background:red;position: absolute;" v-bind:style="{left: position.relativeXPosition}"></div>
-              <img ref="output" style="width:100%;" ondragstart="event.preventDefault()" />
+              <div
+                style="height: 1px; width: 100%; background: red; position: absolute"
+                v-bind:style="{ top: position.relativeYPosition }"
+              ></div>
+              <div
+                style="width: 1px; height: 100%; background: red; position: absolute"
+                v-bind:style="{ left: position.relativeXPosition }"
+              ></div>
+              <img ref="output" style="width: 100%" ondragstart="event.preventDefault()" />
             </div>
           </div>
           <div class="form-group">
             <label>Position name</label>
-            <input type="text" class="form-control" required v-model.trim="position.name" name="positionName" v-on:input="validateName" />
+            <input
+              type="text"
+              class="form-control"
+              required
+              v-model.trim="position.name"
+              name="positionName"
+              v-on:input="validateName"
+            />
             <div class="invalid-feedback" ref="nameFeedback">Required</div>
           </div>
           <div class="form-group">
@@ -101,17 +122,21 @@
               <option>Anderer</option>
             </select>
           </div>
-          <input type="file" accept="image/*" name="image" ref="file" v-on:change="loadFile" style="display: none;" />
+          <input type="file" accept="image/*" name="image" ref="file" v-on:change="loadFile" style="display: none" />
           <div
             class="alert alert-warning"
             role="alert"
             v-show="selectedCard && selectedCard.children[0].id === 'card-output' && titelOfNewImage.length === 0"
           >
-            <div style="padding-top: 4px;padding-bottom: 4px; display:inline-block">The uploaded image has no titel!</div>
-            <button type="button" class="btn btn-success btn-sm" style="float: right;" v-on:click="scrollToTitel">Set Titel</button>
+            <div style="padding-top: 4px; padding-bottom: 4px; display: inline-block">The uploaded image has no titel!</div>
+            <button type="button" class="btn btn-success btn-sm" style="float: right" v-on:click="scrollToTitel">
+              Set Titel
+            </button>
           </div>
-          <div class="mt-2 mb-2 text-danger" v-if="errorString.length !== 0">{{errorString}}</div>
-          <button v-if="!this.embedded" type="button" class="btn btn-success my-4" v-on:click="addPosition">Add Position</button>
+          <div class="mt-2 mb-2 text-danger" v-if="errorString.length !== 0">{{ errorString }}</div>
+          <button v-if="!this.embedded" type="button" class="btn btn-success my-4" v-on:click="addPosition">
+            Add Position
+          </button>
         </form>
       </div>
     </div>
@@ -127,12 +152,12 @@ export default {
   props: {
     embedded: {
       type: Boolean,
-      default: false
+      default: false,
     },
     existingPositions: {
       type: Array,
-      default: null
-    }
+      default: null,
+    },
   },
   data() {
     return {
@@ -142,12 +167,12 @@ export default {
         description: "",
         relativeXPosition: "50%",
         relativeYPosition: "50%",
-        room: null
+        room: null,
       },
       hoverPosition: {
         visible: false,
         relativeXPosition: "0%",
-        relativeYPosition: "0%"
+        relativeYPosition: "0%",
       },
       selectedCard: null,
       lastSelectButton: null,
@@ -155,7 +180,7 @@ export default {
       existingImages: [],
       internalExistingPositions: null,
       titelOfNewImage: null,
-      errorString: ""
+      errorString: "",
     };
   },
   methods: {
@@ -195,10 +220,7 @@ export default {
       // we ignore 'scroll' events with two fingers
       if (this.lastTouchEvent) {
         const e = event.touches[0];
-        this.movePosition(
-          this.lastTouchEvent.pageX - e.pageX,
-          this.lastTouchEvent.pageY - e.pageY
-        );
+        this.movePosition(this.lastTouchEvent.pageX - e.pageX, this.lastTouchEvent.pageY - e.pageY);
         this.lastTouchEvent = e;
         event.preventDefault();
       }
@@ -257,7 +279,7 @@ export default {
 
       // click 'select'
       this.selectCard({
-        target: this.$refs.buttonSelectUploaded
+        target: this.$refs.buttonSelectUploaded,
       });
     },
     scrollToTitel() {
@@ -272,11 +294,8 @@ export default {
       }
       for (let obj of this.internalExistingPositions) {
         if (obj.text === value) {
-          this.$refs.nameFeedback.innerText =
-            'A position with the name "' + obj.text + '" already exists.';
-          e.target.setCustomValidity(
-            'A position with the name "' + obj.text + '" already exists.'
-          );
+          this.$refs.nameFeedback.innerText = 'A position with the name "' + obj.text + '" already exists.';
+          e.target.setCustomValidity('A position with the name "' + obj.text + '" already exists.');
           return;
         }
       }
@@ -296,37 +315,29 @@ export default {
       formData.append("room", this.position.room);
       const file = this.$refs.file.files[0];
       formData.append("file", file);
-      if (
-        this.selectedCard !== null &&
-        this.selectedCard.hasAttribute("imageId")
-      ) {
+      if (this.selectedCard !== null && this.selectedCard.hasAttribute("imageId")) {
         formData.append("imageId", this.selectedCard.getAttribute("imageId"));
       }
-      const xPositionOnImage =
-        Number(this.position.relativeXPosition.slice(0, -1)) / 100;
-      const yPositionOnImage =
-        Number(this.position.relativeYPosition.slice(0, -1)) / 100;
+      const xPositionOnImage = Number(this.position.relativeXPosition.slice(0, -1)) / 100;
+      const yPositionOnImage = Number(this.position.relativeYPosition.slice(0, -1)) / 100;
       formData.append("xPositionOnImage", xPositionOnImage);
       formData.append("yPositionOnImage", yPositionOnImage);
       const promise = http.post("/position", formData, {
         headers: {
-          "Content-Type": "multipart/form-data"
+          "Content-Type": "multipart/form-data",
         },
-        validateStatus: () => true
+        validateStatus: () => true,
       });
       if (returnResponse && !(returnResponse instanceof Event)) {
         return promise;
       } else {
-        promise.then(response => {
+        promise.then((response) => {
           if (response !== undefined) {
             if (response.status === 201) {
               this.errorString = "Created";
               this.$router.push("positions");
             } else if (response.status === 200) {
-              this.errorString =
-                response.data.errors[0].message +
-                ", value: " +
-                response.data.errors[0].value;
+              this.errorString = response.data.errors[0].message + ", value: " + response.data.errors[0].value;
             } else {
               this.errorString = response.data;
             }
@@ -339,28 +350,25 @@ export default {
     retrieveImages() {
       http
         .get("/positions/images")
-        .then(response => {
+        .then((response) => {
           this.existingImages = response.data;
         })
-        .catch(e => {
+        .catch((e) => {
           console.log(e);
         });
     },
     retrieveExistingPositions() {
-      if (
-        this.existingPositions === null &&
-        this.internalExistingPositions === null
-      ) {
+      if (this.existingPositions === null && this.internalExistingPositions === null) {
         http
           .get("/positionsForSelect")
-          .then(response => {
+          .then((response) => {
             this.internalExistingPositions = response.data;
           })
           .catch(console.log);
       } else {
         this.internalExistingPositions = this.existingPositions;
       }
-    }
+    },
     /* eslint-enable no-console */
   },
   created() {
@@ -372,7 +380,7 @@ export default {
     // setup id of file input
     this.$refs.file.id = "id_" + Math.random();
     this.$refs.forFile.setAttribute("for", this.$refs.file.id);
-  }
+  },
 };
 </script>
 

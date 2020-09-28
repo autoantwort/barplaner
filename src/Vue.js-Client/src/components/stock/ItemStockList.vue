@@ -9,7 +9,7 @@
           <input type="text" class="mt-3 form-control" placeholder="Search" v-on:input="filter" />
         </div>
         <div class="mt-3 mb-3">
-          <div v-if="items.length!==0" class="table-responsive">
+          <div v-if="items.length !== 0" class="table-responsive">
             <table class="table table-hover">
               <thead>
                 <tr>
@@ -24,18 +24,21 @@
               <tbody>
                 <tr v-for="item in filteredItems" :key="item.id">
                   <td>
-                    <router-link :to="{ name: 'item',params:{ itemId: item.itemId} }">{{item.stockItem.name}}</router-link>
+                    <router-link :to="{ name: 'item', params: { itemId: item.itemId } }">{{
+                      item.stockItem.name
+                    }}</router-link>
                   </td>
                   <td>
                     <router-link
                       v-if="item.stockItem.itemGroup"
-                      :to="{ name: 'itemGroup',params:{ itemGroupId: item.stockItem.itemGroup.id } }"
-                    >{{item.stockItem.itemGroup.name}}</router-link>
+                      :to="{ name: 'itemGroup', params: { itemGroupId: item.stockItem.itemGroup.id } }"
+                      >{{ item.stockItem.itemGroup.name }}</router-link
+                    >
                   </td>
-                  <td>{{item.inStock}}</td>
-                  <td>{{item.minPrice}}</td>
-                  <td>{{item.avgPrice}}</td>
-                  <td>{{item.maxPrice}}</td>
+                  <td>{{ item.inStock }}</td>
+                  <td>{{ item.minPrice }}</td>
+                  <td>{{ item.avgPrice }}</td>
+                  <td>{{ item.maxPrice }}</td>
                 </tr>
               </tbody>
             </table>
@@ -55,7 +58,7 @@ export default {
   data() {
     return {
       items: [],
-      filteredItems: []
+      filteredItems: [],
     };
   },
   methods: {
@@ -66,18 +69,18 @@ export default {
     retrieveItemStock() {
       http
         .get("/itemStock")
-        .then(response => {
+        .then((response) => {
           this.filteredItems = this.items = response.data;
         })
-        .catch(e => {
+        .catch((e) => {
           console.error(e);
         });
-    }
+    },
   },
   mounted() {
     this.retrieveItemStock();
     /* eslint-enable no-console */
-  }
+  },
 };
 </script>
 

@@ -9,7 +9,7 @@
           <input type="text" class="mt-3 form-control" placeholder="Search" v-on:input="filter" />
         </div>
         <div class="mt-3 mb-3">
-          <div v-if="items.length!==0" class="table-responsive">
+          <div v-if="items.length !== 0" class="table-responsive">
             <table class="table table-hover">
               <thead>
                 <tr>
@@ -23,7 +23,9 @@
               <tbody>
                 <tr v-for="item in filteredItems" :key="item.id">
                   <td>
-                    <router-link :to="{ name: 'item',params:{ itemId: item.id , item: item} }">{{item.name}}</router-link>
+                    <router-link :to="{ name: 'item', params: { itemId: item.id, item: item } }">{{
+                      item.name
+                    }}</router-link>
                     <button
                       v-if="item.imageId !== null"
                       class="ml-2 btn btn-sm btn-sm-flat btn-secondary"
@@ -36,14 +38,19 @@
                   <td>
                     <router-link
                       v-if="item.itemGroup"
-                      :to="{ name: 'itemGroup',params:{ itemGroupId: item.itemGroup.id , itemGroup: item.itemGroup} }"
-                    >{{item.itemGroup.name}}</router-link>
+                      :to="{ name: 'itemGroup', params: { itemGroupId: item.itemGroup.id, itemGroup: item.itemGroup } }"
+                      >{{ item.itemGroup.name }}</router-link
+                    >
                   </td>
                   <td>
                     <template v-if="item.stockPosition">
                       <router-link
-                        :to="{ name: 'position',params:{ positionId: item.stockPosition.id , position: item.stockPosition} }"
-                      >{{item.stockPosition.name}}</router-link>
+                        :to="{
+                          name: 'position',
+                          params: { positionId: item.stockPosition.id, position: item.stockPosition },
+                        }"
+                        >{{ item.stockPosition.name }}</router-link
+                      >
                       <button
                         v-if="item.stockPosition.imageId !== null"
                         class="ml-2 btn btn-sm btn-sm-flat btn-secondary"
@@ -55,8 +62,12 @@
                     </template>
                     <template v-else-if="item.itemGroup && item.itemGroup.stockPosition">
                       <router-link
-                        :to="{ name: 'position',params:{ positionId: item.itemGroup.stockPosition.id , position: item.itemGroup.stockPosition} }"
-                      >{{item.itemGroup.stockPosition.name}}</router-link>
+                        :to="{
+                          name: 'position',
+                          params: { positionId: item.itemGroup.stockPosition.id, position: item.itemGroup.stockPosition },
+                        }"
+                        >{{ item.itemGroup.stockPosition.name }}</router-link
+                      >
                       <button
                         v-if="item.itemGroup.stockPosition.imageId !== null"
                         class="ml-2 btn btn-sm btn-sm-flat btn-secondary"
@@ -67,8 +78,8 @@
                       </button>
                     </template>
                   </td>
-                  <td>{{item.seller}}</td>
-                  <td>{{item.amount}} {{item.unit === 'unknown' ? '' : item.unit}}</td>
+                  <td>{{ item.seller }}</td>
+                  <td>{{ item.amount }} {{ item.unit === "unknown" ? "" : item.unit }}</td>
                 </tr>
               </tbody>
             </table>
@@ -80,10 +91,10 @@
       <positionImage :position="selectedPosition"></positionImage>
     </b-modal>
     <b-modal ref="image" hide-footer no-fade centered :title="selectedItem && selectedItem.name">
-      <div v-if="loading === true" class="justify-content-center" style="display: flex;">
+      <div v-if="loading === true" class="justify-content-center" style="display: flex">
         <b-spinner class="center" label="Loading..."></b-spinner>
       </div>
-      <img v-if="selectedImageId" style="width:100%" :src="baseURL+selectedImageId" v-on:load="loading = false" />
+      <img v-if="selectedImageId" style="width: 100%" :src="baseURL + selectedImageId" v-on:load="loading = false" />
     </b-modal>
   </div>
 </template>
@@ -102,11 +113,11 @@ export default {
       selectedPosition: null,
       selectedItem: null,
       selectedImageId: null,
-      loading: false
+      loading: false,
     };
   },
   components: {
-    PositionImage
+    PositionImage,
   },
   methods: {
     /* eslint-disable no-console */
@@ -123,10 +134,10 @@ export default {
       this.loading = true;
       http
         .get("/image/" + item.imageId)
-        .then(response => {
+        .then((response) => {
           this.selectedImageId = response.data.original;
         })
-        .catch(e => {
+        .catch((e) => {
           console.log(e);
         });
       this.$refs.image.show();
@@ -134,13 +145,13 @@ export default {
     retrieveItems() {
       http
         .get("/itemsWithGroupsAndPositions")
-        .then(response => {
+        .then((response) => {
           this.filteredItems = this.items = response.data;
         })
-        .catch(e => {
+        .catch((e) => {
           console.log(e);
         });
-    }
+    },
   },
   created() {
     this.baseURL = http.defaults.baseURL + "/file/";
@@ -148,7 +159,7 @@ export default {
   mounted() {
     this.retrieveItems();
     /* eslint-enable no-console */
-  }
+  },
 };
 </script>
 

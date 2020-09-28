@@ -16,7 +16,7 @@
         </div>
         <div class="form-group row">
           <label class="col-3">Seller</label>
-          <label class="col-9">{{realItem.seller}}</label>
+          <label class="col-9">{{ realItem.seller }}</label>
         </div>
         <div class="form-group row">
           <label class="col-3">Content</label>
@@ -33,7 +33,12 @@
         <div class="form-group row">
           <label class="col-3">Image</label>
           <label class="col-9">
-            <button v-if="realItem.imageId !== null" class="ml-2 btn btn-sm btn-sm-flat btn-secondary" type="button" v-on:click="openImage">
+            <button
+              v-if="realItem.imageId !== null"
+              class="ml-2 btn btn-sm btn-sm-flat btn-secondary"
+              type="button"
+              v-on:click="openImage"
+            >
               <font-awesome-icon icon="image" />
             </button>
             <template v-else>None</template>
@@ -45,7 +50,7 @@
         </div>
         <div class="form-group row">
           <label class="col-3">In Stock</label>
-          <label class="col-9">{{stock === undefined ? "Loading..." : stock ? stock.inStock : "0"}}</label>
+          <label class="col-9">{{ stock === undefined ? "Loading..." : stock ? stock.inStock : "0" }}</label>
         </div>
         <div class="form-group row">
           <label class="col-3">Website</label>
@@ -66,18 +71,18 @@
             </thead>
             <tbody>
               <tr v-for="change in stockChanges" :key="change.id">
-                <td>{{change.date | asDateTime}}</td>
-                <td>{{change.amount}}</td>
-                <td>{{change.brottoPrice}}</td>
+                <td>{{ change.date | asDateTime }}</td>
+                <td>{{ change.amount }}</td>
+                <td>{{ change.brottoPrice }}</td>
               </tr>
             </tbody>
           </table>
         </div>
         <b-modal ref="image" hide-footer no-fade centered :title="realItem && realItem.name">
-          <div v-if="loading === true" class="justify-content-center" style="display: flex;">
+          <div v-if="loading === true" class="justify-content-center" style="display: flex">
             <b-spinner class="center" label="Loading..."></b-spinner>
           </div>
-          <img v-if="imageId" style="width:100%" :src="baseURL+imageId" v-on:load="loading = false" />
+          <img v-if="imageId" style="width: 100%" :src="baseURL + imageId" v-on:load="loading = false" />
         </b-modal>
       </div>
     </div>
@@ -147,8 +152,7 @@ export default {
         });
     },
     retrieveStock() {
-      const itemId =
-        this.item === null ? this.$route.params.itemId : this.item.id;
+      const itemId = this.item === null ? this.$route.params.itemId : this.item.id;
       http
         .get("/item/" + itemId + "/stock")
         .then((response) => {
@@ -158,8 +162,7 @@ export default {
         .catch(console.error);
     },
     retrieveStockChanges() {
-      const itemId =
-        this.item === null ? this.$route.params.itemId : this.item.id;
+      const itemId = this.item === null ? this.$route.params.itemId : this.item.id;
       http
         .get("/item/" + itemId + "/stockChanges")
         .then((response) => {

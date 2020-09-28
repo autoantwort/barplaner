@@ -38,7 +38,13 @@
             </div>
             <div class="form-group">
               <label for="ideal">Ideal Number in Stock</label>
-              <input type="number" class="form-control" id="ideal" :min="itemGroup.minimumCount" v-model="itemGroup.idealCount" />
+              <input
+                type="number"
+                class="form-control"
+                id="ideal"
+                :min="itemGroup.minimumCount"
+                v-model="itemGroup.idealCount"
+              />
             </div>
             <div class="form-group">
               <position-card ref="position" :usedForItem="false" />
@@ -47,9 +53,12 @@
         </b-card-text>
       </b-tab>
     </b-tabs>
-    <b-card-footer
-      class="bg-info border-info"
-    >A item group is a collection of items (e.g. orange juice as group for orange juice from differend brands). The minimum number should be at the minimum in the stock (e.g. the minimum is 2 and we only have one orange juice bottle in the stock, we get a warning that we have to buy orange juice. We should buy orange juice until we have the ideal number in stock.</b-card-footer>
+    <b-card-footer class="bg-info border-info"
+      >A item group is a collection of items (e.g. orange juice as group for orange juice from differend brands). The minimum
+      number should be at the minimum in the stock (e.g. the minimum is 2 and we only have one orange juice bottle in the
+      stock, we get a warning that we have to buy orange juice. We should buy orange juice until we have the ideal number in
+      stock.</b-card-footer
+    >
   </b-card>
 </template>
 
@@ -134,9 +143,7 @@ export default {
             // select the new item group, maybe there are other errors and when
             // the user press 'add item' again, the user wants to use the created item group
             this.itemGroupTabIndex = 2 /* Existing */;
-            this.selectedItemGroup = this.existingItemGroups[
-              this.existingItemGroups.length - 1
-            ]; // v-model of the select
+            this.selectedItemGroup = this.existingItemGroups[this.existingItemGroups.length - 1]; // v-model of the select
             return response.data.id;
           }
         } catch (error) {

@@ -1,6 +1,6 @@
 <template>
   <edit-component ref="edit" :onSave="save" :onEdit="edit">
-    <label>{{object.amount}} {{object.unit}}</label>
+    <label>{{ object.amount }} {{ object.unit }}</label>
     <template v-slot:edit>
       <content-input ref="input" :object="content" v-on:enter="$refs.edit.save" />
     </template>

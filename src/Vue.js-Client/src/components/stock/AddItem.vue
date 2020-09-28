@@ -56,11 +56,15 @@
           <div class="form-group">
             <item-group-card ref="itemGroup" />
           </div>
-          <div class="my-2 text-danger" v-if="errorString.length !== 0">{{errorString}}</div>
+          <div class="my-2 text-danger" v-if="errorString.length !== 0">{{ errorString }}</div>
           <div class="my-3">
             <button type="button" class="btn btn-success mr-2 mb-2" v-on:click="addPosition">Add and add another</button>
-            <button type="button" class="btn btn-success mr-2 mb-2" v-on:click="addPosition('items')">Add and view item list</button>
-            <button type="button" class="btn btn-success mr-2" v-on:click="addPosition('addStockChange')">Add and add change</button>
+            <button type="button" class="btn btn-success mr-2 mb-2" v-on:click="addPosition('items')">
+              Add and view item list
+            </button>
+            <button type="button" class="btn btn-success mr-2" v-on:click="addPosition('addStockChange')">
+              Add and add change
+            </button>
           </div>
         </form>
       </div>

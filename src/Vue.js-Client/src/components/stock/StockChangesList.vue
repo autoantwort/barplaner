@@ -8,9 +8,9 @@
               <b-form-datepicker
                 v-on:input="dateSelected"
                 v-model="selectedDate"
-                :disabled="datesSet===null"
+                :disabled="datesSet === null"
                 start-weekday="1"
-                :date-format-options="{ 'year': 'numeric', 'month': '2-digit', 'day': '2-digit', 'weekday': 'long' }"
+                :date-format-options="{ year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'long' }"
                 :date-disabled-fn="isDateDisabled"
                 locale="de"
                 placeholder="Jump to date"
@@ -19,11 +19,11 @@
                 <span class="input-group-text" id="basic-addon2">Include:</span>
               </div>
               <div class="input-group-append">
-                <b-dropdown v-bind:text="include" v-model="include" style="min-width:124px">
-                  <b-dropdown-item v-on:click="include='Date only'">Date only</b-dropdown-item>
-                  <b-dropdown-item v-on:click="include='+ 1 Day'">+ 1 Day</b-dropdown-item>
-                  <b-dropdown-item v-on:click="include='+/- 1 Day'">+/- 1 Day</b-dropdown-item>
-                  <b-dropdown-item v-on:click="include='Neighbours'">Neighbours</b-dropdown-item>
+                <b-dropdown v-bind:text="include" v-model="include" style="min-width: 124px">
+                  <b-dropdown-item v-on:click="include = 'Date only'">Date only</b-dropdown-item>
+                  <b-dropdown-item v-on:click="include = '+ 1 Day'">+ 1 Day</b-dropdown-item>
+                  <b-dropdown-item v-on:click="include = '+/- 1 Day'">+/- 1 Day</b-dropdown-item>
+                  <b-dropdown-item v-on:click="include = 'Neighbours'">Neighbours</b-dropdown-item>
                 </b-dropdown>
               </div>
             </div>
@@ -38,7 +38,7 @@
           </div>
         </div>
         <div class="mt-3 mb-3">
-          <div v-if="changes.length!==0" class="table-responsive">
+          <div v-if="changes.length !== 0" class="table-responsive">
             <table class="table">
               <thead>
                 <tr>
@@ -51,35 +51,35 @@
               </thead>
               <tbody>
                 <tr v-if="nextIndex !== null && offset === null">
-                  <td style="text-align:center;padding: 0px" colspan="5">
-                    <button
-                      type="button"
-                      class="btn btn-primary btn-sm my-1"
-                      v-on:click="loadNewerChanges"
-                    >Load {{datesList[nextIndex] | asDayDateTime}}</button>
+                  <td style="text-align: center; padding: 0px" colspan="5">
+                    <button type="button" class="btn btn-primary btn-sm my-1" v-on:click="loadNewerChanges">
+                      Load {{ datesList[nextIndex] | asDayDateTime }}
+                    </button>
                   </td>
                 </tr>
-                <tr v-for="change in changes" :key="change.id" :class="{highlight: change.highlight}">
-                  <td>{{change.date | asDayDateTime}}</td>
+                <tr v-for="change in changes" :key="change.id" :class="{ highlight: change.highlight }">
+                  <td>{{ change.date | asDayDateTime }}</td>
                   <td>
-                    <router-link :to="{ name: 'item',params:{ itemId: change.itemId} }">{{change.stockItem.name}}</router-link>
+                    <router-link :to="{ name: 'item', params: { itemId: change.itemId } }">{{
+                      change.stockItem.name
+                    }}</router-link>
                   </td>
-                  <td>{{change.amount}}</td>
-                  <td>{{change.brottoPrice}}</td>
-                  <td>{{change.user ? change.user.name : ''}}</td>
+                  <td>{{ change.amount }}</td>
+                  <td>{{ change.brottoPrice }}</td>
+                  <td>{{ change.user ? change.user.name : "" }}</td>
                 </tr>
                 <tr v-if="previousIndex !== null && offset === null">
-                  <td style="text-align:center;padding: 0px" colspan="5">
-                    <button
-                      type="button"
-                      class="btn btn-primary btn-sm my-1"
-                      v-on:click="loadOlderChanges"
-                    >Load {{datesList[previousIndex] | asDayDateTime}}</button>
+                  <td style="text-align: center; padding: 0px" colspan="5">
+                    <button type="button" class="btn btn-primary btn-sm my-1" v-on:click="loadOlderChanges">
+                      Load {{ datesList[previousIndex] | asDayDateTime }}
+                    </button>
                   </td>
                 </tr>
                 <tr v-if="!rangeFromQuery && selectedDate === null">
-                  <td style="text-align:center;padding: 0px" colspan="5">
-                    <button type="button" class="btn btn-primary btn-sm my-1" v-on:click="retrieveChanges">Load older changes</button>
+                  <td style="text-align: center; padding: 0px" colspan="5">
+                    <button type="button" class="btn btn-primary btn-sm my-1" v-on:click="retrieveChanges">
+                      Load older changes
+                    </button>
                   </td>
                 </tr>
               </tbody>
@@ -106,7 +106,7 @@ export default {
       previousIndex: null,
       nextIndex: null,
       offset: null,
-      rangeFromQuery: false
+      rangeFromQuery: false,
     };
   },
   methods: {
@@ -118,7 +118,7 @@ export default {
     showLatestChanges() {
       this.$router.replace({
         name: this.$route.name,
-        query: { ...this.$route.query, from: undefined, to: undefined }
+        query: { ...this.$route.query, from: undefined, to: undefined },
       });
       this.selectedDate = null;
       this.retrieveChanges();
@@ -129,12 +129,10 @@ export default {
       }
       // wo do not show new newest changes any more => reset offset
       this.offset = null;
-      const highlight = this.selectedDate
-        ? "&highlight=" + this.selectedDate
-        : "";
+      const highlight = this.selectedDate ? "&highlight=" + this.selectedDate : "";
       http
         .get("/stockChanges?from=" + from + "&to=" + to + highlight)
-        .then(response => {
+        .then((response) => {
           this.changes = response.data;
         })
         .catch(console.error);
@@ -148,10 +146,9 @@ export default {
       let from, to;
       let previousIndex = index === 0 ? null : index - 1;
       let nextIndex = index === this.datesList.length - 1 ? null : index + 1;
-      const moveAfter = date => {
+      const moveAfter = (date) => {
         while (nextIndex !== null && this.datesList[nextIndex] <= date) {
-          nextIndex =
-            nextIndex === this.datesList.length - 1 ? null : nextIndex + 1;
+          nextIndex = nextIndex === this.datesList.length - 1 ? null : nextIndex + 1;
         }
       };
       if (this.include === "Date only") {
@@ -174,10 +171,7 @@ export default {
         // search previous neighbours
         const pre = new Date(date);
         pre.setDate(pre.getDate() - 1);
-        while (
-          previousIndex !== null &&
-          pre.toISOString().startsWith(this.datesList[previousIndex])
-        ) {
+        while (previousIndex !== null && pre.toISOString().startsWith(this.datesList[previousIndex])) {
           pre.setDate(pre.getDate() - 1);
           previousIndex = previousIndex === 0 ? null : previousIndex - 1;
         }
@@ -185,13 +179,9 @@ export default {
         from = pre.toISOString().substring(0, 10);
         // search next neighbours
         date.setDate(date.getDate() + 1);
-        while (
-          nextIndex !== null &&
-          date.toISOString().startsWith(this.datesList[nextIndex])
-        ) {
+        while (nextIndex !== null && date.toISOString().startsWith(this.datesList[nextIndex])) {
           date.setDate(date.getDate() + 1);
-          nextIndex =
-            nextIndex === this.datesList.length - 1 ? null : nextIndex + 1;
+          nextIndex = nextIndex === this.datesList.length - 1 ? null : nextIndex + 1;
         }
         date.setDate(date.getDate() - 1);
         to = date.toISOString().substring(0, 10);
@@ -199,24 +189,18 @@ export default {
       // triggers watch change:
       this.$router.replace({
         name: this.$route.name,
-        query: { ...this.$route.query, from, to }
+        query: { ...this.$route.query, from, to },
       });
       this.nextIndex = nextIndex;
       this.previousIndex = previousIndex;
     },
     loadNewerChanges() {
       const date = this.datesList[this.nextIndex];
-      const newUrl = window.location.hash.replace(
-        /to=\d{4}-\d{2}-\d{2}/,
-        "to=" + date
-      );
-      this.nextIndex =
-        this.nextIndex === this.datesList.length - 1
-          ? null
-          : this.nextIndex + 1;
+      const newUrl = window.location.hash.replace(/to=\d{4}-\d{2}-\d{2}/, "to=" + date);
+      this.nextIndex = this.nextIndex === this.datesList.length - 1 ? null : this.nextIndex + 1;
       http
         .get("/" + date + "/stockChanges")
-        .then(response => {
+        .then((response) => {
           this.changes = response.data.concat(this.changes);
         })
         .catch(console.error);
@@ -225,15 +209,11 @@ export default {
     },
     loadOlderChanges() {
       const date = this.datesList[this.previousIndex];
-      const newUrl = window.location.hash.replace(
-        /from=\d{4}-\d{2}-\d{2}/,
-        "from=" + date
-      );
-      this.previousIndex =
-        this.previousIndex === 0 ? null : this.previousIndex - 1;
+      const newUrl = window.location.hash.replace(/from=\d{4}-\d{2}-\d{2}/, "from=" + date);
+      this.previousIndex = this.previousIndex === 0 ? null : this.previousIndex - 1;
       http
         .get("/" + date + "/stockChanges")
-        .then(response => {
+        .then((response) => {
           this.changes = this.changes.concat(response.data);
         })
         .catch(console.error);
@@ -247,7 +227,7 @@ export default {
       const limit = this.$route.query.limit || 100;
       http
         .get("/stockChanges?limit=" + limit + offset)
-        .then(response => {
+        .then((response) => {
           if (wasOffset) {
             this.changes = this.changes.concat(response.data);
             this.offset += limit;
@@ -261,23 +241,23 @@ export default {
     retrieveDates(callback) {
       http
         .get("/stockChanges/dates")
-        .then(response => {
+        .then((response) => {
           this.datesSet = new Set(response.data);
           this.datesList = response.data;
           if (callback) callback();
         })
         .catch(console.error);
-    }
+    },
   },
   watch: {
     "$route.query"() {
       this.selectDate(this.$route.query.to, this.$route.query.from);
     },
-    include: function() {
+    include: function () {
       if (this.selectedDate) {
         this.dateSelected();
       }
-    }
+    },
   },
   mounted() {
     if (this.selectDate(this.$route.query.to, this.$route.query.from)) {
@@ -305,7 +285,7 @@ export default {
     }
 
     /* eslint-enable no-console */
-  }
+  },
 };
 </script>
 

@@ -9,7 +9,7 @@
           <input type="text" class="mt-3 form-control" placeholder="Search" v-on:input="filter" />
         </div>
         <div class="mt-3 mb-3">
-          <div v-if="itemGroups.length!==0" class="table-responsive">
+          <div v-if="itemGroups.length !== 0" class="table-responsive">
             <table class="table table-hover">
               <thead>
                 <tr>
@@ -22,13 +22,19 @@
               <tbody>
                 <tr v-for="itemGroup in filteredItemGroups" :key="itemGroup.id">
                   <td>
-                    <router-link :to="{ name: 'itemGroup',params:{ itemGroupId: itemGroup.id , itemGroup} }">{{itemGroup.name}}</router-link>
+                    <router-link :to="{ name: 'itemGroup', params: { itemGroupId: itemGroup.id, itemGroup } }">{{
+                      itemGroup.name
+                    }}</router-link>
                   </td>
                   <td>
                     <router-link
                       v-if="itemGroup.stockPosition"
-                      :to="{ name: 'position',params:{ positionId: itemGroup.stockPosition.id , position: itemGroup.stockPosition} }"
-                    >{{itemGroup.stockPosition.name}}</router-link>
+                      :to="{
+                        name: 'position',
+                        params: { positionId: itemGroup.stockPosition.id, position: itemGroup.stockPosition },
+                      }"
+                      >{{ itemGroup.stockPosition.name }}</router-link
+                    >
                     <button
                       v-if="itemGroup.stockPosition && itemGroup.stockPosition.imageId !== null"
                       class="ml-2 btn btn-sm btn-sm-flat btn-secondary"
@@ -38,8 +44,8 @@
                       <font-awesome-icon icon="image" />
                     </button>
                   </td>
-                  <td>{{itemGroup.minimumCount}}</td>
-                  <td>{{itemGroup.idealCount}}</td>
+                  <td>{{ itemGroup.minimumCount }}</td>
+                  <td>{{ itemGroup.idealCount }}</td>
                 </tr>
               </tbody>
             </table>
@@ -56,7 +62,7 @@
 <script>
 import http from "../../http-common";
 import PositionImage from "./PositionImage";
-import phoneticsFilter  from "../../phoneticsFilter";
+import phoneticsFilter from "../../phoneticsFilter";
 
 export default {
   name: "itemGroup-list",
@@ -64,19 +70,16 @@ export default {
     return {
       itemGroups: [],
       filteredItemGroups: [],
-      selectedPosition: null
+      selectedPosition: null,
     };
   },
   components: {
-    PositionImage
+    PositionImage,
   },
   methods: {
     /* eslint-disable no-console */
     filter(event) {
-      this.filteredItemGroups = phoneticsFilter(
-        this.itemGroups,
-        event.target.value
-      );
+      this.filteredItemGroups = phoneticsFilter(this.itemGroups, event.target.value);
     },
     openModal(position) {
       this.selectedPosition = position;
@@ -85,18 +88,18 @@ export default {
     retrieveItemGroups() {
       http
         .get("/itemGroupsWithPositions")
-        .then(response => {
+        .then((response) => {
           this.filteredItemGroups = this.itemGroups = response.data;
         })
-        .catch(e => {
+        .catch((e) => {
           console.log(e);
         });
-    }
+    },
     /* eslint-enable no-console */
   },
   mounted() {
     this.retrieveItemGroups();
-  }
+  },
 };
 </script>
 

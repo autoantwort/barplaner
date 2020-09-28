@@ -2,8 +2,9 @@
   <edit-component ref="edit" :onSave="save" :onEdit="edit">
     <template v-if="object.stockPosition">
       <router-link
-        :to="{ name: 'position',params:{ positionId: object.stockPosition.id , position: object.stockPosition} }"
-      >{{object.stockPosition.name}}</router-link>
+        :to="{ name: 'position', params: { positionId: object.stockPosition.id, position: object.stockPosition } }"
+        >{{ object.stockPosition.name }}</router-link
+      >
       <button
         v-if="object.stockPosition.imageId !== null"
         class="ml-2 btn btn-sm btn-sm-flat btn-secondary"
@@ -15,8 +16,12 @@
     </template>
     <template v-else-if="object.itemGroup && object.itemGroup.stockPosition">
       <router-link
-        :to="{ name: 'position',params:{ positionId: object.itemGroup.stockPosition.id , position: object.itemGroup.stockPosition} }"
-      >{{object.itemGroup.stockPosition.name}}</router-link>
+        :to="{
+          name: 'position',
+          params: { positionId: object.itemGroup.stockPosition.id, position: object.itemGroup.stockPosition },
+        }"
+        >{{ object.itemGroup.stockPosition.name }}</router-link
+      >
       <button
         v-if="object.itemGroup.stockPosition.imageId !== null"
         class="ml-2 btn btn-sm btn-sm-flat btn-secondary"

@@ -23,9 +23,7 @@ export default {
     },
   },
   created() {
-    this.webSocket = new WebSocket(
-      http.defaults.baseWsURL + "/scannerConsumer"
-    );
+    this.webSocket = new WebSocket(http.defaults.baseWsURL + "/scannerConsumer");
     this.webSocket.onmessage = (e) => {
       this.$refs.barcode.value = e.data;
       this.$emit("input", e.data.trim());
