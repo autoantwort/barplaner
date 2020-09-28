@@ -276,13 +276,7 @@
           </div>
         </div>
         <div class="form-group" v-if="currentItem === null">
-          <label>Item Group</label>
-          <v-select
-            :searchable="true"
-            :options="existingItemGroups"
-            v-model="updatedItem.selectedItemGroup"
-            :filterFunction="phoneticsFilter"
-          />
+          <item-group-card ref="itemGroupCard" />
         </div>
         <div
           class="alert alert-warning"
@@ -386,9 +380,9 @@
 <script>
 import http from "../../http-common";
 import phoneticsFilter from "./../../phoneticsFilter";
-import VSelect from "./../vue-bootstrap-select";
 import ContentInput from "./components/ContentInput";
 import PercentInput from "./components/PercentInput";
+import ItemGroupCard from "./components/ItemGroupCard";
 
 function parseDate(input) {
   if (input === undefined) return undefined;
@@ -403,9 +397,9 @@ function parseDate(input) {
 export default {
   name: "invoice",
   components: {
-    VSelect,
     ContentInput,
     PercentInput,
+    ItemGroupCard,
   },
   props: {
     invoice: {
@@ -435,11 +429,9 @@ export default {
         unit: null,
         alcoholByVolume: null,
         selectedImageIndex: null,
-        selectedItemGroup: null,
       },
       loading: false,
       currentImageURL: null,
-      existingItemGroups: [],
       existingItems: [],
       filteredItems: [],
     };
@@ -459,7 +451,6 @@ export default {
   },
   methods: {
     /* eslint-disable no-console */
-    phoneticsFilter,
     filter(event) {
       this.filteredItems = phoneticsFilter(this.existingItems, event.target.value);
     },
@@ -545,7 +536,6 @@ export default {
       this.updatedItem.unit = entry.unit || "Units";
       this.updatedItem.alcoholByVolume = entry.alcoholByVolume;
       this.updatedItem.selectedImageIndex = null;
-      this.updatedItem.selectedItemGroup = null;
       this.$refs.editInvoice.show();
     },
     editItem(entry) {
@@ -570,10 +560,9 @@ export default {
       } else {
         this.updatedItem.alcoholByVolume = entry.alcoholByVolume;
       }
-      this.updatedItem.selectedItemGroup = entry.stockItem.itemGroup;
       this.$refs.editInvoice.show();
     },
-    updateModalClicked() {
+    async updateModalClicked() {
       if (this.$refs.editForm.checkValidity() === false) {
         return;
       }
@@ -590,13 +579,16 @@ export default {
       if (this.updatedItem.selectedImageIndex !== null) {
         data.itemImageURL = this.currentEntry.images[this.updatedItem.selectedImageIndex];
       }
-      if (this.updatedItem.selectedItemGroup) {
-        data["itemGroup.id"] = this.updatedItem.selectedItemGroup.value;
-      }
       const onError = (err) => {
         alert("Fehler: " + err);
         console.error(err);
       };
+      const result = await this.$refs.itemGroupCard.saveItemGroup();
+      if (typeof result === "number" || result === null) {
+        data["itemGroupId"] = result;
+      } else {
+        onError(result);
+      }
       if (this.currentItem) {
         http
           .put("/item/" + this.currentItem.id, data)
@@ -669,8 +661,6 @@ export default {
           for (const e of this.invoiceEntries) {
             e.images = JSON.parse(e.images);
           }
-          // then we need the item groups
-          this.retrieveItemGroups();
         })
         .catch(console.error);
     },
@@ -691,16 +681,6 @@ export default {
           this.analysing = false;
           this.retrieveInvoiceEntries();
           this.$refs.deleteInvoice.show();
-        });
-    },
-    retrieveItemGroups() {
-      http
-        .get("/itemGroupsForSelect")
-        .then((response) => {
-          this.existingItemGroups = response.data;
-        })
-        .catch((e) => {
-          console.log(e);
         });
     },
     retrieveItems() {
