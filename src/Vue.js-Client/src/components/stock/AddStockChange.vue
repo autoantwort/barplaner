@@ -13,139 +13,44 @@
               v-model="item"
               required
             />
-            <div v-if="item === null" class="invalid-feedback" style="display:block">Please select an item.</div>
+            <div v-if="item === null" class="invalid-feedback" style="display: block">Please select an item.</div>
           </div>
-          <div class="form-group">
-            <label for="itemGroupMinCount">Reason</label>
-            <div class="form-check mb-2">
-              <input class="form-check-input" type="radio" v-model="reason" name="reason" id="rc" value="rentalConsumption" required />
-              <label class="form-check-label" for="rc">
-                <strong>Vermietung:</strong> Wenn die Vermietung was verbraucht. Nicht wenn wir was von der Vermietung abkaufen => Eingekauft
-              </label>
-            </div>
-            <div class="form-check mb-2">
-              <input
-                class="form-check-input"
-                type="radio"
-                v-model="reason"
-                name="reason"
-                id="crc"
-                value="correctedRentalConsumption"
-                required
-              />
-              <label class="form-check-label" for="crc">
-                <strong>Korrektur Vermietung:</strong> Wenn die Vermietung nicht alles verbraucht hat und wir wieder die Sachen im Lager haben
-              </label>
-            </div>
-            <div class="form-check mb-2">
-              <input class="form-check-input" type="radio" v-model="reason" name="reason" id="consumedDuringBar" value="consumedDuringBar" />
-              <label class="form-check-label" for="consumedDuringBar">
-                <strong>Verbraucht während regulärer Bar:</strong> Was wir während einer normalen Bar verbrauchen. Nicht sowas wie Baressen (Interner freier Verbrauch), Sommerfest (Weggegeben / Spende)
-              </label>
-            </div>
-            <div class="form-check mb-2">
-              <input class="form-check-input" type="radio" v-model="reason" name="reason" id="ccdb" value="correctedConsumptionDuringBar" />
-              <label class="form-check-label" for="ccdb">
-                <strong>Korrektur Verbrauch während regulärer Bar:</strong> Was wir nach einer Bar wieder zurück ins Lager räumen
-              </label>
-            </div>
-            <div class="form-check mb-2">
-              <input class="form-check-input" type="radio" v-model="reason" name="reason" id="iFC" value="internalFreeConsumption" />
-              <label class="form-check-label" for="iFC">
-                <strong>Interner freier Verbrauch:</strong> Während man z.B. in der Bar arbeitet oder Baressen
-              </label>
-            </div>
-            <div class="form-check mb-2">
-              <input class="form-check-input" type="radio" v-model="reason" name="reason" id="iPC" value="internalPayedConsumption" />
-              <label class="form-check-label" for="iPC">
-                <strong>Interner bezahlter Verbrauch:</strong> Wenn man sich privat Getränke nimmt und diese bezahlt
-              </label>
-            </div>
-            <div class="form-check mb-2">
-              <input class="form-check-input" type="radio" v-model="reason" name="reason" id="bought" value="bought" />
-              <label class="form-check-label" for="bought">
-                <strong>Eingekauft:</strong> Wenn wir etwas bei der Metro, Rewe, etc kaufen. Aber auch, wenn wir einer Vermietung etwas abkaufen (In Notiz erwähnen)
-              </label>
-            </div>
-            <div class="form-check mb-2">
-              <input class="form-check-input" type="radio" v-model="reason" name="reason" id="receivedDonation" value="receivedDonation" />
-              <label class="form-check-label" for="receivedDonation">
-                <strong>Erhaltene Spende:</strong> Wenn wir etwas Geschenkt bekommen. Z.b. die Getränke der Mitglieder beim Baressen
-              </label>
-            </div>
-            <div class="form-check mb-2">
-              <input class="form-check-input" type="radio" v-model="reason" name="reason" id="giveAway" value="giveAway" />
-              <label class="form-check-label" for="giveAway">
-                <strong>Weggegeben / Spende:</strong> Wenn wir Sachen verschenken (Winterfest, Sommerfest, soll weg)
-              </label>
-            </div>
-            <div class="form-check mb-2">
-              <input class="form-check-input" type="radio" v-model="reason" name="reason" id="discarded" value="discarded" />
-              <label class="form-check-label" for="discarded">
-                <strong>Weggeworfen:</strong> Wenn z.B. Sachen abgelaufen sind oder nicht mehr benötigt werden
-              </label>
-            </div>
-            <div class="form-check mb-2">
-              <input class="form-check-input" type="radio" v-model="reason" name="reason" id="sold" value="sold" />
-              <label class="form-check-label" for="sold">
-                <strong>Verkauft:</strong> Wenn wir Sachen verkaufen, z.B. an Hausbewohner oder Kachouri (zurückverkaufen)
-              </label>
-            </div>
-            <div class="form-check">
-              <input class="form-check-input" type="radio" v-model="reason" name="reason" id="other" value="other" />
-              <label class="form-check-label" for="other">
-                <strong>Anderer Grund:</strong> Wenn keiner der obrigen passt. Der richtige Grund muss in der Notiz angegeben werden.
-              </label>
-            </div>
-            <div v-if="reason === null" class="invalid-feedback" style="display:block">Please select an reason.</div>
-            <div v-if="filteredChanges && filteredChanges.length!==0" class="table-responsive mt-3">
-              <table class="table table-sm">
-                <thead>
-                  <tr>
-                    <th scope="col">Date</th>
-                    <th scope="col">#</th>
-                    <th scope="col">Reason</th>
-                    <th scope="col">Price</th>
-                    <th scope="col">User</th>
-                    <th scope="col">Note</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="change in filteredChanges" :key="change.id">
-                    <td class="text-nowrap">{{change.date | asDateTime}}</td>
-                    <td class="text-right">{{change.amount}}</td>
-                    <td>{{change.germanReason}}</td>
-                    <td>{{change.brottoPrice?change.brottoPrice + ' €' : null}}</td>
-                    <td>{{change.user ? change.user.name : ''}}</td>
-                    <td>{{change.note}}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+          <div v-if="item">
+            <ul class="pagination">
+              <li class="page-item" :class="{ active: sign == '+' }">
+                <span class="page-link" v-on:click="paginatorClicked(99)">Hinzugabe</span>
+              </li>
+              <li class="page-item" v-for="i of [1, 2, 3, 5, 6]" :key="i">
+                <span class="page-link" v-on:click="paginatorClicked(i)">{{ i }}</span>
+              </li>
+              <li class="page-item" :class="{ active: sign == '-' }">
+                <span class="page-link" v-on:click="paginatorClicked(-99)">Entnahme</span>
+              </li>
+              <li class="page-item" v-for="i of [1, 2, 3, 5, 6]" :key="-i">
+                <span class="page-link" v-on:click="paginatorClicked(-i)">{{ i }}</span>
+              </li>
+            </ul>
           </div>
-          <div class="form-group was-validated">
-            <label for="itemGroupName">Notiz</label>
-            <textarea type="text" class="form-control" rows="4" name="reason" :required="noteRequired?'true':null" v-model.trim="note" />
-          </div>
-          <div class="form-group was-validated">
+          <div class="form-group was-validated" v-if="sign !== null">
             <label for="itemGroupName">Lagerstandsänderung</label>
             <br />
             <div class="d-flex justify-content-between">
               <span class="ml-5">Aktueller Lagerstand:</span>
-              <span style="padding-right: 48px;">{{currentItemStock}}</span>
+              <span style="padding-right: 48px">{{ currentItemStock }}</span>
             </div>
             <div class="input-group">
               <div class="input-group-prepend">
-                <div class="input-group-text" style="min-width: 36px;">{{this.sign}}</div>
+                <div class="input-group-text" style="min-width: 36px">{{ this.sign }}</div>
               </div>
               <input
                 id="change"
                 type="number"
                 v-on:keypress="onlyNumbers"
+                v-on:input="onInputForChange"
                 class="form-control text-right"
                 step="any"
                 v-model.number="change"
-                :disabled="item === null || reason === null"
+                :disabled="item === null"
                 required
                 title="Die Lagerstandsveränderung. Links steht ob diese positiv oder negativ ist."
               />
@@ -159,66 +64,280 @@
                 class="form-control text-right"
                 v-model.number="result"
                 v-on:keypress="onlyNumbers"
+                v-on:input="onInputForResult"
                 step="any"
-                :min="sign==='+'?currentItemStock + 1:null"
-                :max="sign==='-'?currentItemStock - 1:null"
-                :disabled="item === null|| reason === null"
+                :min="sign === '+' ? currentItemStock + 1 : null"
+                :max="sign === '-' ? currentItemStock - 1 : null"
+                :disabled="item === null"
                 required
                 title="Der neue Lagerstand"
               />
             </div>
-            <div
-              v-if="item === null || reason === null"
-              class="invalid-feedback"
-              style="display:block"
-            >You have to select an item and a reason to edit this fields.</div>
-            <div v-show="resultError !== null" class="invalid-feedback" style="display:block">{{resultError}}</div>
-            <div v-if="result<0" class="alert alert-info mt-2" role="alert">
-              <strong>Der Lagerstand ist negativ:</strong> Keine Problem, kann vorkommen. Passiert zum Beispiel, wenn jemand vergessen hat einen Einkauf einzutragen. Am besten in die Gruppe schreiben und Bescheid geben.
+            <div v-if="item === null" class="invalid-feedback" style="display: block">
+              You have to select an item to edit this fields.
+            </div>
+            <div v-show="resultError !== null" class="invalid-feedback" style="display: block">{{ resultError }}</div>
+            <div v-if="result < 0" class="alert alert-info mt-2" role="alert">
+              <strong>Der Lagerstand ist negativ:</strong> Keine Problem, kann vorkommen. Passiert zum Beispiel, wenn jemand
+              vergessen hat einen Einkauf einzutragen. Am besten in die Gruppe schreiben und Bescheid geben.
             </div>
           </div>
-          <div class="form-group" v-if="reason==='bought'">
+          <div class="form-group" v-if="sign !== null">
+            <label for="itemGroupMinCount">Reason</label>
+            <div class="form-check mb-2" v-if="sign === '-'">
+              <input
+                class="form-check-input"
+                type="radio"
+                v-model="reason"
+                name="reason"
+                id="rc"
+                value="rentalConsumption"
+                required
+              />
+              <label class="form-check-label" for="rc">
+                <strong>Vermietung:</strong> Wenn die Vermietung was verbraucht. Nicht wenn wir was von der Vermietung
+                abkaufen => Eingekauft
+              </label>
+            </div>
+            <div class="form-check mb-2" v-if="sign === '+'">
+              <input
+                class="form-check-input"
+                type="radio"
+                v-model="reason"
+                name="reason"
+                id="crc"
+                value="correctedRentalConsumption"
+                required
+              />
+              <label class="form-check-label" for="crc">
+                <strong>Korrektur Vermietung:</strong> Wenn die Vermietung nicht alles verbraucht hat und wir wieder die
+                Sachen im Lager haben
+              </label>
+            </div>
+            <div class="form-check mb-2" v-if="sign === '-'">
+              <input
+                class="form-check-input"
+                type="radio"
+                v-model="reason"
+                name="reason"
+                id="consumedDuringBar"
+                value="consumedDuringBar"
+              />
+              <label class="form-check-label" for="consumedDuringBar">
+                <strong>Verbraucht während regulärer Bar:</strong> Was wir während einer normalen Bar verbrauchen. Nicht
+                sowas wie Baressen (Interner freier Verbrauch), Sommerfest (Weggegeben / Spende)
+              </label>
+            </div>
+            <div class="form-check mb-2" v-if="sign === '+'">
+              <input
+                class="form-check-input"
+                type="radio"
+                v-model="reason"
+                name="reason"
+                id="ccdb"
+                value="correctedConsumptionDuringBar"
+              />
+              <label class="form-check-label" for="ccdb">
+                <strong>Korrektur Verbrauch während regulärer Bar:</strong> Was wir nach einer Bar wieder zurück ins Lager
+                räumen
+              </label>
+            </div>
+            <div class="form-check mb-2" v-if="sign === '-'">
+              <input
+                class="form-check-input"
+                type="radio"
+                v-model="reason"
+                name="reason"
+                id="iFC"
+                value="internalFreeConsumption"
+              />
+              <label class="form-check-label" for="iFC">
+                <strong>Interner freier Verbrauch:</strong> Während man z.B. in der Bar arbeitet oder Baressen
+              </label>
+            </div>
+            <div class="form-check mb-2" v-if="sign === '-'">
+              <input
+                class="form-check-input"
+                type="radio"
+                v-model="reason"
+                name="reason"
+                id="iPC"
+                value="internalPayedConsumption"
+              />
+              <label class="form-check-label" for="iPC">
+                <strong>Interner bezahlter Verbrauch:</strong> Wenn man sich privat Getränke nimmt und diese bezahlt
+              </label>
+            </div>
+            <div class="form-check mb-2" v-if="sign === '+'">
+              <input class="form-check-input" type="radio" v-model="reason" name="reason" id="bought" value="bought" />
+              <label class="form-check-label" for="bought">
+                <strong>Eingekauft:</strong> Wenn wir etwas bei der Metro, Rewe, etc kaufen. Aber auch, wenn wir einer
+                Vermietung etwas abkaufen (In Notiz erwähnen)
+              </label>
+            </div>
+            <div class="form-check mb-2" v-if="sign === '+'">
+              <input
+                class="form-check-input"
+                type="radio"
+                v-model="reason"
+                name="reason"
+                id="receivedDonation"
+                value="receivedDonation"
+              />
+              <label class="form-check-label" for="receivedDonation">
+                <strong>Erhaltene Spende:</strong> Wenn wir etwas Geschenkt bekommen. Z.b. die Getränke der Mitglieder beim
+                Baressen
+              </label>
+            </div>
+            <div class="form-check mb-2" v-if="sign === '-'">
+              <input class="form-check-input" type="radio" v-model="reason" name="reason" id="giveAway" value="giveAway" />
+              <label class="form-check-label" for="giveAway">
+                <strong>Weggegeben / Spende:</strong> Wenn wir Sachen verschenken (Winterfest, Sommerfest, soll weg)
+              </label>
+            </div>
+            <div class="form-check mb-2" v-if="sign === '-'">
+              <input class="form-check-input" type="radio" v-model="reason" name="reason" id="discarded" value="discarded" />
+              <label class="form-check-label" for="discarded">
+                <strong>Weggeworfen:</strong> Wenn z.B. Sachen abgelaufen sind oder nicht mehr benötigt werden
+              </label>
+            </div>
+            <div class="form-check mb-2" v-if="sign === '-'">
+              <input class="form-check-input" type="radio" v-model="reason" name="reason" id="sold" value="sold" />
+              <label class="form-check-label" for="sold">
+                <strong>Verkauft:</strong> Wenn wir Sachen verkaufen, z.B. an Hausbewohner oder Kachouri (zurückverkaufen)
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" v-model="reason" name="reason" id="other" value="other" />
+              <label class="form-check-label" for="other">
+                <strong>Anderer Grund:</strong> Wenn keiner der obrigen passt. Der richtige Grund muss in der Notiz angegeben
+                werden.
+              </label>
+            </div>
+            <div v-if="reason === null" class="invalid-feedback" style="display: block">Please select an reason.</div>
+            <div v-if="filteredChanges && filteredChanges.length !== 0" class="table-responsive mt-3">
+              <table class="table table-sm">
+                <thead>
+                  <tr>
+                    <th scope="col">Date</th>
+                    <th scope="col">#</th>
+                    <th scope="col">Reason</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">User</th>
+                    <th scope="col">Note</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="change in filteredChanges" :key="change.id">
+                    <td class="text-nowrap">{{ change.date | asDateTime }}</td>
+                    <td class="text-right">{{ change.amount }}</td>
+                    <td>{{ change.germanReason }}</td>
+                    <td>{{ change.brottoPrice ? change.brottoPrice + " €" : null }}</td>
+                    <td>{{ change.user ? change.user.name : "" }}</td>
+                    <td>{{ change.note }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="form-group was-validated" v-if="sign !== null">
+            <label for="itemGroupName">Notiz</label>
+            <textarea
+              type="text"
+              class="form-control"
+              rows="4"
+              name="reason"
+              :required="noteRequired ? 'true' : null"
+              v-model.trim="note"
+            />
+          </div>
+          <div class="form-group" v-if="reason === 'bought'">
             <label>Preisgenauigkeit</label>
             <div class="form-check mb-2">
-              <input class="form-check-input" type="radio" v-model="priceAccuracy" name="pA" id="unknown" value="unknown" required />
+              <input
+                class="form-check-input"
+                type="radio"
+                v-model="priceAccuracy"
+                name="pA"
+                id="unknown"
+                value="unknown"
+                required
+              />
               <label class="form-check-label" for="unknown">
-                <strong>Unbekannt:</strong> Der Preis ist nicht bekannt (Aber es gab wahrscheinlich einen und es war keine Spende)
+                <strong>Unbekannt:</strong> Der Preis ist nicht bekannt (Aber es gab wahrscheinlich einen und es war keine
+                Spende)
               </label>
             </div>
             <div class="form-check mb-2">
-              <input class="form-check-input" type="radio" v-model="priceAccuracy" name="pA" id="estimated" value="estimated" required />
+              <input
+                class="form-check-input"
+                type="radio"
+                v-model="priceAccuracy"
+                name="pA"
+                id="estimated"
+                value="estimated"
+                required
+              />
               <label class="form-check-label" for="estimated">
                 <strong>Geschätzt:</strong> Der Preis ist geschätzt, so teuer sollte der Artikel ungefähr sein
               </label>
             </div>
             <div class="form-check mb-2">
-              <input class="form-check-input" type="radio" v-model="priceAccuracy" name="pA" id="fromBill" value="fromBill" required />
+              <input
+                class="form-check-input"
+                type="radio"
+                v-model="priceAccuracy"
+                name="pA"
+                id="fromBill"
+                value="fromBill"
+                required
+              />
               <label class="form-check-label" for="fromBill">
                 <strong>Von der Rechnung:</strong> Der Preis ist wie auf der Rechnung
               </label>
             </div>
             <div class="form-check mb-2">
-              <input class="form-check-input" type="radio" v-model="priceAccuracy" name="pA" id="researched" value="researched" required />
+              <input
+                class="form-check-input"
+                type="radio"
+                v-model="priceAccuracy"
+                name="pA"
+                id="researched"
+                value="researched"
+                required
+              />
               <label class="form-check-label" for="researched">
-                <strong>Recherchiert:</strong> Der Preis wurde recherchiert. Es kann aber sein, dass der Preis anders oder es ein Sonderangebot war
+                <strong>Recherchiert:</strong> Der Preis wurde recherchiert. Es kann aber sein, dass der Preis anders oder es
+                ein Sonderangebot war
               </label>
             </div>
             <div class="form-check mb-2">
-              <input class="form-check-input" type="radio" v-model="priceAccuracy" name="pA" id="fpb" value="fromPreviousBill" required />
+              <input
+                class="form-check-input"
+                type="radio"
+                v-model="priceAccuracy"
+                name="pA"
+                id="fpb"
+                value="fromPreviousBill"
+                required
+              />
               <label class="form-check-label" for="fpb">
-                <strong>Von vorheriger Rechnung:</strong> Der Preis von einer vorherigen Rechnung, wurde nicht neu nachgeschaut, könnte sich aber geändert haben
+                <strong>Von vorheriger Rechnung:</strong> Der Preis von einer vorherigen Rechnung, wurde nicht neu
+                nachgeschaut, könnte sich aber geändert haben
               </label>
             </div>
-            <div v-if="priceAccuracy === null" class="invalid-feedback" style="display:block">Please select an price accuracy.</div>
+            <div v-if="priceAccuracy === null" class="invalid-feedback" style="display: block">
+              Please select an price accuracy.
+            </div>
           </div>
           <div class="form-group was-validated" v-show="showBrotto">
             <label for>Preis (Netto: ohne Steuern, Brotto: mit Steuern)</label>
             <div class="input-group" v-show="showNetto">
               <div class="input-group-prepend">
-                <div class="input-group-text" style="min-width: 71px;">Netto</div>
+                <div class="input-group-text" style="min-width: 71px">Netto</div>
               </div>
               <div class="input-group-prepend">
-                <div class="input-group-text">{{Math.abs(change)}} ×</div>
+                <div class="input-group-text">{{ Math.abs(change) }} ×</div>
               </div>
               <input
                 type="number"
@@ -275,12 +394,12 @@
                 type="text"
                 step="any"
                 class="form-control px-1"
-                :required="tax==='own' ? true : null"
+                :required="tax === 'own' ? true : null"
                 v-model.number="ownTax"
                 min="0"
                 max="1000"
                 v-on:keypress="onlyNumbers"
-                v-on:click="tax='own'"
+                v-on:click="tax = 'own'"
                 :placeholder="taxPlaceholder"
                 :disabled="change === null"
               />
@@ -294,7 +413,7 @@
                 <div class="input-group-text">Brotto</div>
               </div>
               <div class="input-group-prepend">
-                <div class="input-group-text">{{Math.abs(change)}} ×</div>
+                <div class="input-group-text">{{ Math.abs(change) }} ×</div>
               </div>
               <input
                 type="number"
@@ -328,9 +447,13 @@
               </div>
             </div>
           </div>
-          <div class="mt-2 text-danger" v-if="errorString.length !== 0">{{errorString}}</div>
-          <button type="button" class="btn btn-success my-3" v-on:click="addChange('another')">Add Change and add similar</button>
-          <button type="button" class="btn btn-success ml-own" v-on:click="addChange('list')">Add Change and view list</button>
+          <div class="mt-2 text-danger" v-if="errorString.length !== 0">{{ errorString }}</div>
+          <button v-if="sign !== null" type="button" class="btn btn-success my-3" v-on:click="addChange('another')">
+            Add Change and add similar
+          </button>
+          <button v-if="sign !== null" type="button" class="btn btn-success ml-own" v-on:click="addChange('list')">
+            Add Change and view list
+          </button>
         </form>
       </div>
     </div>
@@ -343,19 +466,19 @@ import VSelect from "./../vue-bootstrap-select";
 import phoneticsFilter from "./../../phoneticsFilter";
 import AddPosition from "./AddPosition";
 import { getGermanReason, getFilterFunction } from "./changeUtil";
-const round = v => Math.round(v * 1000) / 1000;
+const round = (v) => Math.round(v * 1000) / 1000;
 
 export default {
   name: "add-stockChange",
   components: {
     VSelect,
-    AddPosition
+    AddPosition,
   },
   props: {
     itemId: {
       type: Number,
-      default: null
-    }
+      default: null,
+    },
   },
   data() {
     return {
@@ -364,12 +487,13 @@ export default {
       existingItems: [],
       errorString: "",
       reason: null,
+      entnahme: null,
       priceAccuracy: null,
       currentItemStock: null,
       change: null,
       result: null,
       resultError: null,
-      sign: "+",
+      sign: null,
       einzelBrotto: null,
       gesamtBrotto: null,
       einzelNetto: null,
@@ -378,7 +502,7 @@ export default {
       tax: null,
       ownTax: null,
       taxPlaceholder: "Eigener",
-      note: null
+      note: null,
     };
   },
   computed: {
@@ -401,17 +525,11 @@ export default {
       return this.change === null || this.priceAccuracy === "unknown";
     },
     filteredChanges() {
-      return this.lastChanges === null
-        ? null
-        : this.lastChanges.filter(getFilterFunction(this.reason));
-    }
+      return this.lastChanges === null ? null : this.lastChanges.filter(getFilterFunction(this.reason));
+    },
   },
   watch: {
-    change: function(change) {
-      if (this.currentItemStock !== null) {
-        this.result =
-          this.currentItemStock + change * (this.sign === "+" ? 1 : -1);
-      }
+    change: function () {
       if (this.priceFrom === "einzelBrotto") {
         this.gesamtBrotto = this.einzelBrotto * Math.abs(this.change);
         this.updateNetto();
@@ -426,7 +544,7 @@ export default {
         this.updateBrotto();
       }
     },
-    realTax: function(tax) {
+    realTax: function (tax) {
       if (tax >= 0 && this.priceFrom) {
         if (this.priceFrom.endsWith("Brotto")) {
           this.updateNetto();
@@ -435,41 +553,40 @@ export default {
         }
       }
     },
-    result: function(result) {
+    result: function (result) {
       if (this.currentItemStock !== null) {
         const change = result - this.currentItemStock;
-        if (this.reason !== "other") {
-          if (this.sign === "+" && change <= 0) {
-            this.resultError =
-              "Durch die Änderung müsste der Lagerstand steigen.";
-            return;
-          } else if (this.sign === "-" && change >= 0) {
-            this.resultError =
-              "Durch die Änderung müsste der Lagerstand sinken.";
-            return;
-          } else {
-            this.resultError = null;
-          }
+        if (this.sign === "+" && change <= 0) {
+          this.resultError = "Durch die Änderung müsste der Lagerstand steigen.";
+          return;
+        } else if (this.sign === "-" && change >= 0) {
+          this.resultError = "Durch die Änderung müsste der Lagerstand sinken.";
+          return;
+        } else {
+          this.resultError = null;
         }
-        this.sign = change < 0 ? "-" : "+";
-        this.change = Math.abs(change);
       }
     },
-    item: function() {
+    item: function () {
+      this.sign = null;
+      this.change = null;
+      this.result = null;
+      this.reason = null;
+      if (this.item !== null) this.errorString = "";
       if (this.item) {
         http
           .get("/item/" + this.item.value + "/stock")
-          .then(response => {
+          .then((response) => {
             this.currentItemStock = response.data.inStock;
           })
-          .catch(e => {
+          .catch((e) => {
             this.currentItemStock = e.toString();
             console.log(e);
           });
         http
           .get("/item/" + this.item.value + "/stockChanges")
-          .then(response => {
-            response.data.forEach(c => {
+          .then((response) => {
+            response.data.forEach((c) => {
               c.germanReason = getGermanReason(c.reason);
               c.date = new Date(c.date);
             });
@@ -478,24 +595,26 @@ export default {
           .catch(console.log);
       }
     },
-    reason: function() {
-      if (
-        [
-          "bought",
-          "receivedDonation",
-          "other",
-          "correctedRentalConsumption",
-          "correctedConsumptionDuringBar"
-        ].indexOf(this.reason) === -1
-      ) {
-        this.sign = "-";
-      } else {
-        this.sign = "+";
-      }
-    }
   },
   methods: {
     phoneticsFilter,
+    paginatorClicked(num) {
+      if (num > 0) this.sign = "+";
+      else this.sign = "-";
+      if (Math.abs(num) !== 99) {
+        this.change = Math.abs(num);
+      }
+      if (this.change === null) this.result = null;
+      else this.result = this.currentItemStock + (this.sign === "+" ? 1 : -1) * this.change;
+    },
+    onInputForChange() {
+      this.result = this.currentItemStock + (this.sign === "+" ? 1 : -1) * this.change;
+    },
+    onInputForResult() {
+      const change = this.currentItemStock - this.result;
+      this.sign = change > 0 ? "-" : "+";
+      this.change = Math.abs(change);
+    },
     onNewEinzelNetto() {
       this.gesamtNetto = this.einzelNetto * Math.abs(this.change);
       this.updateBrotto();
@@ -522,9 +641,7 @@ export default {
         this.einzelBrotto = round(this.einzelNetto * (1 + tax / 100));
         this.gesamtBrotto = round(this.gesamtNetto * (1 + tax / 100));
       } else if (this.gesamtBrotto && this.gesamtNetto) {
-        this.taxPlaceholder = round(
-          (1 - this.gesamtBrotto / this.gesamtNetto) * -100
-        );
+        this.taxPlaceholder = round((1 - this.gesamtBrotto / this.gesamtNetto) * -100);
       }
     },
     updateNetto() {
@@ -533,9 +650,7 @@ export default {
         this.einzelNetto = round(this.einzelBrotto * (100 / (100 + tax)));
         this.gesamtNetto = round(this.gesamtBrotto * (100 / (100 + tax)));
       } else if (this.gesamtNetto && this.gesamtBrotto) {
-        this.taxPlaceholder = round(
-          (1 - this.gesamtBrotto / this.gesamtNetto) * -100
-        );
+        this.taxPlaceholder = round((1 - this.gesamtBrotto / this.gesamtNetto) * -100);
       }
     },
     onlyNumbers(evt) {
@@ -548,27 +663,18 @@ export default {
         evt.preventDefault();
         return;
       }
-      if (
-        (charCode < 48 || charCode > 57) &&
-        charCode !== 46 &&
-        charCode !== 44
-      ) {
+      if ((charCode < 48 || charCode > 57) && charCode !== 46 && charCode !== 44) {
         evt.preventDefault();
       }
-      if (
-        (charCode === 43 || charCode === 45) &&
-        this.reason === "other" &&
-        evt.target.id === "change"
-      ) {
+      if ((charCode === 43 || charCode === 45) && this.reason === "other" && evt.target.id === "change") {
         this.sign = evt.key;
-        this.result =
-          this.currentItemStock + this.change * (this.sign === "+" ? 1 : -1);
+        this.result = this.currentItemStock + this.change * (this.sign === "+" ? 1 : -1);
       }
     },
     retrieveItems() {
       http
         .get("/itemsForSelect")
-        .then(response => {
+        .then((response) => {
           this.existingItems = response.data;
           if (this.itemId !== null) {
             for (let item of this.existingItems) {
@@ -579,7 +685,7 @@ export default {
             }
           }
         })
-        .catch(e => {
+        .catch((e) => {
           console.log(e);
         });
     },
@@ -595,7 +701,7 @@ export default {
         itemId: this.item.value,
         reason: this.reason,
         amount: (this.sign === "+" ? 1 : -1) * this.change,
-        note: this.note === "" ? null : this.note
+        note: this.note === "" ? null : this.note,
       };
       if (this.reason === "bought") {
         data.priceAccuracy = this.priceAccuracy;
@@ -609,9 +715,9 @@ export default {
 
       http
         .post("/stockChange", data, {
-          validateStatus: () => true
+          validateStatus: () => true,
         })
-        .then(response => {
+        .then((response) => {
           if (response !== undefined) {
             if (response.status === 201) {
               if (next === "list") {
@@ -640,27 +746,21 @@ export default {
             this.errorString = "Network error :(";
           }
         });
-    }
+    },
   },
   mounted() {
     this.retrieveItems();
   },
 
   created() {
-    this.webSocket = new WebSocket(
-      http.defaults.baseWsURL + "/scannerConsumer"
-    );
-    this.webSocket.onmessage = e => {
+    this.webSocket = new WebSocket(http.defaults.baseWsURL + "/scannerConsumer");
+    this.webSocket.onmessage = (e) => {
       const barcode = e.data.trim();
-      const item = this.existingItems.find(i => i.barcode === barcode);
+      const item = this.existingItems.find((i) => i.barcode === barcode);
       if (item === undefined) {
         const h = this.$createElement;
         const vNodesMsg = h("p", [
-          h(
-            "span",
-            { class: ["mr-2"] },
-            `No Item found for barcode "${barcode}"`
-          ),
+          h("span", { class: ["mr-2"] }, `No Item found for barcode "${barcode}"`),
           h(
             "router-link",
             {
@@ -668,18 +768,18 @@ export default {
               props: {
                 to: {
                   name: "addItem",
-                  params: { initialItem: { barcode: barcode } }
-                }
-              }
+                  params: { initialItem: { barcode: barcode } },
+                },
+              },
             },
             "Create Item"
-          )
+          ),
         ]);
         this.$bvToast.toast([vNodesMsg], {
           title: "No item selected!",
           solid: true,
           toaster: "b-toaster-bottom-center",
-          variant: "danger"
+          variant: "danger",
         });
       } else {
         this.item = item;
@@ -687,7 +787,7 @@ export default {
           title: "Item selected",
           solid: true,
           toaster: "b-toaster-bottom-center",
-          variant: "info"
+          variant: "info",
         });
       }
     };
@@ -695,7 +795,7 @@ export default {
   beforeDestroy() {
     this.webSocket.close();
     /* eslint-enable no-console */
-  }
+  },
 };
 </script>
 
