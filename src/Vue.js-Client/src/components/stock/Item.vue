@@ -2,6 +2,13 @@
   <div class="container">
     <div class="row mt-3">
       <div v-if="realItem" class="col-12 col-md-8 offset-md-2 was-validated">
+        <div class="d-flex justify-content-end">
+          <router-link
+            class="btn btn-sm btn-success mb-3 mr-3"
+            :to="{ name: 'addStockChange', params: { itemId: realItem.id } }"
+            >Add Change</router-link
+          >
+        </div>
         <div class="form-group row">
           <label class="col-3">Name</label>
           <generic-input-component :object="realItem" property="name" endpoint="/item/:id" required :minLength="4" />
