@@ -121,7 +121,16 @@
                   </td>
                   <td>
                     <!--<router-link v-if="entry.item" :to="{ name: 'item',params:{ itemId: entry.item.id } }">{{entry.item.name}}</router-link>-->
-                    <span v-if="entry.change">#{{ entry.change.id }}</span>
+                    <span v-if="entry.stockChange">#{{ entry.stockChange.id }}</span>
+                    <div v-else-if="entry.stockItemId">
+                      <button
+                        class="btn btn-sm btn-sm-flat btn-success px-1 mr-1"
+                        title="Create Change from this Invoice Entry"
+                        v-on:click="newChange(entry)"
+                      >
+                        <font-awesome-icon icon="plus-square" />
+                      </button>
+                    </div>
                   </td>
                   <td>{{ entry.itemDescription }}</td>
                   <td>{{ entry.amount }} {{ entry.unit }}</td>
@@ -453,6 +462,21 @@ export default {
     /* eslint-disable no-console */
     filter(event) {
       this.filteredItems = phoneticsFilter(this.existingItems, event.target.value);
+    },
+    newChange(entry) {
+      http
+        .post("/stockChange", {
+          itemId: entry.stockItemId,
+          netPrice: entry.netPrice,
+          brottoPrice: entry.brottoPrice,
+          amount: entry.quantity,
+          priceAccuracy: "fromBill",
+          reason: "bought",
+          invoiceEntryId: entry.id,
+        })
+        .then((res) => {
+          entry.stockChange = res.data;
+        });
     },
     linkItem(entry) {
       this.currentEntry = entry;
