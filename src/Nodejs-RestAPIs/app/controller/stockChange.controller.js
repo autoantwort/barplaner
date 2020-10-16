@@ -2,6 +2,7 @@ const db = require('../config/db.config.js');
 const StockChange = db.stock.Change;
 const Item = db.stock.Item;
 const ItemGroup = db.stock.ItemGroup;
+const InvoiceEntry = db.stock.InvoiceEntry;
 const User = db.User;
 const sequelize = db.sequelize;
 const Op = db.Sequelize.Op;
@@ -72,6 +73,9 @@ exports.getStockChanges = (req, res) => {
         }, {
             model: Item,
             attributes: ['id', 'name'],
+        }, {
+            model: InvoiceEntry,
+            attributes: ['invoiceId'],
         }],
         order: [
             ['date', "DESC"],

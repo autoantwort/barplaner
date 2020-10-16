@@ -39,13 +39,14 @@
         </div>
         <div class="mt-3 mb-3">
           <div v-if="changes.length !== 0" class="table-responsive">
-            <table class="table">
+            <table class="table table-sm">
               <thead>
                 <tr>
                   <th scope="col">Date</th>
                   <th scope="col">Item</th>
-                  <th scope="col">Amount</th>
-                  <th scope="col">Price</th>
+                  <th scope="col" class="text-center px-0">Amount</th>
+                  <th scope="col" class="text-center">Reason</th>
+                  <th scope="col" class="text-center">Price</th>
                   <th scope="col">User</th>
                 </tr>
               </thead>
@@ -64,8 +65,25 @@
                       change.stockItem.name
                     }}</router-link>
                   </td>
-                  <td>{{ change.amount }}</td>
-                  <td>{{ change.brottoPrice }}</td>
+                  <td class="text-center">
+                    {{ change.amount }}
+                  </td>
+                  <td class="text-center">
+                    <template v-if="change.invoiceEntry === null">
+                      {{ getGermanReason(change.reason) }}
+                    </template>
+                    <router-link v-else :to="{ name: 'invoice', params: { invoiceId: change.invoiceEntry.invoiceId } }">
+                      {{ getGermanReason(change.reason) }}
+                    </router-link>
+                  </td>
+                  <td :id="'tooltip_' + change.id" class="text-center">
+                    <template v-if="change.brottoPrice">
+                      {{ change.netPrice.toFixed(2) }} / {{ change.brottoPrice.toFixed(2) }} €
+                      <b-tooltip v-if="change.priceAccuracy" :target="'tooltip_' + change.id">
+                        {{ change.priceAccuracy }}
+                      </b-tooltip>
+                    </template>
+                  </td>
                   <td>{{ change.user ? change.user.name : "" }}</td>
                 </tr>
                 <tr v-if="previousIndex !== null && offset === null">
@@ -93,6 +111,7 @@
 
 <script>
 import http from "../../http-common";
+import { getGermanReason } from "./changeUtil";
 
 export default {
   name: "stockChanges-list",
@@ -110,6 +129,7 @@ export default {
     };
   },
   methods: {
+    getGermanReason,
     /* eslint-disable no-console */
     isDateDisabled(dateAsString) {
       if (this.datesSet === null) return true;
@@ -291,6 +311,10 @@ export default {
 
 
 <style>
+.tooltip {
+  top: 10px !important;
+}
+/* Für die Animation wenn man einen Tag auswählt (Die Zeilen werden hervorgehoben): */
 @keyframes highlight {
   0% {
     background: #17a2b8;
