@@ -36,9 +36,9 @@
                     >
                   </td>
                   <td>{{ item.inStock }}</td>
-                  <td>{{ item.minPrice }}</td>
-                  <td>{{ item.avgPrice }}</td>
-                  <td>{{ item.maxPrice }}</td>
+                  <td>{{ print(item.minBrottoPrice) }}</td>
+                  <td>{{ print(item.avgBrottoPrice) }}</td>
+                  <td>{{ print(item.maxBrottoPrice) }}</td>
                 </tr>
               </tbody>
             </table>
@@ -65,6 +65,10 @@ export default {
     /* eslint-disable no-console */
     filter(event) {
       this.filteredItems = phoneticsFilter(this.items, event.target.value);
+    },
+    print(price) {
+      if (price === null) return null;
+      return price.toFixed(2) + " €";
     },
     retrieveItemStock() {
       http
