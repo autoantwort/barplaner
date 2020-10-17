@@ -68,22 +68,7 @@
           <edit-textarea-component :object="realItem" property="internalNote" endpoint="/item/:id" />
         </div>
         <div class="row" v-if="stockChanges && stockChanges.length > 0">
-          <table class="table table-hover">
-            <thead>
-              <tr>
-                <th scope="col">Date</th>
-                <th scope="col">Amount</th>
-                <th scope="col">Brotto Price</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="change in stockChanges" :key="change.id">
-                <td>{{ change.date | asDateTime }}</td>
-                <td>{{ change.amount }}</td>
-                <td>{{ change.brottoPrice }}</td>
-              </tr>
-            </tbody>
-          </table>
+          <stock-changes-list :changes="stockChanges" :showItem="false" />
         </div>
         <b-modal ref="image" hide-footer no-fade centered :title="realItem && realItem.name">
           <div v-if="loading === true" class="justify-content-center" style="display: flex">
@@ -107,6 +92,8 @@ import EditTextareaComponent from "./components/EditTextareaComponent";
 import EditUrlComponent from "./components/EditUrlComponent";
 import EditPercentComponent from "./components/EditPercentComponent";
 
+import StockChangesList from "./StockChangesList";
+
 export default {
   name: "item",
   props: {
@@ -124,6 +111,7 @@ export default {
     EditTextareaComponent,
     EditUrlComponent,
     EditPercentComponent,
+    StockChangesList,
   },
   data() {
     return {

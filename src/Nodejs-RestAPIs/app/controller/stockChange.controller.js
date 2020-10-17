@@ -144,7 +144,13 @@ exports.getStockChangesForItem = (req, res) => {
         order: [
             ['id', "DESC"],
         ],
-        include: [{ model: User, attributes: ["name"] }],
+        include: [{
+            model: User,
+            attributes: ["name"]
+        }, {
+            model: InvoiceEntry,
+            attributes: ['invoiceId'],
+        }],
     }).then(changes => {
         res.send(changes);
     }).catch(err => {
