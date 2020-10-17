@@ -19,7 +19,7 @@ import ItemList from "./components/stock/ItemList.vue";
 import ItemGroupList from "./components/stock/ItemGroupList.vue";
 import AddItem from "./components/stock/AddItem.vue";
 import Item from "./components/stock/Item.vue";
-import StockChanges from "./components/stock/StockChangesList.vue";
+import StockChanges from "./components/stock/StockChangesView.vue";
 import ItemGroupStockList from "./components/stock/ItemGroupStockList.vue";
 import ItemStockList from "./components/stock/ItemStockList.vue";
 import AddStockChange from "./components/stock/AddStockChange.vue";
