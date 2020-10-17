@@ -93,7 +93,7 @@
                     </button>
                   </td>
                 </tr>
-                <tr v-if="!rangeFromQuery && selectedDate === null">
+                <tr v-if="!rangeFromQuery && selectedDate === null && olderChangesExists">
                   <td style="text-align: center; padding: 0px" colspan="5">
                     <button type="button" class="btn btn-primary btn-sm my-1" v-on:click="retrieveChanges">
                       Load older changes
@@ -126,6 +126,7 @@ export default {
       nextIndex: null,
       offset: null,
       rangeFromQuery: false,
+      olderChangesExists: false, // for the button 'Load older Changes'
     };
   },
   methods: {
@@ -248,6 +249,7 @@ export default {
       http
         .get("/stockChanges?limit=" + limit + offset)
         .then((response) => {
+          this.olderChangesExists = response.data.length >= limit;
           if (wasOffset) {
             this.changes = this.changes.concat(response.data);
             this.offset += limit;
