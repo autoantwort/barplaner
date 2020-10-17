@@ -91,8 +91,8 @@ const additionalAttributes = {
     attributes: {
         include: [
             [sequelize.fn('SUM', sequelize.col('stockChange.amount')), "inStock"],
-            [sequelize.fn('MIN', sequelize.col('brottoPrice')), "minBrottoPrice"],
-            [sequelize.fn('MAX', sequelize.col('brottoPrice')), "maxBrottoPrice"],
+            [sequelize.fn('ROUND', sequelize.fn('MIN', sequelize.col('brottoPrice')), 2), "minBrottoPrice"],
+            [sequelize.fn('ROUND', sequelize.fn('MAX', sequelize.col('brottoPrice')), 2), "maxBrottoPrice"],
             [sequelize.fn('ROUND', sequelize.fn('AVG', sequelize.col('brottoPrice')), 2), "avgBrottoPrice"],
         ],
     },
@@ -162,8 +162,8 @@ exports.getItemStockForItemGroup = (req, res) => {
     sequelize.query(`Select stockItems.*, itemsWithChanges.*, stockItems.id as id from stockItems left join ( 
                         Select itemId as id,
                                SUM(stockChanges.amount) as inStock, 
-                               MIN(brottoPrice) as minBrottoPrice, 
-                               MAX(brottoPrice) as maxBrottoPrice, 
+                               ROUND(MIN(brottoPrice),2) as minBrottoPrice, 
+                               ROUND(MAX(brottoPrice),2) as maxBrottoPrice, 
                                ROUND(AVG(brottoPrice),2) as avgBrottoPrice from stockChanges 
                             inner join stockItems as items on stockChanges.itemId = items.id AND items.itemGroupId = :itemGroupId
                         group by itemId
@@ -182,8 +182,8 @@ exports.getItemStockForPosition = (req, res) => {
                     Select * from searchedItems left join (
                         Select itemId,
                                SUM(amount) as inStock, 
-                               MIN(brottoPrice) as minBrottoPrice, 
-                               MAX(brottoPrice) as maxBrottoPrice, 
+                               ROUND(MIN(brottoPrice),2) as minBrottoPrice, 
+                               ROUND(MAX(brottoPrice),2) as maxBrottoPrice, 
                                ROUND(AVG(brottoPrice),2) as avgBrottoPrice
                         from stockChanges group by itemId
                     ) as changes on searchedItems.id = changes.itemId
