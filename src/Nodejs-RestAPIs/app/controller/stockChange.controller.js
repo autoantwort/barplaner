@@ -271,6 +271,9 @@ exports.getAllChangesAtDay = (req, res) => {
         }, {
             model: Item,
             attributes: ['id', 'name'],
+        }, {
+            model: InvoiceEntry,
+            attributes: ['invoiceId'],
         }],
         order: [
             ['date', "DESC"],
