@@ -75,6 +75,9 @@ export default {
         .get("/itemStock")
         .then((response) => {
           this.filteredItems = this.items = response.data;
+          for (let item of this.items) {
+            item.nameColognePhonetics = item.stockItem.nameColognePhonetics;
+          }
         })
         .catch((e) => {
           console.error(e);
