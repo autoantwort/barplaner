@@ -51,6 +51,10 @@ module.exports = (sequelize, Sequelize, Image, ItemGroup, Position) => {
                     item.nameColognePhonetics = colognePhonetics.convert(item.name);
                 }
             },
+            beforeBulkUpdate: (options) => {
+                if (options.fields.indexOf('name') !== -1)
+                    options.individualHooks = true;
+            },
         },
         sequelize
     });
