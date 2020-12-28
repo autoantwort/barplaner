@@ -9,6 +9,8 @@ const convert = s => {
     let code = '';
     let lastChar = ' ';
     for (let i = 0; i < s.length; ++i) {
+        if (i > 0)
+            lastChar = s[i - 1];
         const c = s[i];
         const nextChar = i + 1 === s.length ? ' ' : s[i + 1];
         switch (c) {
@@ -80,11 +82,14 @@ const convert = s => {
                 break;
             case 'X':
                 switch (lastChar) {
-                    default: code += '4';
                     case 'C':
-                            case 'K':
-                            case 'Q':
-                            code += '8';
+                    case 'K':
+                    case 'Q':
+                        code += '8';
+                        break;
+                    default:
+                        code += '4';
+                        break;
                 }
                 break;
             case 'C':
