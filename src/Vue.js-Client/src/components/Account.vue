@@ -75,10 +75,32 @@
             </div>
           </div>
 
-          <div class="form-group">
-            <label for="active">Active</label>
-            <input type="checkbox" class="form-control" id="active" v-model="user.active" />
+          <div>
+            <b-form-checkbox
+              id="active"
+              v-model="user.active"
+              name="active"
+            >
+              <div class="text-black">
+                Active Bar AG Member
+              </div>
+            </b-form-checkbox>
           </div>
+
+          <div>
+            <b-form-checkbox
+              id="only_show_gitlab_notifications_if_assigned"
+              v-model="user.only_show_gitlab_notifications_if_assigned"
+              name="only_show_gitlab_notifications_if_assigned"
+            >
+              <div class="text-black">
+                Only show GitLab notifications if assigned
+              </div>
+            </b-form-checkbox>
+          </div>
+
+          <br>
+
           <div class="form-group" v-if="user.telegramID.indexOf('login') === 0">
             <label>Dein Telegram Login Pin: {{user.telegramID.substr(11)}}</label>
             <a
@@ -133,7 +155,8 @@ export default {
         phone: this.user.phone,
         active: this.user.active,
         birthday: this.user.birthday,
-        gitLabID: this.user.gitLabID
+        gitLabID: this.user.gitLabID,
+        only_show_gitlab_notifications_if_assigned: this.user.only_show_gitlab_notifications_if_assigned,
       };
 
       http
@@ -147,6 +170,8 @@ export default {
           this.user.active = response.data.active;
           this.user.birthday = response.data.birthday;
           this.user.gitLabID = response.data.gitLabID;
+          this.user.only_show_gitlab_notifications_if_assigned = response.data.only_show_gitlab_notifications_if_assigned;
+          
           Roles.setUser(this.user);
           console.log("result : ", response.data);
           setTimeout(() => (this.success = false), 2000);
@@ -178,5 +203,9 @@ export default {
 .btn-outline-link:hover {
   color: #0056b3;
   text-decoration: underline;
+}
+
+.text-black {
+  color: black;
 }
 </style>

@@ -311,7 +311,7 @@ exports.update = (req, res) => {
         return;
     }
     if (req.params.userID == req.user.id && req.body.experienced_cleaner === undefined) {
-        realFunc({ name: req.body.name, email: req.body.email, phone: req.body.phone, telegramID: req.body.telegramID, active: req.body.active, birthday: req.body.birthday, gitLabID: req.body.gitLabID, });
+        realFunc({ name: req.body.name, email: req.body.email, phone: req.body.phone, telegramID: req.body.telegramID, active: req.body.active, birthday: req.body.birthday, gitLabID: req.body.gitLabID, only_show_gitlab_notifications_if_assigned: req.body.only_show_gitlab_notifications_if_assigned, });
     } else {
         if (req.body.experienced_cleaner !== undefined) {
             UserRoles.findOne({
@@ -337,7 +337,7 @@ exports.update = (req, res) => {
                 if (result === null) {
                     res.status(403).send("You dont have this permission");
                 } else {
-                    realFunc({ name: req.body.name, email: req.body.email, phone: req.body.phone, telegramID: req.body.telegramID, active: req.body.active, birthday: req.body.birthday, gitLabID: req.body.gitLabID, });
+                    realFunc({ name: req.body.name, email: req.body.email, phone: req.body.phone, telegramID: req.body.telegramID, active: req.body.active, birthday: req.body.birthday, gitLabID: req.body.gitLabID, only_show_gitlab_notifications_if_assigned: req.body.only_show_gitlab_notifications_if_assigned, });
                 }
             }).catch(err => res.status(500).send("Error -> " + err));
         }
