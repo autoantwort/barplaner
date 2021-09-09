@@ -1,3 +1,9 @@
+# ignore example data while developing
+Metro_PDFs
+
+# ignore uploaded webserver files
+webserver
+
 # Ignore database files
 *.sqlite
 
