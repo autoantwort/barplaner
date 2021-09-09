@@ -11,15 +11,15 @@ const env = {
         idle: 10000
     },
     databaseFile: 'data.sqlite',
-    facebookAccessToken: 'Your access token',
+    facebookAccessToken: '', // Insert your access token
     symposionPageID: 'Facebook site id',
     facebookFetchInterval: '5',
-    telegramAccessToken: 'Your access token',
-    resetDatabase: true,
-    loadOldData: true,
+    telegramAccessToken: '', // Insert your access token (Create bot here: https://t.me/botfather)
+    resetDatabase: false,
+    loadOldData: false,
     baseURL: "http://localhost:8080",
     staticVue: false,
-    gitLabAccessToken: 'Your gitlab access token',
+    gitLabAccessToken: '', // Insert your access token (Create access token here: https://git.rwth-aachen.de/-/profile/personal_access_tokens)
     gitLabBrowser: {
         host: "git.rwth-aachen.de",
         projectId: "31804",
