@@ -17,8 +17,10 @@ library.add(faTrashAlt, faPlay, faPause, faStop, faRedo, faStepForward);
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 
 // see https://bootstrap-vue.js.org/docs/#using-module-bundlers
-import { NavPlugin } from 'bootstrap-vue';
+import { FormCheckboxPlugin, NavPlugin } from 'bootstrap-vue';
+
 Vue.use(NavPlugin);
+Vue.use(FormCheckboxPlugin);
 
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
