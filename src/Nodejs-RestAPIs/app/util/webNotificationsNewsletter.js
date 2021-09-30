@@ -1,11 +1,13 @@
+import db from '../config/db.config';
+import { Op } from 'sequelize';
+
 const webPush = require('web-push');
 const env = require('../config/env');
-const db = require('../config/db.config');
+
 const BarUtil = require('./addBar');
 const CronJob = require('cron').CronJob;
 const Bar = db.Bar;
 const WebPushSubs = db.WebPushSubscription;
-const Op = db.Sequelize.Op;
 
 // see https://serviceworke.rs/web-push.html for good examples
 

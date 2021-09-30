@@ -1,10 +1,10 @@
-const db = require('../config/db.config.js');
+import db from '../config/db.config';
+import { Op } from 'sequelize';
+
 const Bar = db.Bar;
 const User = db.User;
 const BarDuty = db.BarDuty;
 const sequelize = db.sequelize;
-const Role = db.Role;
-const UserRoles = db.UserRoles;
 const Setting = db.Setting;
 
 
@@ -25,7 +25,7 @@ exports.computeCleaning = (barID, numberOfPersons) => {
                 Bar.findAll({
                     where: {
                         start: {
-                            [db.Sequelize.Op.lt]: bar.start
+                            [Op.lt]: bar.start
                         }
                     },
                     limit: wieOftNicht,
@@ -41,7 +41,7 @@ exports.computeCleaning = (barID, numberOfPersons) => {
                     BarDuty.findAll({
                         where: {
                             barID: {
-                                [db.Sequelize.Op.in]: barIDs
+                                [Op.in]: barIDs
                             }
                         }
                     }).then(duties => {
@@ -54,7 +54,7 @@ exports.computeCleaning = (barID, numberOfPersons) => {
                                 --numberOfPersons;
                                 for (const user of users) {
                                     if (user.id === duty.userID) {
-                                        experienced_cleaner_present |= user.experienced_cleaner;
+                                        experienced_cleaner_present = user.experienced_cleaner || experienced_cleaner_present;
                                         break;
                                     }
                                 }
@@ -82,7 +82,7 @@ exports.computeCleaning = (barID, numberOfPersons) => {
                             BarDuty.update({ have_to_clean: true }, {
                                 where: {
                                     userID: {
-                                        [db.Sequelize.Op.in]: users.map(u => u.id),
+                                        [Op.in]: users.map(u => u.id),
                                     },
                                     barID: barID,
                                 }
@@ -90,13 +90,13 @@ exports.computeCleaning = (barID, numberOfPersons) => {
                         } else {
                             //console.log("---------------", ++what, "---------------");
                             BarDuty.findAll({
-                                attributes: ['userID', [sequelize.fn('count', sequelize.col('userID')), "count"]],
+                                attributes: ['userID', [sequelize.Sequelize.fn('count', sequelize.Sequelize.col('userID')), "count"]],
                                 group: "userID",
                                 raw: true
                             }).then(barCount => {
                                 //console.log("---------------", ++what, "---------------");
                                 BarDuty.findAll({
-                                    attributes: ['userID', [sequelize.fn('COUNT', sequelize.col('userID')), "count"]],
+                                    attributes: ['userID', [sequelize.Sequelize.fn('COUNT', sequelize.Sequelize.col('userID')), "count"]],
                                     where: {
                                         have_to_clean: true
                                     },
@@ -164,7 +164,7 @@ exports.computeCleaning = (barID, numberOfPersons) => {
                                     BarDuty.update({ have_to_clean: true }, {
                                         where: {
                                             userID: {
-                                                [db.Sequelize.Op.in]: userIDs
+                                                [Op.in]: userIDs
                                             },
                                             barID: barID,
                                         }
@@ -188,12 +188,12 @@ exports.computeRatio = function() {
 
 
             BarDuty.findAll({
-                attributes: ['userID', [sequelize.fn('count', sequelize.col('userID')), "count"]],
+                attributes: ['userID', [sequelize.Sequelize.fn('count', sequelize.Sequelize.col('userID')), "count"]],
                 group: "userID",
                 raw: true
             }).then(barCount => {
                 BarDuty.findAll({
-                    attributes: ['userID', [sequelize.fn('COUNT', sequelize.col('userID')), "count"]],
+                    attributes: ['userID', [sequelize.Sequelize.fn('COUNT', sequelize.Sequelize.col('userID')), "count"]],
                     where: {
                         have_to_clean: true
                     },

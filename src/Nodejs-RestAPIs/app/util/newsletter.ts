@@ -180,16 +180,19 @@ function sendNewsletter(barObject, newsletterId, sendTime) {
                                     Wordpress.query(sql, { replacements: [newsletter.id], type: Wordpress.QueryTypes.DELETE }).catch(console.error);
                                     return;
                                 }
-                                let update = {};
-                                update.message = replacePlaceholders(template.message, barObject, DefaultImageURL.value);
-                                update.subject = replacePlaceholders(template.subject, barObject, DefaultImageURL.value);
+                                let update = {
+                                    id: newsletter.id,
+                                    message:  replacePlaceholders(template.message, barObject, DefaultImageURL.value),
+                                    subject: replacePlaceholders(template.subject, barObject, DefaultImageURL.value),
+                                    send_on: Number((sendTime / 1000).toFixed(0)),
+                                };
+
                                 const now = new Date();
                                 now.setMinutes(now.getMinutes() + now.getTimezoneOffset());
-                                update.send_on = Number((sendTime / 1000).toFixed(0));
                                 let sql = "Update wp_2_newsletter_emails SET ";
                                 sql += Object.getOwnPropertyNames(update).map(p => p + " = :" + p).join(', '); /* message = :message, ... */
                                 sql += " WHERE id = :id";
-                                update.id = newsletter.id;
+                                
                                 Wordpress.query(sql, { replacements: update, type: Wordpress.QueryTypes.UPDATE }).catch(console.error);
                             }
                         }

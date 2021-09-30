@@ -1,4 +1,6 @@
-const db = require('../config/db.config.js');
+import db from '../config/db.config';
+import { Op } from 'sequelize';
+
 const Telegram = require('./telegram');
 const CronJob = require('cron').CronJob;
 
@@ -6,7 +8,6 @@ const User = db.User;
 const Survey = db.Survey;
 const Question = db.Question;
 const Answer = db.Answer;
-const Op = db.Sequelize.Op;
 
 const sendSurvey = new CronJob('0 0 * * * *', function() {
     // send notifications when a user has not completed a 'allowMultipleAnswers' survey

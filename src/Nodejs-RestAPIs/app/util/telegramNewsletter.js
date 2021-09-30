@@ -1,10 +1,11 @@
-const db = require('../config/db.config.js');
+import db from '../config/db.config';
+import { Op } from 'sequelize';
+
 const Telegram = require('./telegram.js');
 const cron = require('cron');
 const CronJob = cron.CronJob;
 const CronTime = cron.CronTime;
 
-const Op = db.Sequelize.Op;
 const TelegramNewsletter = db.TelegramNewsletter;
 const Bar = db.Bar;
 

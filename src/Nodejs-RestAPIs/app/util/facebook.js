@@ -1,4 +1,6 @@
-const db = require('../config/db.config.js');
+import db from '../config/db.config';
+import { Op } from 'sequelize';
+
 const Axios = require("axios");
 const env = require('../config/env');
 
@@ -8,10 +10,9 @@ const UserRoles = db.UserRoles;
 const BarDuty = db.BarDuty;
 const Role = db.Role;
 const Setting = db.Setting;
-const Op = db.Sequelize.Op;
 const BarUtil = require('./addBar');
 
-let axios = Axios.create({
+let axios = Axios.default.create({
     baseURL: "https://graph.facebook.com/v3.2",
     // headers: {
     //     "Content-type": "application/json",
@@ -105,7 +106,7 @@ exports.syncFacebookEvents = () => {
             Bar.findAll({
                 where: {
                     start: {
-                        [db.Sequelize.Op.gt]: now
+                        [Op.gt]: now
                     }
                 },
                 order: [

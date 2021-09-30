@@ -14,12 +14,12 @@ const env = {
     facebookAccessToken: '', // Insert your access token
     symposionPageID: 'Facebook site id',
     facebookFetchInterval: '5',
-    telegramAccessToken: '', // Insert your access token (Create bot here: https://t.me/botfather)
+    telegramAccessToken: '1912209102:AAHM33piGfncmQ02ykbZM5ROpEXAIR4YX0U', // Insert your access token (Create bot here: https://t.me/botfather)
     resetDatabase: false,
     loadOldData: false,
     baseURL: "http://localhost:8080",
     staticVue: false,
-    gitLabAccessToken: '', // Insert your access token (Create access token here: https://git.rwth-aachen.de/-/profile/personal_access_tokens)
+    gitLabAccessToken: 'DHiTZLxNetpRxtxsAmNQ', // Insert your access token (Create access token here: https://git.rwth-aachen.de/-/profile/personal_access_tokens)
     gitLabBrowser: {
         host: "git.rwth-aachen.de",
         projectId: "31804",

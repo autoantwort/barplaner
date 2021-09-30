@@ -1,9 +1,11 @@
+import db from '../config/db.config';
+import { Op } from 'sequelize';
+
 const ICal = require('ical-generator');
 const env = require('../config/env');
-const db = require('../config/db.config');
+
 const BarUtil = require('./addBar');
 const Bar = db.Bar;
-const Op = db.Sequelize.Op;
 
 // see https://www.npmjs.com/package/dav for the api
 // the api feels often like a C api (you have the client and pass 

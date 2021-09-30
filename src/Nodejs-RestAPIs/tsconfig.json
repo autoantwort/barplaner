@@ -1,0 +1,12 @@
+{
+    "compilerOptions": {
+        "target": "es6",
+        "allowJs": true,
+        "checkJs": true,
+        "outDir": "./lib",
+        "moduleResolution": "node",
+    },
+    "include": [
+        "./app/**/*"
+    ],
+}

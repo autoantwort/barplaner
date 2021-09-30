@@ -1,15 +1,11 @@
-const db = require('../config/db.config.js');
+import db from '../config/db.config';
+import { Op } from 'sequelize';
+
 const env = require('../config/env');
 const Telegram = require('./telegram.js');
-const CronJob = require('cron').CronJob;
 const Axios = require("axios");
-const fs = require("fs");
-const path = require('path');
 
-const User = db.User;
-const Op = db.Sequelize.Op;
-
-const axios = Axios.create({
+const axios = Axios.default.create({
     baseURL: "https://" + env.gitLabBrowser.host + "/api/v4",
     headers: {
         "Private-Token": env.gitLabAccessToken,

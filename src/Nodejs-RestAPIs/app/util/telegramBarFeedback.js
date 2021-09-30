@@ -1,4 +1,6 @@
-const db = require('../config/db.config.js');
+import db from '../config/db.config';
+import { Op } from 'sequelize';
+
 const env = require('../config/env');
 const cron = require('cron');
 const Telegram = require('./telegram');
@@ -10,7 +12,6 @@ const User = db.User;
 const BarDuty = db.BarDuty;
 const Setting = db.Setting;
 const Role = db.Role;
-const Op = db.Sequelize.Op;
 
 let SendDaysBefore = null;
 let SendAt = null;
