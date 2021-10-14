@@ -1,8 +1,5 @@
-module.exports = function(app) {
+import * as Duty from "../controller/duty.controller";
 
-    const duty = require('../controller/duty.controller.js');
-
-
-    app.get('/api/duty', duty.list);
-
-};
+export default function (app) {
+  app.get("/api/duty", Duty.list);
+}

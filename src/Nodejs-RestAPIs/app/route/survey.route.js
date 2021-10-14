@@ -1,9 +1,7 @@
-module.exports = function(app) {
-
-    const survey = require('../controller/survey.controller.js');
-
-    // Create a new Survey
-    app.post('/api/survey', survey.create);
-    // Retrieve all Surveys
-    app.get('/api/surveys', survey.getAll);
+import * as Survey from "../controller/survey.controller";
+module.exports = function (app) {
+  // Create a new Survey
+  app.post("/api/survey", Survey.create);
+  // Retrieve all Surveys
+  app.get("/api/surveys", Survey.getAll);
 };

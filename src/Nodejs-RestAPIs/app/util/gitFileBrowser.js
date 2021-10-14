@@ -1,8 +1,8 @@
 import db from '../config/db.config';
 import { Op } from 'sequelize';
+import * as Telegram from './telegram';
 
 const env = require('../config/env');
-const Telegram = require('./telegram.js');
 const Axios = require("axios");
 
 const axios = Axios.default.create({
@@ -38,7 +38,6 @@ const getDataMapping = (id) => {
 };
 
 let convertFileEnding = new RegExp("\\.(" + env.gitLabBrowser.convertedToPdf.join("|") + ")$");
-
 
 Telegram.bot.onText(/\/(files?|datei(en)?|pdfs?|git|gitlab)/, msg => {
     const fakeUser = {

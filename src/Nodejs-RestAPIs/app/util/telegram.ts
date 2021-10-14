@@ -1,7 +1,7 @@
 import db from "../config/db.config";
 import { Op, col } from "sequelize";
 
-import TelegramBot from 'node-telegram-bot-api';
+import TelegramBot from "node-telegram-bot-api";
 
 const env = require("../config/env");
 const ShouldDelete = db.ShouldDelete;
@@ -14,7 +14,8 @@ const options = {
       env.telegramAccessToken.length > 0,
   },
 };
-const bot = new TelegramBot(TOKEN, options);
+
+export const bot = new TelegramBot(TOKEN, options);
 
 console.log("## start bot, polling : ", bot.isPolling());
 
@@ -57,7 +58,7 @@ bot.on("text", (message) => {
 
 // Handle callback queries
 bot.on("callback_query", function onCallbackQuery(callbackQuery) {
-  const callbackDataToObject = (string) => {
+  const callbackDataToObject = (string): any => {
     const array = JSON.parse(string);
     const obj = {
       chatId: array[0],
@@ -81,7 +82,7 @@ bot.on("callback_query", function onCallbackQuery(callbackQuery) {
 
 const registeredResponseSystems = {};
 
-exports.registerResponseSystem = (systemId, responseCallback) => {
+export const registerResponseSystem = (systemId, responseCallback) => {
   if (registeredResponseSystems[systemId] !== undefined) {
     throw new Error(
       "A response system with id " + systemId + " is already registered."
@@ -160,14 +161,14 @@ exports.registerResponseSystem = (systemId, responseCallback) => {
         newRow: function () {
           this.buttons.push([]);
         },
-        sendMessage: async function (deleteAfter, textAfterDelete) {
+        sendMessage: async function (deleteAfter, textAfterDelete?: string) {
           const message = await bot.sendMessage(user.telegramID, this.text, {
             reply_markup: {
               inline_keyboard: this.buttons,
             },
           });
           if (deleteAfter !== undefined) {
-            exports.deleteTelegramMessage(
+            deleteTelegramMessage(
               user.telegramID,
               message.message_id,
               deleteAfter,
@@ -225,14 +226,14 @@ exports.registerResponseSystem = (systemId, responseCallback) => {
           });
         }
       },
-      sendNewMessage: async function (deleteAfter, textAfterDelete) {
+      sendNewMessage: async function (deleteAfter, textAfterDelete?: string) {
         const message = await bot.sendMessage(this.chatId, this.newText, {
           reply_markup: {
             inline_keyboard: this.buttons,
           },
         });
         if (deleteAfter !== undefined) {
-          exports.deleteTelegramMessage(
+          deleteTelegramMessage(
             this.chatId,
             message.message_id,
             deleteAfter,
@@ -246,7 +247,7 @@ exports.registerResponseSystem = (systemId, responseCallback) => {
   return messageCreator;
 };
 
-exports.sendMessage = (user, message, deleteAfter, afterDeleteText) => {
+export const sendMessage = (user, message, deleteAfter, afterDeleteText?: string) => {
   if (user.telegramID.indexOf("login") === -1) {
     let startIndex = 0;
     let messages = [];
@@ -309,8 +310,6 @@ exports.sendMessage = (user, message, deleteAfter, afterDeleteText) => {
   }
 };
 
-exports.bot = bot;
-
 //////////////////////////////////////////////////////
 ///////////////// Delete Messages ////////////////////
 //////////////////////////////////////////////////////
@@ -371,7 +370,12 @@ db.addSyncCallback(() => {
   computeNewNextTimeout();
 });
 
-exports.deleteTelegramMessage = (chatID, messageID, deleteAfter, newText) => {
+export const deleteTelegramMessage = (
+  chatID,
+  messageID,
+  deleteAfter,
+  newText
+) => {
   if (deleteAfter === undefined) {
     throw new Error("Minimum 3 arguments are required!");
   }

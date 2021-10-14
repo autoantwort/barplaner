@@ -1,7 +1,7 @@
 import db from '../config/db.config';
 import { Op } from 'sequelize';
 
-const Telegram = require('./telegram');
+import * as Telegram from './telegram';
 const CronJob = require('cron').CronJob;
 
 const User = db.User;
@@ -38,7 +38,7 @@ const sendSurvey = new CronJob('0 0 * * * *', function() {
     }).then(answers => {
         const now = new Date();
         answers.forEach(answer => {
-            const hoursBefore = Math.floor((answer.question.survey.end - now) / 1000 / 60 / 60);
+            const hoursBefore = Math.floor((answer.question.survey.end - now.getMilliseconds()) / 1000 / 60 / 60);
             let modulus = 1;
             if (hoursBefore >= 24 * 6) {
                 modulus = 24;
@@ -59,7 +59,7 @@ const sendSurvey = new CronJob('0 0 * * * *', function() {
     }).catch(console.error);
 }, null, true);
 
-exports.sendNewSurvey = (survey, questions, users) => {
+export const sendNewSurvey = (survey, questions, users) => {
     try {
         // only send the message to people with a telegramID
         users.filter(user => user.telegramID.indexOf("login") === -1).forEach(user => {

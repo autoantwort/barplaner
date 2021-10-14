@@ -1,15 +1,12 @@
-module.exports = function(app) {
+import * as Setting from "../controller/setting.controller";
 
-    const setting = require('../controller/setting.controller.js');
+module.exports = function (app) {
+  // Retrieve all settings
+  app.get("/api/settings", Setting.getAll);
 
+  // Retrieve a setting by name
+  app.get("/api/setting/:name", Setting.getOne);
 
-    // Retrieve all settings
-    app.get('/api/settings', setting.getAll);
-
-    // Retrieve a setting by name
-    app.get('/api/setting/:name', setting.getOne);
-
-    // Update a setting by name
-    app.put('/api/setting/:name', setting.updateOne);
-
+  // Update a setting by name
+  app.put("/api/setting/:name", Setting.updateOne);
 };

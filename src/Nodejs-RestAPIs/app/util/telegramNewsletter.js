@@ -43,7 +43,7 @@ const createCronJob = value => {
                     .filter(b => {
                         const barDate = new Date(b.start);
                         barDate.setHours(0, 0, 0, 0);
-                        let dayDiff = (barDate - now) / 1000 / 60 / 60 / 24;
+                        let dayDiff = (barDate.getMilliseconds() - now.getMilliseconds()) / 1000 / 60 / 60 / 24;
                         return sendDaysBefore.some(v => v === dayDiff);
                     })
                     .forEach(bar => {

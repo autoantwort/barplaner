@@ -29,7 +29,7 @@ const issueCronJob = new CronJob(
   true
 );
 
-exports.getUser = (userObject) => {
+export const getUser = (userObject) => {
   return new Promise((resolve, reject) => {
     if (
       userObject.id === undefined ||
@@ -101,7 +101,7 @@ exports.getUser = (userObject) => {
 
 let screenShotFileID = null;
 
-exports.sendNotificationsForIssus = async () => {
+export const sendNotificationsForIssus = async () => {
   const projectsResponse = await axios.get(
     "/projects?membership=true&per_page=100"
   );
@@ -116,7 +116,7 @@ exports.sendNotificationsForIssus = async () => {
     projects[project.id] = project;
   }
 
-  for (const [projectId, project] of Object.entries(projects)) {
+  for (const [projectId, project]  of Object.entries<any>(projects)) {
     const issuesResponse = await axios.get(
       `/projects/${projectId}/issues?scope=all&state=opened&per_page=100`
     );
@@ -146,7 +146,7 @@ exports.sendNotificationsForIssus = async () => {
     const project = projects[issue.project_id];
 
     for (const participant of issue.participants) {
-      const user = await this.getUser(participant);
+      const user: any = await getUser(participant);
 
       if (user !== null) {
         let userMessage = userMessages[participant.id];
@@ -203,8 +203,8 @@ exports.sendNotificationsForIssus = async () => {
     }
   }
 
-  for (const [participantId, message] of Object.entries(userMessages)) {
-    const user = await this.getUser(messageParticipants[participantId]);
+  for (const [participantId, message] of Object.entries<any>(userMessages)) {
+    const user: any = await getUser(messageParticipants[participantId]);
 
     if (user.gitLabID === null) {
       user.gitLabID = participantId;

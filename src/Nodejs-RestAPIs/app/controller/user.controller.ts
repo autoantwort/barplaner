@@ -33,7 +33,7 @@ db.addSyncCallback(() => {
     }).catch(console.error);
 });
 // Post a User
-exports.create = (req, res) => {
+export const create = (req, res) => {
     UserRoles.findOne({
         where: {
             userId: req.user.id,
@@ -89,7 +89,7 @@ exports.create = (req, res) => {
     }).catch(err => res.status(500).send("Error -> " + err));
 };
 
-exports.getRoles = (req, res) => {
+export const getRoles = (req, res) => {
     User.findByPk(req.params.userID).then(user => {
         user.getRoles().then(roles => {
             res.send(roles)
@@ -100,7 +100,7 @@ exports.getRoles = (req, res) => {
 }
 
 // Add a role to user (POST)
-exports.addRole = (req, res) => {
+export const addRole = (req, res) => {
     UserRoles.findOne({
         where: {
             userId: req.user.id,
@@ -124,7 +124,7 @@ exports.addRole = (req, res) => {
 };
 
 // remove a role to user (DELETE)
-exports.removeRole = (req, res) => {
+export const removeRole = (req, res) => {
     UserRoles.findOne({
         where: {
             userId: req.user.id,
@@ -156,7 +156,7 @@ exports.removeRole = (req, res) => {
 };
 
 // FETCH all User
-exports.findAll = (req, res) => {
+export const findAll = (req, res) => {
     User.findAll({
         raw: true,
         attributes: ['active', 'birthday', 'email', 'experienced_cleaner', 'gitLabID', 'id', 'name', 'phone', 'telegramID'],
@@ -167,8 +167,9 @@ exports.findAll = (req, res) => {
         res.status(500).send("Error -> " + err);
     });
 };
+
 // FETCH all Roles
-exports.findAllRoles = (req, res) => {
+export const findAllRoles = (req, res) => {
     User.findAll({
         raw: true,
     }).then(user => {
@@ -189,7 +190,7 @@ exports.findAllRoles = (req, res) => {
     });
 };
 
-exports.userRolesTable = (req, res) => {
+export const userRolesTable = (req, res) => {
     User.findAll({
         raw: true,
     }).then(user => {
@@ -218,7 +219,7 @@ exports.userRolesTable = (req, res) => {
 };
 
 // Find a User by Id
-exports.findById = (req, res) => {
+export const findById = (req, res) => {
     User.findByPk(req.params.userID, {
         raw: true,
         attributes: ['active', 'birthday', 'email', 'experienced_cleaner', 'gitLabID', 'id', 'name', 'phone', 'telegramID'],
@@ -231,9 +232,9 @@ exports.findById = (req, res) => {
 
 
 // Update a User
-exports.update = (req, res) => {
+export const update = (req, res) => {
     let realFunc = (data) => {
-        let createUser = function(hash) {
+        let createUser = function(hash?) {
             let update = {...data, password: hash }; //{ name: req.body.name, email: req.body.email, phone: req.body.phone, telegramID: req.body.telegramID, active: req.body.active, password: hash };
             //remove undefined properties, otherwise update() will set the entries in the table to null
             Object.keys(update).forEach(key => update[key] === undefined && delete update[key]);
@@ -346,7 +347,7 @@ exports.update = (req, res) => {
 };
 
 // Delete a User by Id
-exports.delete = (req, res) => {
+export const deleteUser = (req, res) => {
     UserRoles.findOne({
         where: {
             userId: req.user.id,

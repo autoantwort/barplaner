@@ -9,7 +9,7 @@ const Setting = db.Setting;
 
 
 // Post a Bar
-exports.computeCleaning = (barID, numberOfPersons) => {
+export const computeCleaning = (barID, numberOfPersons) => {
     return new Promise((resolve, reject) => {
         let what = 0;
         //console.log("---------------", ++what, "---------------");
@@ -182,7 +182,7 @@ exports.computeCleaning = (barID, numberOfPersons) => {
     });
 };
 
-exports.computeRatio = function() {
+export const computeRatio = function() {
     return new Promise((resolve, reject) => {
         User.findAll({ where: { active: true }, raw: true }).then(users => {
 
