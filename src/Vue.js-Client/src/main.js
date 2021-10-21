@@ -7,19 +7,30 @@ import VueCollapse from 'vue2-collapse';
 import Roles from './roles';
 
 Vue.use(VueCollapse);
-Vue.use(require('vue-moment'));
+import { printDate, printDateTime, printDayDateTime } from './dateFilters';
+Vue.filter('asDate', printDate);
+Vue.filter('asDateTime', printDateTime);
+Vue.filter('asDayDateTime', printDayDateTime);
+Vue.filter('asEuro', n => n === null ? "" : n.toLocaleString("de-DE", { maximumFractionDigits: 2 }) + " €");
 
 // see https://www.npmjs.com/package/@fortawesome/vue-fontawesome#recommended
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faTrashAlt, faPlay, faPause, faStop, faRedo, faStepForward } from '@fortawesome/free-solid-svg-icons';
+import { faTrashAlt, faPlay, faPause, faStop, faRedo, faStepForward, faImage, faLink, faPlusSquare, faEdit, faUnlink, faTimes, faSave } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-library.add(faTrashAlt, faPlay, faPause, faStop, faRedo, faStepForward);
+library.add(faTrashAlt, faPlay, faPause, faStop, faRedo, faStepForward, faImage, faLink, faPlusSquare, faEdit, faUnlink, faTimes, faSave);
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 
 // see https://bootstrap-vue.js.org/docs/#using-module-bundlers
-import { FormCheckboxPlugin, NavPlugin } from 'bootstrap-vue';
-
+import { NavPlugin, TabsPlugin, CardPlugin, AlertPlugin, ModalPlugin, SpinnerPlugin, FormDatepickerPlugin, ToastPlugin, FormFilePlugin, FormCheckboxPlugin} from 'bootstrap-vue';
 Vue.use(NavPlugin);
+Vue.use(TabsPlugin);
+Vue.use(CardPlugin);
+Vue.use(AlertPlugin);
+Vue.use(ModalPlugin);
+Vue.use(SpinnerPlugin);
+Vue.use(FormDatepickerPlugin);
+Vue.use(ToastPlugin);
+Vue.use(FormFilePlugin);
 Vue.use(FormCheckboxPlugin);
 
 import 'bootstrap/dist/css/bootstrap.css';

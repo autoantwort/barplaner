@@ -6,11 +6,14 @@ var expressWs = require('express-ws')(app);
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 var env = require('./app/config/env');
+const fileUpload = require('express-fileupload');
 
 if (env.staticVue === true)
     app.use(express.static("../Vue.js-Client/dist"));
 
+app.use(fileUpload({ useTempFiles: false, }));
 app.use(bodyParser.json());
+app.use(bodyParser.text());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 const cors = require('cors');
@@ -53,6 +56,8 @@ const remoteVolumeControl = require("./app/util/remoteVolumeControl");
 remoteVolumeControl.registerClients(app);
 const remoteControlPane = require("./app/util/remoteControlPane");
 remoteControlPane.registerClients(app);
+const scanner = require("./app/util/scanner");
+scanner.registerClients(app);
 
 const ical = require("./app/util/icalCalendar");
 app.get(env.ical.urlPath, (req, res) => ical.serve(res));
@@ -145,11 +150,36 @@ app.post('/api/logout', (req, res) => {
 });
 remoteVolumeControl.registerMasters(app);
 remoteControlPane.registerMasters(app);
+scanner.registerMasters(app);
 require('./app/route/user.route.js')(app);
 require('./app/route/bar.route.js')(app);
 require('./app/route/duty.route.js')(app);
 require('./app/route/setting.route.js')(app);
 require('./app/route/survey.route.js')(app);
+require('./app/route/position.route')(app);
+require('./app/route/file.route')(app);
+require('./app/route/item.route')(app);
+require('./app/route/itemGroup.route')(app);
+require('./app/route/stockChanges.route')(app);
+require('./app/route/invoice.route')(app);
+
+// distribute files from file db
+console.log("Store at and load files from: ", env.fileStoragePath);
+app.use('/api/file/:fileId', (req, res, next) => {
+    // set the Content-Type header, we have this information in our database        
+    db.File.findByPk(req.params.fileId).then(file => {
+        if (file === null) {
+            res.status(404).send("The file with id " + req.params.fileId + " does not exists");
+        } else {
+            res.setHeader("Content-Type", file.mimeType);
+            next();
+        }
+    });
+});
+app.use('/api/file/', express.static(env.fileStoragePath, {
+    maxAge: 1000 * 60 * 60 * 24 * 365 * 10 /*10 years*/ ,
+    index: false,
+}));
 
 // Create a Server
 var server = app.listen(8080, function() {

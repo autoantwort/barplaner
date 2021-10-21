@@ -6,6 +6,13 @@ let axios = Axios.create({
         "Content-type": "application/json",
     }
 });
+axios.getFile = (fileId) => {
+    return axios.defaults.baseURL + "/file/" + fileId;
+};
+axios.getImage = (imageId) => {
+    return axios.getFile(imageId);
+};
 axios.defaults.withCredentials = true;
+axios.defaults.baseWsURL = "wss://orga.symposion.hilton.rwth-aachen.de";
 
 export default axios;

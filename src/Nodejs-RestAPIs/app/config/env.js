@@ -33,6 +33,7 @@ const env = {
         host: '***',
         dialect: 'mysql',
     },
+    fileStoragePath: __dirname + '/../../../../webserver/files/',
     ical: {
         urlPath: '/publicEvents.ics', // the path on the server
         domain: 'symposion-aachen.com',

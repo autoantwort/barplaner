@@ -11,7 +11,7 @@
                 v-collapse-toggle
                 class="card-header text-center"
                 v-bind:class="{ pressable: bar.hide,'text-primary': bar.hide }"
-              >{{bar.name}} ({{ bar.start | moment("DD.MM.YYYY") }}) {{bar.canceled ? "Abgesagt":""}}</div>
+              >{{bar.name}} ({{ bar.start | asDate }}) {{bar.canceled ? "Abgesagt":""}}</div>
               <div>
                 <div v-collapse-content>
                   <div class="card-body" v-if="!bar.canceled">
@@ -157,7 +157,9 @@
         <div v-if="oldBars.length === 0" class="text-center mt-3 mb-3">Alte Bars laden...</div>
         <div v-else v-for="bar in oldBars" :key="bar.id">
           <div class="card mt-3 mb-3">
-            <div class="card-header text-center">{{bar.name}} ({{ bar.start | moment("DD.MM.YYYY") }}) {{bar.canceled ? "Abgesagt":""}}</div>
+            <div
+              class="card-header text-center"
+            >{{bar.name}} ({{ bar.start | asDate }}) {{bar.canceled ? "Abgesagt":""}}</div>
             <div class="card-body" v-if="!bar.canceled">
               <div class="table-responsive">
                 <table class="table">

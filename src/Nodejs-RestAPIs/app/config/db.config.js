@@ -54,6 +54,17 @@ db.Survey = require('../model/survey.model.js')(sequelize, Sequelize, db.User);
 db.Question = require('../model/question.model.js')(sequelize, Sequelize, db.Survey);
 db.Answer = require('../model/answer.model.js')(sequelize, Sequelize, db.User, db.Question);
 
+db.File = require('../model/file.model.js')(sequelize, Sequelize);
+db.Image = require('../model/image.model.js')(sequelize, Sequelize, db.File);
+db.stock = {};
+db.stock.Position = require('../model/stockManagement/position.model')(sequelize, Sequelize, db.Image);
+db.stock.ItemGroup = require('../model/stockManagement/itemGroup.model')(sequelize, Sequelize, db.stock.Position);
+db.stock.Item = require('../model/stockManagement/item.model')(sequelize, Sequelize, db.Image, db.stock.ItemGroup, db.stock.Position);
+db.stock.Invoice = require('../model/stockManagement/invoice.model')(sequelize, Sequelize, db.File);
+db.stock.InvoiceEntry = require('../model/stockManagement/invoiceEntry.model')(sequelize, Sequelize, db.stock.Invoice, db.stock.Item);
+db.stock.Change = require('../model/stockManagement/change.model')(sequelize, Sequelize, db.stock.Item, db.User, db.stock.InvoiceEntry);
+
+
 let funcArray = [];
 
 db.addSyncCallback = function(func) {

@@ -47,6 +47,8 @@
 </template>
 
 <script>
+import http from "../http-common";
+
 export default {
   name: "remote-volume-control",
   data() {
@@ -97,7 +99,7 @@ export default {
   },
   created() {
     this.webSocket = new WebSocket(
-      "wss://orga.symposion.hilton.rwth-aachen.de/volumeMaster"      
+      http.defaults.baseWsURL + "/volumeMaster"
     );
     this.initialize();
   },

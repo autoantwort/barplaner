@@ -1,0 +1,15 @@
+{
+    /* Stole from Vue.js-Client/package.json 'eslintConfig'. Needed by the webpack compiler for the file colognePhonetics.js (There must be a config file at the path for every module in the app) */
+    "root": true,
+    "env": {
+        "node": true
+    },
+    "extends": [
+        "plugin:vue/essential",
+        "eslint:recommended"
+    ],
+    "rules": {},
+    "parserOptions": {
+        "parser": "babel-eslint"
+    }
+}
