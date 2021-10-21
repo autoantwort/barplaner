@@ -11,10 +11,10 @@
                 v-collapse-toggle
                 class="card-header text-center"
                 v-bind:class="{ pressable: bar.hide,'text-primary': bar.hide }"
-              >{{bar.name}} ({{ bar.start | asDate }})</div>
+              >{{bar.name}} ({{ bar.start | asDate }}) {{bar.canceled ? "Abgesagt":""}}</div>
               <div>
                 <div v-collapse-content>
-                  <div class="card-body">
+                  <div class="card-body" v-if="!bar.canceled">
                     <!-- <div class="m-2 text-center" v-if="bar.start > now && cleaningAdmin">
                     <input class="form-control" style="display:inline;max-width:60px" type="number" min="0" value="2"> Personen zum putzen zuordnen lassen? 
                     <button class="btn btn-primary" title="Es wird nur die Differenz zwischen schon zugeteilten und soll Anzahl hinzugefüt">Ja</button>
@@ -36,26 +36,14 @@
                             <th
                               v-if="cleaningAdmin /*|| (user.id === duty.userID &&!duty.have_to_clean && bar.start > now)*//*sich selber eintragen*/"
                             >
-                              <input
-                                type="checkbox"
-                                v-on:click="updateActive(bar.id,duty.userID,$event)"
-                                v-model="duty.have_to_clean"
-                              >
+                              <input type="checkbox" v-on:click="updateActive(bar.id,duty.userID,$event)" v-model="duty.have_to_clean" />
                             </th>
                             <th v-else-if="duty.have_to_clean">❌</th>
                             <th v-else></th>
                             <td>{{duty['user.name']}}</td>
                             <td v-if="user.id === duty.userID && bar.start > now">
-                              <select
-                                class="form-control minWidth"
-                                v-model="duty.state"
-                                @change="save(duty)"
-                              >
-                                <option
-                                  v-if="duty.state==='no_info'"
-                                  disabled
-                                  value="no_info"
-                                >Please select</option>
+                              <select class="form-control minWidth" v-model="duty.state" @change="save(duty)">
+                                <option v-if="duty.state==='no_info'" disabled value="no_info">Please select</option>
                                 <option value="present">Komme</option>
                                 <option value="absent">Komme nicht</option>
                               </select>
@@ -171,8 +159,8 @@
           <div class="card mt-3 mb-3">
             <div
               class="card-header text-center"
-            >{{bar.name}} ({{ bar.start | asDate }})</div>
-            <div class="card-body">
+            >{{bar.name}} ({{ bar.start | asDate }}) {{bar.canceled ? "Abgesagt":""}}</div>
+            <div class="card-body" v-if="!bar.canceled">
               <div class="table-responsive">
                 <table class="table">
                   <thead>
@@ -211,10 +199,7 @@
           </div>
         </div>
         <div v-if="oldBars.length !== 0 && veryOldBars.length !== 0" class="text-center mt-3 mb-3">
-          <button
-            class="btn btn-primary"
-            @click="renderAllOldBars"
-          >Alle alten Bars laden (rendern kann dauern)</button>
+          <button class="btn btn-primary" @click="renderAllOldBars">Alle alten Bars laden (rendern kann dauern)</button>
         </div>
         <!-- End code dublication -->
       </div>
@@ -260,7 +245,7 @@ export default {
           let hasNew = false;
           for (let i = bars.length - 1; i >= 0; --i) {
             if (hasNew) {
-              bars[i].hide = true;
+              bars[i].hide = bars[i].canceled ? false : true;
             } else {
               bars[i].hide = false;
               console.log(bars[i].end > bars[i].start);

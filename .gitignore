@@ -1,8 +1,11 @@
-# Default folder for files
-webserver/*
-# database
-*.sqlite
+# ignore example data while developing
+Metro_PDFs
 
+# ignore uploaded webserver files
+webserver
+
+# Ignore database files
+*.sqlite
 
 # Logs
 logs

@@ -32,6 +32,7 @@ const createCronJob = value => {
                         [Op.gt]: new Date(),
                     },
                     public: true,
+                    canceled: false,
                 }
             }).then(bars => {
                 const now = new Date();

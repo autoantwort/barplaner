@@ -59,6 +59,16 @@ remoteControlPane.registerClients(app);
 const scanner = require("./app/util/scanner");
 scanner.registerClients(app);
 
+const ical = require("./app/util/icalCalendar");
+app.get(env.ical.urlPath, (req, res) => ical.serve(res));
+
+if (env.webDavCalendars && env.webDavCalendars.length > 0) {
+    require("./app/util/webDavCalendar");
+}
+if (env.webNotifications && env.webNotifications.vapidKeys.privateKey.length > 0) {
+    require("./app/util/webNotificationsNewsletter")(app, "/push/"); // we do not use webPush because that would be blocked by uBlock
+}
+
 const crypto = require('crypto');
 
 const User = db.User;

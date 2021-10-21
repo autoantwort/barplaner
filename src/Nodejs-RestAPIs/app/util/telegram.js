@@ -171,6 +171,7 @@ exports.registerResponseSystem = (systemId, responseCallback) => {
 exports.sendMessage = (user, message, deleteAfter, afterDeleteText) => {
     if (user.telegramID.indexOf('login') === -1) {
         let startIndex = 0;
+        let messages = [];
         // we have to split the message if the message have more than 4096 'visible' chars.
         // E.g. The markdown string "[test](www.google.com)" results in a length of 4, but for simplicity we ignore this circumstance.
         while (startIndex < message.length) {
@@ -194,14 +195,21 @@ exports.sendMessage = (user, message, deleteAfter, afterDeleteText) => {
                 currentMsg = message.substring(startIndex, lastIndex);
                 startIndex = lastIndex;
             }
-            bot.sendMessage(user.telegramID, currentMsg, { parse_mode: "Markdown", disable_web_page_preview: true }).then(message => {
-                if (deleteAfter instanceof Date) {
-                    exports.deleteTelegramMessage(user.telegramID, message.message_id, deleteAfter, afterDeleteText);
-                } else if (deleteAfter !== null && deleteAfter !== undefined) {
-                    console.error(deleteAfter + " is not a date at Telegram.sendMessage(...)");
-                }
-            }).catch(error => console.error("Error while sending telegram message: ", error));
+            messages.push(currentMsg);
         }
+        const sendMessage = () => {
+            if (messages.length > 0) {
+                bot.sendMessage(user.telegramID, messages.shift(), { parse_mode: "Markdown", disable_web_page_preview: true }).then(message => {
+                    sendMessage();
+                    if (deleteAfter instanceof Date) {
+                        exports.deleteTelegramMessage(user.telegramID, message.message_id, deleteAfter, afterDeleteText);
+                    } else if (deleteAfter !== null && deleteAfter !== undefined) {
+                        console.error(deleteAfter + " is not a date at Telegram.sendMessage(...)");
+                    }
+                }).catch(error => console.error("Error while sending telegram message: ", error));
+            }
+        }
+        sendMessage();
         return true;
     } else {
         return false;

@@ -89,9 +89,9 @@ exports.getFacebookEvents = () => {
         } else {
             AccessToken.reload().then(() => {
                 PageID.reload().then(() => {
-                    axios.get(PageID.value + "/events?fields=start_time,end_time,description,id,interested_count,is_canceled,is_draft,maybe_count,name,declined_count,noreply_count,type,cover&access_token=" + AccessToken.value).then(response => {
+                    axios.get(PageID.value + "/events?fields=start_time,end_time,description,id,interested_count,is_canceled,is_draft,maybe_count,name,declined_count,noreply_count,type,cover&include_canceled=true&access_token=" + AccessToken.value).then(response => {
                         resolve(response.data.data); // the events array in saved in a data property
-                    }).catch(err => reject(err.response.data));
+                    }).catch(err => reject(err.response));
                 });
             });
         }
@@ -116,21 +116,34 @@ exports.syncFacebookEvents = () => {
                     events[i].start = new Date(events[i].start_time);
                     events[i].end = new Date(events[i].end_time);
                 }
-                events = events.filter(e => e.start > now).filter(e => !e.is_draft && !e.is_canceled).reverse();
+                events = events.filter(e => e.start > now).filter(e => !e.is_draft).reverse();
                 if (events.length === 0) {
                     resolve();
                     return;
                 }
                 Setting.findByPk("defaultNumberOfPersonsToClean").then(numberSetting => {
                     let barsToCreate = [];
+                    const getBarData = event => {
+                        return {
+                            name: event.name,
+                            description: event.description,
+                            start: event.start,
+                            end: event.end,
+                            facebookEventID: event.id,
+                            facebookCoverImageURL: event.cover.source,
+                            public: event.type == "public",
+                            canceled: event.is_canceled,
+                        };
+                    };
                     // both sorted by time
                     let e = 0;
                     for (let b = 0; e < events.length && b < bars.length && events[e].start > now;) {
-                        // check if on same date:                    
+                        // check if on same date:
                         if (bars[b].start.getYear() === events[e].start.getYear() &&
                             bars[b].start.getMonth() === events[e].start.getMonth() &&
                             bars[b].start.getDate() === events[e].start.getDate()) {
-
+                            // the BarUtil checks what should be updated (if any)
+                            BarUtil.changeBar(bars[b], getBarData(events[e]));
                             ++b;
                             ++e;
                             // bar is older then the facebook event, skip bar
@@ -142,28 +155,12 @@ exports.syncFacebookEvents = () => {
                             if (event.is_draft || event.is_canceled) {
                                 continue;
                             }
-                            barsToCreate.push({
-                                name: event.name,
-                                description: event.description,
-                                start: event.start,
-                                end: event.end,
-                                facebookEventID: event.id,
-                                facebookCoverImageURL: event.cover.source,
-                                public: event.type == "public",
-                            });
+                            barsToCreate.push(getBarData(event));
                         }
                     }
                     for (; e < events.length; ++e) {
                         const event = events[e];
-                        barsToCreate.push({
-                            name: event.name,
-                            description: event.description,
-                            start: event.start,
-                            end: event.end,
-                            facebookEventID: event.id,
-                            facebookCoverImageURL: event.cover.source,
-                            public: event.type == "public",
-                        });
+                        barsToCreate.push(getBarData(event));
                     }
                     if (barsToCreate.length > 0) {
                         // only create a new bar, if the last bar is finished, otherwise the ratio computing in the cleaning distribution breaks

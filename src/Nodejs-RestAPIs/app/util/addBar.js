@@ -12,6 +12,9 @@ const Setting = db.Setting;
 const Op = db.Sequelize.Op;
 const Util = require('../util/cleaning');
 
+const barAddedListener = [];
+const barChangedListener = [];
+
 exports.addBar = (barData, numberOfPersonsToClean) => {
     return new Promise((resolve, reject) => {
         Bar.create(barData).then(bar => {
@@ -38,6 +41,7 @@ exports.addBar = (barData, numberOfPersonsToClean) => {
                             .catch(reject);
                     } else {
                         TelegramBarFeedback.barAdded(bar);
+                        barAddedListener.forEach(c => c(bar));
                         resolve(bar);
                     }
                 }).catch(err => {
@@ -51,3 +55,38 @@ exports.addBar = (barData, numberOfPersonsToClean) => {
         });
     });
 };
+
+exports.onBarAdded = callback => barAddedListener.push(callback);
+
+/**
+ * Must be called to change a bar object. Checks if there are changes and do 
+ * additional things like changing newsletters, deleting bar duties, ...
+ * 
+ * @param {Bar} barObject the bar model instance 
+ * @param {object} newBarData the new bar data with the same fields as the bar model instance
+ */
+exports.changeBar = (barObject, newBarData) => {
+    if (barObject.facebookEventID === null) {
+        console.warn("Update a bar object with facebook data that has no facebookEventID");
+    }
+    if (!barObject.canceled && newBarData.canceled) {
+        // if the bar was cancelled, delete all bar duties
+        BarDuty.destroy({
+            where: {
+                barID: barObject.id,
+            }
+        });
+    }
+    for (let p in newBarData) {
+        barObject[p] = newBarData[p];
+    }
+    // if the previous for loop changed a property
+    if (barObject.changed()) {
+        barObject.save();
+        // update the email newsletter
+        Newsletter.sendEmailForBar(barObject);
+        barChangedListener.forEach(c => c(barObject));
+    }
+};
+
+exports.onBarChanged = callback => barChangedListener.push(callback);

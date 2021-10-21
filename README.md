@@ -54,6 +54,17 @@
 
  Now you can visit your `baseURL`
 
+ ## Database migration
+ If you add an field to the database or change the database, you have to create a migration
+ ##### Create a database migration
+ 1. `cd` in the `src/Nodejs-RestAPIs` folder
+ 2. run `sequelize migration:generate --name YOUR_CHANGE_NAME` replace `YOUR_CHANGE_NAME`
+ 3. the command will output a file name. Write in this filename the commands that are needed to change the database. Look in the other change files for inspiration.
+ 
+ ##### Apply a database migration
+ 1. `cd` in the `src/Nodejs-RestAPIs` folder
+ 2. run `sequelize db:migrate` to migrate the database
+
  ## Create service to run your server (for linux systems with systemd)
   1. create a file \<_your_service_name_\>.service
 

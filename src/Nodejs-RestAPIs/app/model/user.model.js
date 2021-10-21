@@ -46,6 +46,11 @@ module.exports = (sequelize, Sequelize) => {
             defaultValue: null,
             allowNull: true,
         },
+        only_show_gitlab_notifications_if_assigned: {
+            type: Sequelize.BOOLEAN,
+            defaultValue: false,
+            allowNull: false,
+        },
     });
 
     return User;
