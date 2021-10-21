@@ -118,7 +118,7 @@ BarUtil.onBarChanged(bar => {
     if (bar.canceled) {
         sendNotification({
             titel: "Die Bar " + bar.name + " wurde abgesagt!",
-            facebookEventID: facebookEventID,
+            facebookEventID: bar.facebookEventID,
         });
     }
 });

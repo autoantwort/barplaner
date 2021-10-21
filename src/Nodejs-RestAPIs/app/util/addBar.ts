@@ -1,7 +1,7 @@
 import db from "../config/db.config";
 import { Op } from "sequelize";
+import * as Telegram from "./telegram";
 
-const TelegramBarFeedback = require("./telegramBarFeedback");
 const Newsletter = require("./newsletter.js");
 const Axios = require("axios");
 
@@ -45,12 +45,12 @@ export const addBar = (barData, numberOfPersonsToClean) => {
                 ) {
                   Util.computeCleaning(bar.id, numberOfPersonsToClean)
                     .then((userIDs) => {
-                      TelegramBarFeedback.barAdded(bar);
+                      Telegram.barAdded(bar);
                       resolve(userIDs);
                     })
                     .catch(reject);
                 } else {
-                  TelegramBarFeedback.barAdded(bar);
+                  Telegram.barAdded(bar);
                   barAddedListener.forEach((c) => c(bar));
                   resolve(bar);
                 }

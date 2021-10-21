@@ -4,7 +4,6 @@ import * as Util from "../util/cleaning";
 const BarUtil = require("../util/addBar");
 
 import * as Telegram from "../util/telegram";
-import * as TelegramBarFeedback from "../util/telegramBarFeedback";
 
 const Bar = db.Bar;
 const User = db.User;
@@ -96,7 +95,7 @@ export const updateCleaning = (req, res) => {
       },
     })
       .spread((affectedCount, affectedRows) => {
-        TelegramBarFeedback.changeCleaningStatus(
+        Telegram.changeCleaningStatus(
           req.params.barID,
           req.params.userID,
           req.body.have_to_clean
@@ -138,7 +137,6 @@ export const updateCleaning = (req, res) => {
     })
     .catch((err) => res.status(500).send("Error -> " + err));
 }; // Update cleaning
-
 
 export const updateDuty = (req, res) => {
   if (req.user.id === Number(req.params.userID)) {

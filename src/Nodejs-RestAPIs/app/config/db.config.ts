@@ -47,6 +47,7 @@ const wordpressDB = new Sequelize(
     logging: (e, t) => {},
   }
 );
+
 wordpressDB
   .authenticate()
   .then(() => {
@@ -95,19 +96,6 @@ db.TelegramNewsletter = require("../model/telegramNewsletter.model")(
 db.WebPushSubscription = require("../model/webPushSubscription.model")(
   sequelize,
   Sequelize
-);
-
-db.Survey = require("../model/survey.model.js")(sequelize, Sequelize, db.User);
-db.Question = require("../model/question.model.js")(
-  sequelize,
-  Sequelize,
-  db.Survey
-);
-db.Answer = require("../model/answer.model.js")(
-  sequelize,
-  Sequelize,
-  db.User,
-  db.Question
 );
 
 let funcArray = [];
