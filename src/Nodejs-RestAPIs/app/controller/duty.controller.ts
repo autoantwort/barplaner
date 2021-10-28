@@ -1,11 +1,9 @@
-import db from "../config/db.config";
-import * as Util from "../util/cleaning";
+import db from "../config/db.config.js";
+import * as Util from "../util/cleaning.js";
 
-const Bar = db.Bar;
 const User = db.User;
 const BarDuty = db.BarDuty;
 const sequelize = db.sequelize;
-const Role = db.Role;
 const UserRoles = db.UserRoles;
 
 // Update a Bar

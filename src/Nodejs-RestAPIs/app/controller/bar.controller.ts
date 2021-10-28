@@ -1,15 +1,16 @@
-import db from "../config/db.config";
-import * as Util from "../util/cleaning";
+import db from "../config/db.config.js";
+import * as Util from "../util/cleaning.js";
+
+import Bar from "../model/bar.model.js";
+import Role from "../model/role.model.js";
 
 const BarUtil = require("../util/addBar");
 
-import * as Telegram from "../util/telegram";
+import * as Telegram from "../util/telegram.js";
 
-const Bar = db.Bar;
 const User = db.User;
 const BarDuty = db.BarDuty;
 const sequelize = db.sequelize;
-const Role = db.Role;
 const UserRoles = db.UserRoles;
 
 let BarAdminRole = null;
@@ -172,12 +173,16 @@ export const getAllBarsWithBarduties = (req, res) => {
       .then((bars) => {
         console.time("order by");
         // Send all bars to Client
-        //bars.map(b => b.toJSON());
         var map = {};
-        for (let i = 0; i < bars.length; ++i) {
-          bars[i] = bars[i].toJSON();
-          bars[i]["duties"] = [];
-          map[bars[i].id] = bars[i];
+        const jsonBars = [];
+
+        for (const bar of bars) {
+          let jsonBar = bar.toJSON();
+          jsonBar["duties"] = [];
+
+          jsonBars.push(jsonBar);
+
+          map[bar.id] = jsonBar;
         }
         console.timeEnd("order by");
         BarDuty.findAll({
@@ -196,7 +201,7 @@ export const getAllBarsWithBarduties = (req, res) => {
               duty["user.name"] = userMap[duty.userID].name;
             }
             console.timeEnd("zuordnen");
-            res.send(bars);
+            res.send(jsonBars);
           })
           .catch((err) => {
             res.status(500).send("Error -> " + err);
@@ -210,7 +215,7 @@ export const getAllBarsWithBarduties = (req, res) => {
 
 // Find a Bar by Id
 export const findById = (req, res) => {
-  Bar.findById(req.params.barID)
+  Bar.findByPk(req.params.barID)
     .then((bar) => {
       res.send(bar);
     })

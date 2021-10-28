@@ -1,12 +1,13 @@
 import db from "../config/db.config.js";
-import { Op } from "sequelize";
+import Role from "../model/role.model.js";
+import * as seq from "sequelize";
+
+const Op = seq.Op;
 
 const Util = require("../util/cleaning");
-const Bar = db.Bar;
 const User = db.User;
 const BarDuty = db.BarDuty;
 const sequelize = db.sequelize;
-const Role = db.Role;
 const UserRoles = db.UserRoles;
 const Setting = db.Setting;
 

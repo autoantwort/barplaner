@@ -1,16 +1,11 @@
-import db from "../config/db.config";
-import { Op } from "sequelize";
-import * as Telegram from "./telegram";
+import db from "../config/db.config.js";
+import * as Telegram from "./telegram.js";
+import Bar from "../model/bar.model.js";
 
 const Newsletter = require("./newsletter.js");
-const Axios = require("axios");
 
-const Bar = db.Bar;
 const User = db.User;
-const UserRoles = db.UserRoles;
 const BarDuty = db.BarDuty;
-const Role = db.Role;
-const Setting = db.Setting;
 const Util = require("../util/cleaning");
 
 const barAddedListener = [];

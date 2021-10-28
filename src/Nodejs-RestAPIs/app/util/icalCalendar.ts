@@ -1,10 +1,12 @@
-import db from "../config/db.config";
-import { Op } from "sequelize";
+import db from "../config/db.config.js";
+import Bar from "../model/bar.model.js";
+import * as seq from "sequelize";
+
+const Op = seq.Op;
 
 const ical = require("ical-generator");
-const env = require("../config/env");
+import env from "../config/env.js";
 const BarUtil = require("./addBar");
-const Bar = db.Bar;
 
 const cal = ical({
   domain: env.ical.domain,
@@ -30,9 +32,11 @@ const addBar = (event) => {
   }
   e.organizer(env.ical.organizer);
   e.geo(env.ical.geo);
+
   if (env.ical.location && !env.ical.appleLocation) {
     e.location(env.ical.location);
   }
+
   if (env.ical.appleLocation) {
     e.appleLocation(env.ical.appleLocation);
   }

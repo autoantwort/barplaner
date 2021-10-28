@@ -1,9 +1,8 @@
-import db from "../config/db.config";
+import db from "../config/db.config.js";
 import { QueryTypes } from "sequelize";
+import Role from "../model/role.model.js";
 
 const Wordpress = db.Wordpress;
-const Bar = db.Bar;
-const Role = db.Role;
 const Setting = db.Setting;
 
 let NewsletterAdminRole = null;

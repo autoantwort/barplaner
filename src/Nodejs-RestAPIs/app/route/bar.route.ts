@@ -1,4 +1,4 @@
-import * as Bar from "../controller/bar.controller";
+import * as Bar from "../controller/bar.controller.js";
 
 export default function (app) {
   // Create a new Bar

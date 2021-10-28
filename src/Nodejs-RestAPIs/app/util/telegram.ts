@@ -1,17 +1,21 @@
-import db from "../config/db.config";
-import { Op, col } from "sequelize";
+import db from "../config/db.config.js";
+import * as seq from "sequelize";
+
+const Op = seq.Op;
+const col = seq.col;
 
 import * as TelegramBot from "node-telegram-bot-api";
-import * as SettingsController from "../controller/setting.controller";
+import * as SettingsController from "../controller/setting.controller.js";
+import Bar from "../model/bar.model.js";
+import Role from "../model/role.model.js";
 
-const env = require("../config/env");
+import env from "../config/env.js";
+
 const cron = require("cron");
 
-const Bar = db.Bar;
 const User = db.User;
 const BarDuty = db.BarDuty;
 const Setting = db.Setting;
-const Role = db.Role;
 const ShouldDelete = db.ShouldDelete;
 
 const TOKEN = env.telegramAccessToken;
@@ -169,7 +173,7 @@ export const registerResponseSystem = (systemId, responseCallback) => {
         newRow: function () {
           this.buttons.push([]);
         },
-        sendMessage: async function (deleteAfter, textAfterDelete?: string) {
+        sendMessage: async function (deleteAfter?, textAfterDelete?: string) {
           const message = await bot.sendMessage(user.telegramID, this.text, {
             reply_markup: {
               inline_keyboard: this.buttons,
@@ -387,19 +391,22 @@ export const deleteTelegramMessage = (
   chatID,
   messageID,
   deleteAfter,
-  newText
+  newText?
 ) => {
   if (deleteAfter === undefined) {
     throw new Error("Minimum 3 arguments are required!");
   }
+
   if (typeof newText !== "string") {
     newText = null;
   }
+
   ShouldDelete.create({
     chatID: chatID,
     messageID: messageID,
     deleteAfter: deleteAfter,
   }).catch(console.error);
+
   if (nextDeleteExecution === null || nextDeleteExecution > deleteAfter) {
     if (deleteTimeout !== null) {
       clearTimeout(deleteTimeout);
@@ -808,7 +815,7 @@ export const barAdded = (bar) => {
 export const changeCleaningStatus = (barId, userId, newHaveToCleanState) => {
   Bar.findByPk(barId)
     .then((bar) => {
-      const end = bar.start.setHours(bar.start.getHours() + 12);
+      const end = new Date(bar.start.setHours(bar.start.getHours() + 12));
       // bar is to old
       if (new Date() > end) {
         return;

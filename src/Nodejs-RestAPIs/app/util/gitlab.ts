@@ -1,7 +1,9 @@
-import db from "../config/db.config";
-import { Op } from "sequelize";
+import db from "../config/db.config.js";
+import * as seq from "sequelize";
 
-const env = require("../config/env");
+const Op = seq.Op;
+
+import env from "../config/env.js";
 const Telegram = require("./telegram.js");
 const CronJob = require("cron").CronJob;
 const Axios = require("axios");

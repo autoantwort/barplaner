@@ -1,13 +1,16 @@
 import db from "../config/db.config.js";
-import { Op } from "sequelize";
+import * as seq from "sequelize";
+
+const Op = seq.Op;
+
+import Bar from "../model/bar.model.js";
+import Role from "../model/role.model.js";
 
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
-const Bar = db.Bar;
 const User = db.User;
 const UserRoles = db.UserRoles;
 const BarDuty = db.BarDuty;
-const Role = db.Role;
 
 // Post a User
 exports.createAdmin = (name, password, callback) => {
@@ -33,15 +36,19 @@ exports.createAdmin = (name, password, callback) => {
             },
           })
             .then((bars) => {
+              const barDuties = [];
+
               for (let i = 0; i < bars.length; ++i) {
-                bars[i] = {
+                barDuties.push({
                   barID: bars[i].id,
                   userID: user.id,
-                };
+                });
               }
+
               BarDuty.bulkCreate(bars).catch((err) => {
                 callback(err);
               });
+
               Role.findAll().then((res) => {
                 callback("suuccess : " + res);
                 user

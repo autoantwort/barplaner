@@ -1,12 +1,15 @@
 {
     "compilerOptions": {
-        "target": "es5",
+        "target": "es6",
         "allowJs": true,
         "checkJs": true,
         "outDir": "./lib",
         "moduleResolution": "node",
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "module": "esnext"
     },
     "include": [
         "./app/**/*"
-    ],
+    ]
 }

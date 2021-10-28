@@ -1,14 +1,16 @@
 #!/usr/bin/env node
-
 var express = require("express");
 var app = express();
 var expressWs = require("express-ws")(app);
 var bodyParser = require("body-parser");
 var cookieParser = require("cookie-parser");
-var env = require("./config/env");
 
-import barRoute from "./route/bar.route";
-import dutyRoute from "./route/duty.route";
+import env from "./config/env.js";
+
+import barRoute from "./route/bar.route.js";
+import dutyRoute from "./route/duty.route.js";
+import settingRoute from "./route/setting.route.js";
+import userRoute from "./route/user.route.js";
 
 if (env.staticVue === true) app.use(express.static("../Vue.js-Client/dist"));
 
@@ -25,7 +27,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(cookieParser());
 
-import db from "./config/db.config";
+import db from "./config/db.config.js";
 const bcrypt = require("bcrypt");
 bcrypt.genSalt(10, function (err, salt) {
   console.log(salt);
@@ -181,8 +183,8 @@ app.post("/api/logout", (req, res) => {
 remoteVolumeControl.registerMasters(app);
 remoteControlPane.registerMasters(app);
 
-require("./route/user.route.js")(app);
-require("./route/setting.route.js")(app);
+settingRoute(app);
+userRoute(app);
 barRoute(app);
 dutyRoute(app);
 
