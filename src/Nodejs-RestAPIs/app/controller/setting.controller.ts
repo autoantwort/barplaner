@@ -4,10 +4,6 @@ import * as seq from "sequelize";
 
 const Op = seq.Op;
 
-const Util = require("../util/cleaning");
-const User = db.User;
-const BarDuty = db.BarDuty;
-const sequelize = db.sequelize;
 const UserRoles = db.UserRoles;
 const Setting = db.Setting;
 

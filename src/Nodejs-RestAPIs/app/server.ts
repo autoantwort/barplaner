@@ -1,9 +1,10 @@
 #!/usr/bin/env node
-var express = require("express");
-var app = express();
-var expressWs = require("express-ws")(app);
-var bodyParser = require("body-parser");
-var cookieParser = require("cookie-parser");
+import * as express from "express";
+
+const app = express();
+
+import * as bodyParser from "body-parser";
+import * as cookieParser from "cookie-parser";
 
 import env from "./config/env.js";
 
@@ -17,18 +18,22 @@ if (env.staticVue === true) app.use(express.static("../Vue.js-Client/dist"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-const cors = require("cors");
+import * as cors from "cors";
+
 const corsOptions = {
   //origin: "http://localhost:4200",
   origin: true,
   optionsSuccessStatus: 200,
   credentials: true,
 };
+
 app.use(cors(corsOptions));
 app.use(cookieParser());
 
 import db from "./config/db.config.js";
-const bcrypt = require("bcrypt");
+
+import * as bcrypt from "bcrypt";
+
 bcrypt.genSalt(10, function (err, salt) {
   console.log(salt);
   console.log(JSON.stringify(salt));
@@ -41,7 +46,8 @@ db.sequelize.sync({ force: env.resetDatabase }).then(() => {
   //const Util = require('./app/util/adduser');
   //Util.createAdmin("Test", "Test", e => console.log(e));
 });
-if (env.loadOldData === true) require("./old_data/loadOldData").loadOldData();
+
+import * as facebookUtil from "./util/facebook.js";
 
 if (
   typeof env.facebookAccessToken === "string" &&
@@ -49,33 +55,40 @@ if (
   typeof env.symposionPageID === "string" &&
   env.symposionPageID.length > 0
 ) {
-  require("./util/facebook").runFacebookSync();
+  facebookUtil.runFacebookSync();
 }
-require("./util/telegram");
-require("./util/gitFileBrowser");
-require("./util/telegramNewsletter");
-require("./util/gitlab");
-const remoteVolumeControl = require("./util/remoteVolumeControl");
+
+import * as telegram from "./util/telegram.js";
+import * as gitFileBrowser from "./util/gitFileBrowser.js";
+import * as telegramNewsletter from "./util/telegramNewsletter.js";
+import * as gitlab from "./util/gitlab.js";
+
+import * as remoteVolumeControl from "./util/remoteVolumeControl.js";
 remoteVolumeControl.registerClients(app);
-const remoteControlPane = require("./util/remoteControlPane");
+
+import * as remoteControlPane from "./util/remoteControlPane.js";
 remoteControlPane.registerClients(app);
 
-const ical = require("./util/icalCalendar");
+import * as ical from "./util/icalCalendar.js";
 app.get(env.ical.urlPath, (req, res) => ical.serve(res));
 
+import * as webDavCalendar from "./util/webDavCalendar.js";
+import webNotificationsNewsletter from "./util/webNotificationsNewsletter.js";
+
 if (env.webDavCalendars && env.webDavCalendars.length > 0) {
-  require("./util/webDavCalendar");
+  //require("./util/webDavCalendar");
 }
 if (
   env.webNotifications &&
   env.webNotifications.vapidKeys.privateKey.length > 0
 ) {
-  require("./util/webNotificationsNewsletter")(app, "/push/"); // we do not use webPush because that would be blocked by uBlock
+  webNotificationsNewsletter(app, "/push/");
 }
 
-const crypto = require("crypto");
+import * as crypto from "crypto";
 
 const User = db.User;
+
 app.post("/api/login", (req, res) => {
   User.findOne({
     where: {
@@ -151,17 +164,20 @@ app.post("/api/login", (req, res) => {
     }
   });
 });
+
 app.use((req, res, next) => {
   if (req.cookies.auth === undefined) {
     res.status(401).send("not authenticated");
     return;
   }
+
   User.findOne({ where: { sessionID: req.cookies.auth } })
     .then((user) => {
       if (user === null) {
         res.status(401).send("not authenticated");
       } else {
-        req.user = user;
+        const request: any = req;
+        request.user = user;
         next();
       }
     })
@@ -169,17 +185,22 @@ app.use((req, res, next) => {
       res.status(500).send("Error -> " + err);
     });
 });
+
 app.post("/api/logout", (req, res) => {
   res.clearCookie("auth", {
     httpOnly: true,
     sameSite: false /* TODO */,
     secure: req.secure,
   });
-  req.user
+
+  const request: any = req;
+
+  request.user
     .update({ sessionID: null })
     .then(() => res.send("logged out"))
     .catch((err) => res.status(500).send("Error -> " + err));
 });
+
 remoteVolumeControl.registerMasters(app);
 remoteControlPane.registerMasters(app);
 
@@ -190,8 +211,14 @@ dutyRoute(app);
 
 // Create a Server
 var server = app.listen(8080, function () {
-  var host = server.address().address;
-  var port = server.address().port;
+  const address = server.address();
+  let host = "";
+  let port: string | number = "";
+
+  if (typeof address !== "string") {
+    host = address.address;
+    port = address.port;
+  }
 
   console.log("App listening at http://%s:%s", host, port);
 });

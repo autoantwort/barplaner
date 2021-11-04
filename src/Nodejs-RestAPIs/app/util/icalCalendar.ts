@@ -4,9 +4,9 @@ import * as seq from "sequelize";
 
 const Op = seq.Op;
 
-const ical = require("ical-generator");
+import * as ical from "ical-generator";
 import env from "../config/env.js";
-const BarUtil = require("./addBar");
+import * as BarUtil from "./addBar.js";
 
 const cal = ical({
   domain: env.ical.domain,
@@ -81,4 +81,4 @@ BarUtil.onBarChanged((event) => {
   }
 });
 
-exports.serve = (res) => cal.serve(res);
+export const serve = (res) => cal.serve(res);

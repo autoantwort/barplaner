@@ -11,7 +11,7 @@ import Role from "../model/role.model.js";
 
 import env from "../config/env.js";
 
-const cron = require("cron");
+import * as cron from "cron";
 
 const User = db.User;
 const BarDuty = db.BarDuty;

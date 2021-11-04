@@ -9,7 +9,7 @@ namespace RemoteControlPane {
   }
 }
 
-exports.registerClients = function (app) {
+export const registerClients = function (app) {
   app.ws("/controlPaneClient", (ws, req) => {
     let name = "unnamed";
     RemoteControlPane.clients[name] = { ws, data: {} };
@@ -65,7 +65,8 @@ exports.registerClients = function (app) {
     });
   });
 };
-exports.registerMasters = (app) => {
+
+export const registerMasters = (app) => {
   app.ws("/controlPaneMaster", (ws, req) => {
     RemoteControlPane.controllers.push(ws);
     // send all know clients to the new master

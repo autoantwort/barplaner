@@ -4,11 +4,14 @@ import * as seq from "sequelize";
 const Op = seq.Op;
 
 import env from "../config/env.js";
-const Telegram = require("./telegram.js");
-const CronJob = require("cron").CronJob;
-const Axios = require("axios");
-const fs = require("fs");
-const path = require("path");
+import * as Telegram from "./telegram.js";
+import * as CJob from "cron";
+
+const CronJob = CJob.CronJob;
+
+import * as Axios from "axios";
+import * as fs from "fs";
+import * as path from "path";
 
 const User = db.User;
 
@@ -118,7 +121,7 @@ export const sendNotificationsForIssus = async () => {
     projects[project.id] = project;
   }
 
-  for (const [projectId, project]  of Object.entries<any>(projects)) {
+  for (const [projectId, project] of Object.entries<any>(projects)) {
     const issuesResponse = await axios.get(
       `/projects/${projectId}/issues?scope=all&state=opened&per_page=100`
     );
@@ -252,7 +255,10 @@ export const sendNotificationsForIssus = async () => {
           caption:
             "Deinem Barplaner Account konnte kein GitLab Account automatisch zugeordnet werden. Du musst diese Zuordnung leider selber durchführen. Gehe dafür bitte auf git.rwth-aachen.de/profile, kopiere die User ID, trage sie unter orga.symposion.hilton.rwth-aachen.de/#/account ein und klicke auf 'Update information'.",
         })
-        .then((response) => console.log(response.body))
+        .then((response) => {
+          const res: any = response;
+          console.log(res.body);
+        })
         .catch(console.error); // Besuche dafür die Seite: orga.symposion.hilton.rwth-aachen.de/#/account");
     } catch (e) {
       console.warn("Couldn't send telegram message.");

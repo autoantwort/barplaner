@@ -6,14 +6,11 @@ const Op = seq.Op;
 import Bar from "../model/bar.model.js";
 import Role from "../model/role.model.js";
 
-const Axios = require("axios");
+import * as Axios from "axios";
 import env from "../config/env.js";
 
-const User = db.User;
-const UserRoles = db.UserRoles;
-const BarDuty = db.BarDuty;
 const Setting = db.Setting;
-const BarUtil = require("./addBar");
+import * as BarUtil from "./addBar.js";
 
 let axios = Axios.default.create({
   baseURL: "https://graph.facebook.com/v3.2",
@@ -98,7 +95,7 @@ db.addSyncCallback(() => {
     .catch(console.error);
 });
 
-exports.getFacebookEvents = () => {
+export const getFacebookEvents = () => {
   return new Promise((resolve, reject) => {
     if (AccessToken === null) {
       reject("Not in sync with db");
@@ -121,7 +118,7 @@ exports.getFacebookEvents = () => {
   });
 };
 
-exports.syncFacebookEvents = () => {
+export const syncFacebookEvents = () => {
   return new Promise((resolve, reject) => {
     exports
       .getFacebookEvents()
@@ -234,7 +231,7 @@ exports.syncFacebookEvents = () => {
 let intervalID = null;
 let time = 4;
 
-exports.runFacebookSync = () => {
+export const runFacebookSync = () => {
   if (intervalID === null) {
     intervalID = setInterval(() => {
       ++time;
@@ -255,7 +252,7 @@ exports.runFacebookSync = () => {
   }
 };
 
-exports.stopFacebookSync = () => {
+export const stopFacebookSync = () => {
   if (intervalID !== null) {
     clearInterval(intervalID);
     intervalID = null;

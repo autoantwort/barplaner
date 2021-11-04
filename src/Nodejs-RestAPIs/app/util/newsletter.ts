@@ -1,6 +1,9 @@
 import db from "../config/db.config.js";
-import { QueryTypes } from "sequelize";
 import Role from "../model/role.model.js";
+
+import * as seq from "sequelize";
+
+const QueryTypes = seq.QueryTypes;
 
 const Wordpress = db.Wordpress;
 const Setting = db.Setting;
@@ -293,7 +296,7 @@ function sendNewsletter(barObject, newsletterId, sendTime) {
  *
  * @param {Bar} barData the bar model object
  */
-exports.sendEmailForBar = (barData) => {
+export const sendEmailForBar = (barData) => {
   TemplateNewsletterId.reload()
     .then((id) => {
       computeSendTime(barData.start)

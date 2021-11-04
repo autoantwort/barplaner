@@ -4,7 +4,7 @@ import * as Util from "../util/cleaning.js";
 import Bar from "../model/bar.model.js";
 import Role from "../model/role.model.js";
 
-const BarUtil = require("../util/addBar");
+import * as BarUtil from"../util/addBar.js";
 
 import * as Telegram from "../util/telegram.js";
 

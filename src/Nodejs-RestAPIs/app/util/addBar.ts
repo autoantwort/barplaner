@@ -2,11 +2,11 @@ import db from "../config/db.config.js";
 import * as Telegram from "./telegram.js";
 import Bar from "../model/bar.model.js";
 
-const Newsletter = require("./newsletter.js");
+import * as Newsletter from "./newsletter.js";
 
 const User = db.User;
 const BarDuty = db.BarDuty;
-const Util = require("../util/cleaning");
+import * as Util from "../util/cleaning.js";
 
 const barAddedListener = [];
 const barChangedListener = [];

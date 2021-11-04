@@ -2,8 +2,9 @@ import db from "../config/db.config.js";
 import { Op } from "sequelize";
 import Bar from "../model/bar.model.js";
 
-const Telegram = require("./telegram.js");
-const cron = require("cron");
+import * as Telegram from "./telegram.js";
+import * as cron from "cron";
+
 const CronJob = cron.CronJob;
 const CronTime = cron.CronTime;
 

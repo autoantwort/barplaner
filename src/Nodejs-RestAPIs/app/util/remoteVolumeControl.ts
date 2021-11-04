@@ -9,7 +9,7 @@ namespace RemoteControlVolume {
   }
 }
 
-exports.registerClients = function (app) {
+export const registerClients = function (app) {
   app.ws("/volumeClient", (ws, req) => {
     let name = "unnamed";
     RemoteControlVolume.clients[name] = ws;
@@ -43,7 +43,7 @@ exports.registerClients = function (app) {
   });
 };
 
-exports.registerMasters = (app) => {
+export const registerMasters = (app) => {
   app.ws("/volumeMaster", (ws, req) => {
     RemoteControlVolume.controllers.push(ws);
     // send all know clients to the new master

@@ -4,10 +4,10 @@ import * as seq from "sequelize";
 
 const Op = seq.Op;
 
-const ICal = require("ical-generator");
+import * as ICal from "ical-generator";
 import env from "../config/env.js";
 
-const BarUtil = require("./addBar");
+import * as BarUtil from "./addBar.js";
 
 // see https://www.npmjs.com/package/dav for the api
 // the api feels often like a C api (you have the client and pass
@@ -48,11 +48,11 @@ const createEvent = (event) => {
   return toICalString(e);
 };
 
-const dav = require("dav");
+import * as dav from "dav";
 
 const clients = [];
 for (const config of env.webDavCalendars) {
-  const client = new dav.Client(
+  const client: any = new dav.Client(
     new dav.transport.Basic(new dav.Credentials(config.auth))
   );
   clients.push(client);

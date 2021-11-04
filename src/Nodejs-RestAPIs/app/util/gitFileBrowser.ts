@@ -1,7 +1,7 @@
 import * as Telegram from "./telegram.js";
 import env from "../config/env.js";
 
-const Axios = require("axios");
+import * as Axios from "axios";
 
 const axios = Axios.default.create({
   baseURL: "https://" + env.gitLabBrowser.host + "/api/v4",

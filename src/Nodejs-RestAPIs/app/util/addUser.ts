@@ -6,10 +6,10 @@ const Op = seq.Op;
 import Bar from "../model/bar.model.js";
 import Role from "../model/role.model.js";
 
-const bcrypt = require("bcrypt");
-const crypto = require("crypto");
+import * as bcrypt from "bcrypt";
+import * as crypto from "crypto";
+
 const User = db.User;
-const UserRoles = db.UserRoles;
 const BarDuty = db.BarDuty;
 
 // Post a User

@@ -1,14 +1,18 @@
 import db from "../config/db.config.js";
-import Bar from "../model/bar.model";
+import Bar from "../model/bar.model.js";
 import * as seq from "sequelize";
 
 const Op = seq.Op;
 
-const webPush = require("web-push");
+import * as webPush from "web-push";
 import env from "../config/env.js";
 
-const BarUtil = require("./addBar");
-const CronJob = require("cron").CronJob;
+import * as BarUtil from "./addBar.js";
+
+import * as CJob from "cron";
+
+const CronJob = CJob.CronJob;
+
 const WebPushSubs = db.WebPushSubscription;
 
 // see https://serviceworke.rs/web-push.html for good examples
@@ -78,7 +82,7 @@ function sendNotificationForBar(bar) {
   );
 }
 
-module.exports = function (app, route) {
+export default function (app, route) {
   app.get(route + "vapidPublicKey", function (req, res) {
     res.send(env.webNotifications.vapidKeys.publicKey);
   });
@@ -117,7 +121,7 @@ module.exports = function (app, route) {
     }).catch(console.error);
     res.sendStatus(201);
   });
-};
+}
 
 BarUtil.onBarAdded((bar) => {
   if (!bar.public && !bar.canceled) return;
