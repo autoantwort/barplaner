@@ -3,6 +3,12 @@ import env from "./env.js";
 import { Sequelize } from "sequelize-typescript";
 import Bar from "../model/bar.model.js";
 import Role from "../model/role.model.js";
+import Barduty from "../model/barduty.model.js";
+import Setting from "../model/setting.model.js";
+import ShouldDelete from "../model/shouldDelete.model.js";
+import TelegramNewsletter from "../model/telegramNewsletter.model.js";
+import User from "../model/user.model.js";
+import WebPushSubsciption from "../model/webPushSubscription.model.js";
 
 interface Database {
   sequelize?: Sequelize;
@@ -32,7 +38,16 @@ const sequelize = new Sequelize(env.database, env.username, env.password, {
   storage: env.databaseFile,
 });
 
-sequelize.addModels([Bar, Role]);
+sequelize.addModels([
+  Bar,
+  Role,
+  Barduty,
+  Setting,
+  ShouldDelete,
+  TelegramNewsletter,
+  User,
+  WebPushSubsciption,
+]);
 
 const wordpressDB = new Sequelize(
   env.wordpress.database,
@@ -60,34 +75,6 @@ const db: Database = {};
 
 db.sequelize = sequelize;
 db.Wordpress = wordpressDB;
-
-// Models/tables
-db.User = require("../model/user.model.js")(sequelize, Sequelize);
-db.BarDuty = require("../model/barduty.model.js")(
-  sequelize,
-  Sequelize,
-  Bar,
-  db.User
-);
-db.UserRoles = require("../model/userroles.model.js")(
-  sequelize,
-  Sequelize,
-  db.User,
-  Role
-);
-db.Setting = require("../model/setting.model.js")(sequelize, Sequelize, Role);
-db.ShouldDelete = require("../model/shouldDelete.model.js")(
-  sequelize,
-  Sequelize
-);
-db.TelegramNewsletter = require("../model/telegramNewsletter.model")(
-  sequelize,
-  Sequelize
-);
-db.WebPushSubscription = require("../model/webPushSubscription.model")(
-  sequelize,
-  Sequelize
-);
 
 let funcArray = [];
 

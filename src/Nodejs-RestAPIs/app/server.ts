@@ -1,10 +1,10 @@
 #!/usr/bin/env node
-import * as express from "express";
+import express from "express";
 
 const app = express();
 
-import * as bodyParser from "body-parser";
-import * as cookieParser from "cookie-parser";
+import bodyParser from "body-parser";
+import cookieParser from "cookie-parser";
 
 import env from "./config/env.js";
 
@@ -18,7 +18,7 @@ if (env.staticVue === true) app.use(express.static("../Vue.js-Client/dist"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-import * as cors from "cors";
+import cors from "cors";
 
 const corsOptions = {
   //origin: "http://localhost:4200",

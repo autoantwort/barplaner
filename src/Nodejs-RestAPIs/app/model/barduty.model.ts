@@ -1,61 +1,47 @@
-module.exports = (sequelize, Sequelize, Bar, User) => {
-  const Barduty = sequelize.define("barduty", {
-    barID: {
-      type: Sequelize.INTEGER,
-      references: {
-        // reference to the Bar model
-        model: Bar,
-        key: "id",
-      },
-      primaryKey: true,
-    },
-    userID: {
-      type: Sequelize.INTEGER,
-      references: {
-        // reference to the User model
-        model: User,
-        key: "id",
-      },
-      primaryKey: true,
-    },
-    state: {
-      type: Sequelize.ENUM,
-      values: ["absent", "no_info", "present"],
-      defaultValue: "no_info",
-    },
-    job: {
-      type: Sequelize.STRING,
-      defaultValue: "",
-    },
-    from: {
-      type: Sequelize.STRING,
-      defaultValue: "",
-    },
-    to: {
-      type: Sequelize.STRING,
-      defaultValue: "",
-    },
-    have_to_clean: {
-      type: Sequelize.BOOLEAN,
-      defaultValue: false,
-    },
-  });
+import {
+  Column,
+  DataType,
+  Default,
+  Model,
+  PrimaryKey,
+  Table,
+} from "sequelize-typescript";
 
-  User.hasMany(Barduty, {
-    foreignKey: "userID",
-    constraints: false,
-  });
-  Barduty.belongsTo(User, {
-    foreignKey: "userID",
-    constraints: false,
-  });
-  Bar.hasMany(Barduty, {
-    foreignKey: "barID",
-    constraints: false,
-  });
-  Barduty.belongsTo(Bar, {
-    foreignKey: "barID",
-    constraints: false,
-  });
-  return Barduty;
-};
+enum BardutyState {
+  ABSENT = "absent",
+  NO_INFO = "no_info",
+  PRESENT = "present",
+}
+
+@Table
+class Barduty extends Model {
+  @PrimaryKey
+  @Column(DataType.INTEGER)
+  barID: number;
+
+  @PrimaryKey
+  @Column(DataType.INTEGER)
+  userID: number;
+
+  @Default(BardutyState.NO_INFO)
+  @Column({ type: DataType.ENUM, values: ["absent", "no_info", "present"] })
+  state: BardutyState;
+
+  @Default("")
+  @Column(DataType.STRING)
+  job: string;
+
+  @Default("")
+  @Column(DataType.STRING)
+  from: string;
+
+  @Default("")
+  @Column(DataType.STRING)
+  to: string;
+
+  @Default("")
+  @Column(DataType.BOOLEAN)
+  have_to_clean: boolean;
+}
+
+export default Barduty;

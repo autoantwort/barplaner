@@ -7,7 +7,7 @@ import {
   Model,
   Table,
 } from "sequelize-typescript";
-import Role from "./role.model";
+import Role from "./role.model.js";
 
 @Table
 export default class Setting extends Model {
@@ -17,7 +17,6 @@ export default class Setting extends Model {
   @AllowNull
   @Default(null)
   @Column({ type: DataType.STRING, references: { model: Role, key: "name" } })
-  @BelongsTo(() => Role, { constraints: false, foreignKey: "permission" })
   permission: string;
 
   @Default("")

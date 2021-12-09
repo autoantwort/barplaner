@@ -4,7 +4,7 @@ import * as seq from "sequelize";
 const Op = seq.Op;
 const col = seq.col;
 
-import * as TelegramBot from "node-telegram-bot-api";
+import TelegramBot from "node-telegram-bot-api";
 import * as SettingsController from "../controller/setting.controller.js";
 import Bar from "../model/bar.model.js";
 import Role from "../model/role.model.js";

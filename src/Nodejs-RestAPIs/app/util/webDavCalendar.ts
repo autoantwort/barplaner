@@ -4,7 +4,7 @@ import * as seq from "sequelize";
 
 const Op = seq.Op;
 
-import * as ICal from "ical-generator";
+import ICal from "ical-generator";
 import env from "../config/env.js";
 
 import * as BarUtil from "./addBar.js";
