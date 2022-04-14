@@ -145,42 +145,35 @@ model questions {
   answers   answers[]
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
 model roles {
-  name        String?     @id
+  name        String      @id
   description String?
   createdAt   DateTime
   updatedAt   DateTime
   UserRoles   UserRoles[]
   settings    settings[]
-
-  @@ignore
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
 model settings {
-  name        String?  @id
+  name        String   @id
   permission  String?
   description String?  @default("")
   value       String?  @default("")
   createdAt   DateTime
   updatedAt   DateTime
   roles       roles?   @relation(fields: [permission], references: [name], onDelete: NoAction, onUpdate: NoAction)
-
-  @@ignore
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+
 model shouldDeletes {
-  chatID      Unsupported("INTEGER(64)")
-  messageID   Unsupported("INTEGER(64)")
+  chatID      BigInt
+  messageID   BigInt
   deleteAfter DateTime?
   newText     String?
   createdAt   DateTime
   updatedAt   DateTime
 
   @@id([chatID, messageID])
-  @@ignore
 }
 
 model stockChanges {
@@ -249,7 +242,7 @@ model surveys {
   question             String?
   creatorId            Int?
   end                  DateTime?
-  allowMultipleAnswers Unsupported("TINYINT(1)")?
+  allowMultipleAnswers Boolean?
   createdAt            DateTime
   updatedAt            DateTime
   users                users?                     @relation(fields: [creatorId], references: [id])
@@ -287,12 +280,9 @@ model users {
   surveys                                    surveys[]
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
 model webPushSubscriptions {
-  endpoint     String?  @id
+  endpoint     String  @id
   subscription String?
   createdAt    DateTime
   updatedAt    DateTime
-
-  @@ignore
 }
