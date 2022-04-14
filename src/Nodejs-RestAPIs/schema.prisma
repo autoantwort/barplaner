@@ -8,29 +8,25 @@ generator client {
 }
 
 model UserRoles {
-  createdAt DateTime
-  updatedAt DateTime
   userId    Int
   roleName  String
-  roles     roles    @relation(fields: [roleName], references: [name], onDelete: Cascade) @ignore
-  users     users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  roles     Roles    @relation(fields: [roleName], references: [name], onDelete: Cascade) @ignore
+  users     Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([userId, roleName])
 }
 
-model answers {
+model Answers {
   userId     Int
   questionId Int
   value      String?   @default("no_answer")
-  createdAt  DateTime
-  updatedAt  DateTime
-  questions  questions @relation(fields: [questionId], references: [id], onDelete: Cascade)
-  users      users     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  questions  Questions @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  users      Users     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([userId, questionId])
 }
 
-model barduties {
+model Barduties {
   barID         Int
   userID        Int
   state         String?                    @default("no_info")
@@ -38,15 +34,13 @@ model barduties {
   from          String?                    @default("")
   to            String?                    @default("")
   have_to_clean Boolean?                   @default(false)
-  createdAt     DateTime
-  updatedAt     DateTime
-  bars          bars                       @relation(fields: [barID], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  users         users                      @relation(fields: [userID], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  bars          Bars                       @relation(fields: [barID], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users         Users                      @relation(fields: [userID], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@id([barID, userID])
 }
 
-model bars {
+model Bars {
   id                    Int                        @id @default(autoincrement())
   name                  String?
   description           String?
@@ -56,37 +50,31 @@ model bars {
   end                   DateTime?
   facebookEventID       String?
   facebookCoverImageURL String?
-  createdAt             DateTime
-  updatedAt             DateTime
-  barduties             barduties[]
+  barduties             Barduties[]
 }
 
-model files {
+model Files {
   id                              String     @id
   filename                        String?
   mimeType                        String?
   telegramFileId                  String?
-  createdAt                       DateTime
-  updatedAt                       DateTime
-  images_filesToimages_compressed images[]   @relation("filesToimages_compressed")
-  images_filesToimages_original   images[]   @relation("filesToimages_original")
-  invoices                        invoices[]
+  images_filesToimages_compressed Images[]   @relation("filesToimages_compressed")
+  images_filesToimages_original   Images[]   @relation("filesToimages_original")
+  invoices                        Invoices[]
 }
 
-model images {
+model Images {
   id                             Int              @id @default(autoincrement())
   titel                          String?
-  createdAt                      DateTime
-  updatedAt                      DateTime
   original                       String?
   compressed                     String?
-  files_filesToimages_compressed files?           @relation("filesToimages_compressed", fields: [compressed], references: [id])
-  files_filesToimages_original   files?           @relation("filesToimages_original", fields: [original], references: [id])
-  stockItems                     stockItems[]
-  stockPositions                 stockPositions[]
+  files_filesToimages_compressed Files?           @relation("filesToimages_compressed", fields: [compressed], references: [id])
+  files_filesToimages_original   Files?           @relation("filesToimages_original", fields: [original], references: [id])
+  stockItems                     StockItems[]
+  stockPositions                 StockPositions[]
 }
 
-model invoiceEntries {
+model InvoiceEntries {
   id              Int            @id @default(autoincrement())
   itemDescription String
   articleNumber   String?
@@ -99,84 +87,70 @@ model invoiceEntries {
   images          String?
   productSite     String?
   alcoholByVolume Decimal?
-  createdAt       DateTime
-  updatedAt       DateTime
   invoiceId       Int?
   stockItemId     Int?
-  invoices        invoices?      @relation(fields: [invoiceId], references: [id])
-  stockItems      stockItems?    @relation(fields: [stockItemId], references: [id])
-  stockChanges    stockChanges[]
+  invoices        Invoices?      @relation(fields: [invoiceId], references: [id])
+  stockItems      StockItems?    @relation(fields: [stockItemId], references: [id])
+  stockChanges    StockChanges[]
 }
 
-model invoices {
+model Invoices {
   id                    Int              @id @default(autoincrement())
   deliveryDate          DateTime?
   invoiceDate           DateTime?
   seller                String?
   extraCostsDescription String?
   extraCostsAmount      Decimal?
-  createdAt             DateTime
-  updatedAt             DateTime
   fileId                String?
-  files                 files?           @relation(fields: [fileId], references: [id])
-  invoiceEntries        invoiceEntries[]
+  files                 Files?           @relation(fields: [fileId], references: [id])
+  invoiceEntries        InvoiceEntries[]
 }
 
-model itemGroups {
+model ItemGroups {
   id                   Int             @id @default(autoincrement())
   name                 String?         @unique(map: "sqlite_autoindex_itemGroups_1")
   nameColognePhonetics String?
   minimumCount         Decimal?        @default(0)
   idealCount           Decimal?
-  createdAt            DateTime
-  updatedAt            DateTime
   stockPositionId      Int?
-  stockPositions       stockPositions? @relation(fields: [stockPositionId], references: [id])
-  stockItems           stockItems[]
+  stockPositions       StockPositions? @relation(fields: [stockPositionId], references: [id])
+  stockItems           StockItems[]
 }
 
-model questions {
+model Questions {
   id        Int       @id @default(autoincrement())
   text      String?
   surveyId  Int?
-  createdAt DateTime
-  updatedAt DateTime
-  surveys   surveys?  @relation(fields: [surveyId], references: [id], onDelete: Cascade)
-  answers   answers[]
+  surveys   Surveys?  @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+  answers   Answers[]
 }
 
-model roles {
+model Roles {
   name        String      @id
   description String?
-  createdAt   DateTime
-  updatedAt   DateTime
   UserRoles   UserRoles[]
-  settings    settings[]
+  settings    Settings[]
 }
 
-model settings {
+model Settings {
   name        String   @id
   permission  String?
   description String?  @default("")
   value       String?  @default("")
-  createdAt   DateTime
-  updatedAt   DateTime
-  roles       roles?   @relation(fields: [permission], references: [name], onDelete: NoAction, onUpdate: NoAction)
+  roles       Roles?   @relation(fields: [permission], references: [name], onDelete: NoAction, onUpdate: NoAction)
 }
 
 
-model shouldDeletes {
+model ShouldDeletes {
   chatID      BigInt
   messageID   BigInt
   deleteAfter DateTime?
   newText     String?
-  createdAt   DateTime
-  updatedAt   DateTime
 
   @@id([chatID, messageID])
 }
 
-model stockChanges {
+model StockChanges {
   id             Int             @id @default(autoincrement())
   date           DateTime
   netPrice       Decimal?
@@ -185,17 +159,15 @@ model stockChanges {
   priceAccuracy  String?
   reason         String?
   note           String?
-  createdAt      DateTime
-  updatedAt      DateTime
   itemId         Int
   userId         Int?
   invoiceEntryId Int?
-  invoiceEntries invoiceEntries? @relation(fields: [invoiceEntryId], references: [id])
-  stockItems     stockItems      @relation(fields: [itemId], references: [id], onDelete: NoAction)
-  users          users?          @relation(fields: [userId], references: [id])
+  invoiceEntries InvoiceEntries? @relation(fields: [invoiceEntryId], references: [id])
+  stockItems     StockItems      @relation(fields: [itemId], references: [id], onDelete: NoAction)
+  users          Users?          @relation(fields: [userId], references: [id])
 }
 
-model stockItems {
+model StockItems {
   id                   Int              @id @default(autoincrement())
   name                 String?
   nameColognePhonetics String?
@@ -207,21 +179,19 @@ model stockItems {
   internalNote         String?
   website              String?
   alcoholByVolume      Decimal?
-  createdAt            DateTime
-  updatedAt            DateTime
   itemGroupId          Int?
   stockPositionId      Int?
   imageId              Int?
-  images               images?          @relation(fields: [imageId], references: [id])
-  itemGroups           itemGroups?      @relation(fields: [itemGroupId], references: [id])
-  stockPositions       stockPositions?  @relation(fields: [stockPositionId], references: [id])
-  invoiceEntries       invoiceEntries[]
-  stockChanges         stockChanges[]
+  images               Images?          @relation(fields: [imageId], references: [id])
+  itemGroups           ItemGroups?      @relation(fields: [itemGroupId], references: [id])
+  stockPositions       StockPositions?  @relation(fields: [stockPositionId], references: [id])
+  invoiceEntries       InvoiceEntries[]
+  stockChanges         StockChanges[]
 
   @@unique([barcode, seller], map: "sqlite_autoindex_stockItems_1")
 }
 
-model stockPositions {
+model StockPositions {
   id                   Int          @id @default(autoincrement())
   name                 String?      @unique(map: "sqlite_autoindex_stockPositions_1")
   nameColognePhonetics String?
@@ -229,36 +199,30 @@ model stockPositions {
   xPositionOnImage     Float?
   yPositionOnImage     Float?
   room                 String?
-  createdAt            DateTime
-  updatedAt            DateTime
   imageId              Int?
-  images               images?      @relation(fields: [imageId], references: [id])
-  itemGroups           itemGroups[]
-  stockItems           stockItems[]
+  images               Images?      @relation(fields: [imageId], references: [id])
+  itemGroups           ItemGroups[]
+  stockItems           StockItems[]
 }
 
-model surveys {
+model Surveys {
   id                   Int                        @id @default(autoincrement())
   question             String?
   creatorId            Int?
   end                  DateTime?
   allowMultipleAnswers Boolean?
-  createdAt            DateTime
-  updatedAt            DateTime
-  users                users?                     @relation(fields: [creatorId], references: [id])
-  questions            questions[]
+  users                Users?                     @relation(fields: [creatorId], references: [id])
+  questions            Questions[]
 }
 
-model telegramNewsletters {
+model TelegramNewsletters {
   chatId         Int                        @id @default(autoincrement())
   enabled        Boolean?                   @default(true)
   sendAt         String?                    @default("1500")
   sendDaysBefore String?                    @default("[0,1,3,8]")
-  createdAt      DateTime
-  updatedAt      DateTime
 }
 
-model users {
+model Users {
   id                                         Int                        @id @default(autoincrement())
   name                                       String?                    @unique(map: "sqlite_autoindex_users_1")
   password                                   String?
@@ -271,18 +235,14 @@ model users {
   experienced_cleaner                        Boolean?                   @default(false)
   birthday                                   String?
   only_show_gitlab_notifications_if_assigned Boolean                    @default(false)
-  createdAt                                  DateTime
-  updatedAt                                  DateTime
   UserRoles                                  UserRoles[]
-  answers                                    answers[]
-  barduties                                  barduties[]
-  stockChanges                               stockChanges[]
-  surveys                                    surveys[]
+  answers                                    Answers[]
+  barduties                                  Barduties[]
+  stockChanges                               StockChanges[]
+  surveys                                    Surveys[]
 }
 
-model webPushSubscriptions {
+model WebPushSubscriptions {
   endpoint     String  @id
   subscription String?
-  createdAt    DateTime
-  updatedAt    DateTime
 }
