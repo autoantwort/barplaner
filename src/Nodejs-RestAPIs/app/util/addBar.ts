@@ -1,67 +1,45 @@
-import db from "../config/db.config.js";
 import * as Telegram from "./telegram.js";
-import Bar from "../model/bar.model.js";
-
 import * as Newsletter from "./newsletter.js";
 
-const User = db.User;
-const BarDuty = db.BarDuty;
+import { prisma } from "../config/prisma.js";
+
 import * as Util from "../util/cleaning.js";
+import { Bar, Barduty, Prisma } from "@prisma/client";
 
 const barAddedListener = [];
 const barChangedListener = [];
 
-export const addBar = (barData, numberOfPersonsToClean) => {
-  return new Promise((resolve, reject) => {
-    Bar.create(barData)
-      .then((bar) => {
-        Newsletter.sendEmailForBar(bar);
-        User.findAll({
-          where: {
-            active: true,
-          },
-        })
-          .then((users) => {
-            for (let i = 0; i < users.length; ++i) {
-              users[i] = {
-                barID: bar.id,
-                userID: users[i].id,
-              };
-            }
-            BarDuty.bulkCreate(users)
-              .then(() => {
-                console.log(
-                  "## numberOfPersonsToClean",
-                  numberOfPersonsToClean
-                );
-                if (
-                  numberOfPersonsToClean !== undefined &&
-                  numberOfPersonsToClean > 0
-                ) {
-                  Util.computeCleaning(bar.id, numberOfPersonsToClean)
-                    .then((userIDs) => {
-                      Telegram.barAdded(bar);
-                      resolve(userIDs);
-                    })
-                    .catch(reject);
-                } else {
-                  Telegram.barAdded(bar);
-                  barAddedListener.forEach((c) => c(bar));
-                  resolve(bar);
-                }
-              })
-              .catch((err) => {
-                reject(err);
-              });
-          })
-          .catch((err) => {
-            reject(err);
-          });
-      })
-      .catch((err) => {
-        reject(err);
-      });
+export const addBar = async (barData, numberOfPersonsToClean) => {
+  const bar = await prisma.bar.create({
+    data: barData,
   });
+
+  Newsletter.sendEmailForBar(bar);
+  const activeUsers = await prisma.user.findMany({ where: { active: true } });
+
+  const promises: Prisma.Prisma__BardutyClient<Barduty>[] = [];
+
+  for (const user of activeUsers) {
+    promises.push(
+      prisma.barduty.create({ data: { barID: bar.id, userID: user.id } })
+    );
+  }
+
+  await Promise.all(promises);
+
+  console.log("## numberOfPersonsToClean", numberOfPersonsToClean);
+
+  if (numberOfPersonsToClean !== undefined && numberOfPersonsToClean > 0) {
+    const userIDs = await Util.computeCleaning(bar.id, numberOfPersonsToClean);
+    Telegram.barAdded(bar);
+
+    return userIDs;
+  }
+
+  Telegram.barAdded(bar);
+  barAddedListener.forEach((c) => c(bar));
+
+  return bar;
 };
 
 export const onBarAdded = (callback) => barAddedListener.push(callback);
@@ -73,7 +51,7 @@ export const onBarAdded = (callback) => barAddedListener.push(callback);
  * @param {Bar} barObject the bar model instance
  * @param {object} newBarData the new bar data with the same fields as the bar model instance
  */
-export const changeBar = (barObject, newBarData) => {
+export const changeBar = async (barObject: Bar, newBarData: Bar) => {
   if (barObject.facebookEventID === null) {
     console.warn(
       "Update a bar object with facebook data that has no facebookEventID"
@@ -81,19 +59,22 @@ export const changeBar = (barObject, newBarData) => {
   }
   if (!barObject.canceled && newBarData.canceled) {
     // if the bar was cancelled, delete all bar duties
-    BarDuty.destroy({
-      where: {
-        barID: barObject.id,
-      },
-    });
+    prisma.barduty.deleteMany({ where: { barID: barObject.id } });
   }
+
+  let changed = false;
   for (let p in newBarData) {
-    barObject[p] = newBarData[p];
+    if (barObject[p] !== newBarData[p]) {
+      changed = true;
+    }
   }
-  // if the previous for loop changed a property
-  if (barObject.changed()) {
-    barObject.save();
-    // update the email newsletter
+
+  if (changed) {
+    barObject = await prisma.bar.update({
+      data: newBarData,
+      where: { id: barObject.id },
+    });
+
     Newsletter.sendEmailForBar(barObject);
     barChangedListener.forEach((c) => c(barObject));
   }

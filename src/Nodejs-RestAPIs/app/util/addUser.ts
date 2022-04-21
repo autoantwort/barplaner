@@ -1,74 +1,62 @@
-import db from "../config/db.config.js";
-import * as seq from "sequelize";
-
-const Op = seq.Op;
-
-import Bar from "../model/bar.model.js";
-import Role from "../model/role.model.js";
-
+import { Barduty, Prisma, User, UserRole } from "@prisma/client";
 import * as bcrypt from "bcrypt";
 import * as crypto from "crypto";
 
-const User = db.User;
-const BarDuty = db.BarDuty;
+import { prisma } from "../config/prisma";
 
 // Post a User
-exports.createAdmin = (name, password, callback) => {
+exports.createAdmin = async (
+  name: string,
+  password: string,
+  callback: (msg: string) => void
+) => {
   if (password === undefined || name === undefined) {
     callback("password or name was not defined");
     return;
   }
-  bcrypt.hash(password, 10).then(function (hash) {
-    User.create({
-      name: name,
-      password: hash,
-      sessionID: crypto.randomBytes(32).toString("hex"),
-    })
-      .then((user) => {
-        callback("user created : " + user);
-        if (user.active) {
-          // add user to barduty of every bar in the future
-          Bar.findAll({
-            where: {
-              start: {
-                [Op.gt]: new Date(),
-              },
-            },
-          })
-            .then((bars) => {
-              const barDuties = [];
 
-              for (let i = 0; i < bars.length; ++i) {
-                barDuties.push({
-                  barID: bars[i].id,
-                  userID: user.id,
-                });
-              }
+  try {
+    const passwordHash = await bcrypt.hash(password, 10);
+    const user = await prisma.user.create({
+      data: {
+        name: name,
+        password: passwordHash,
+        sessionID: crypto.randomBytes(32).toString("hex"),
+      },
+    });
 
-              BarDuty.bulkCreate(bars).catch((err) => {
-                callback(err);
-              });
+    callback("user created : " + user);
 
-              Role.findAll().then((res) => {
-                callback("suuccess : " + res);
-                user
-                  .addRoles(res)
-                  .then(() => {
-                    callback("suuccess");
-                  })
-                  .catch((err) => {
-                    callback("Error -> " + err);
-                  });
-              });
-            })
-            .catch((err) => {
-              callback(err);
-            });
-        }
-        callback(user);
-      })
-      .catch((err) => {
-        callback("Error -> " + err);
+    if (user.active) {
+      const barsInFuture = await prisma.bar.findMany({
+        where: { start: { gt: new Date() } },
       });
-  });
+
+      const promises: Prisma.Prisma__BardutyClient<Barduty>[] = [];
+
+      for (const bar of barsInFuture) {
+        promises.push(
+          prisma.barduty.create({ data: { barID: bar.id, userID: user.id } })
+        );
+      }
+
+      await Promise.all(promises);
+
+      const roles = await prisma.role.findMany();
+
+      const userRolePromises: Prisma.Prisma__UserRoleClient<UserRole>[] = [];
+
+      for (const role of roles) {
+        userRolePromises.push(
+          prisma.userRole.create({
+            data: { userId: user.id, roleName: role.name },
+          })
+        );
+      }
+
+      await Promise.all(userRolePromises);
+    }
+  } catch (e) {
+    callback(e);
+  }
 };
