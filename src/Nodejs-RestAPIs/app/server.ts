@@ -13,6 +13,9 @@ import dutyRoute from "./route/duty.route.js";
 import settingRoute from "./route/setting.route.js";
 import userRoute from "./route/user.route.js";
 
+import { prisma } from "./config/prisma.js";
+import { User, UserRole } from "@prisma/client";
+
 if (env.staticVue === true) app.use(express.static("../Vue.js-Client/dist"));
 
 app.use(bodyParser.json());
@@ -30,8 +33,6 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(cookieParser());
 
-import db from "./config/db.config.js";
-
 import * as bcrypt from "bcrypt";
 
 bcrypt.genSalt(10, function (err, salt) {
@@ -40,12 +41,12 @@ bcrypt.genSalt(10, function (err, salt) {
 });
 
 // force: true will drop the table if it already exists
-db.sequelize.sync({ force: env.resetDatabase }).then(() => {
-  console.log("Sync with db");
-  db.callSyncCallbacks();
-  //const Util = require('./app/util/adduser');
-  //Util.createAdmin("Test", "Test", e => console.log(e));
-});
+// db.sequelize.sync({ force: env.resetDatabase }).then(() => {
+//   console.log("Sync with db");
+//   db.callSyncCallbacks();
+//   //const Util = require('./app/util/adduser');
+//   //Util.createAdmin("Test", "Test", e => console.log(e));
+// });
 
 import * as facebookUtil from "./util/facebook.js";
 
@@ -86,104 +87,121 @@ if (
 }
 
 import * as crypto from "crypto";
+import { isError } from "util";
+import { where } from "sequelize/types";
 
-const User = db.User;
+app.post("/api/login", async (req, res) => {
+  let user: User;
+  
+  try {
+    user = await prisma.user.findUnique({ where: { name: req.body.name } });
+  } catch (e) {
+    res.status(500).send('Error querying user.');
+    
+    return;
+  }
 
-app.post("/api/login", (req, res) => {
-  User.findOne({
-    where: {
-      name: req.body.name,
-    },
-  }).then((user) => {
-    if (user === null) {
-      res.status(401).send("User not exists");
-    } else {
-      let func = (result) => {
-        if (result === true) {
-          res.cookie("auth", user.sessionID, {
-            maxAge: 1892160000000 /*60 years*/,
-            httpOnly: true,
-            sameSite: false /* TODO */,
-            secure: req.secure,
-          });
-          user
-            .getRoles()
-            .then((roles) => {
-              res.send({ user: user, roles: roles });
-            })
-            .catch((err) => res.status(500).send(err));
+  if (user === null) {
+    res.status(401).send("User not exists");
+  } else {
+    let func = async (result: boolean) => {
+      if (result === true) {
+        res.cookie("auth", user.sessionID, {
+          maxAge: 1892160000000 /*60 years*/,
+          httpOnly: true,
+          sameSite: false /* TODO */,
+          secure: req.secure,
+        });
+
+        let userRoles: UserRole[];
+
+        try {
+          userRoles = (await prisma.user.findUnique({ where: { name: req.body.name }, include: { user_roles: true } })).user_roles;
+        } catch (e) {
+          res.status(500).send(e);
+
+          return;
+        }
+
+        if (userRoles === null) {
+          res.status(500).send('User roles not found')
         } else {
-          res.status(401).send("Wrong passord");
+          res.send({ user: user, roles: userRoles });
         }
-      };
-      // old password hash from old db
-      if (user.password.indexOf("$md5$") === 0) {
-        const hash = crypto.createHash("md5");
-        hash.update(req.body.password);
-        // right, but old password hash
-        let result = user.password.substr(5) === hash.digest("hex");
-        if (result) {
-          bcrypt.hash(req.body.password, 10).then(function (hash) {
-            user
-              .update({ password: hash })
-              .then(() => {
-                console.log("password hash updated");
-              })
-              .catch((err) =>
-                console.error("Error while updating password hash : " + err)
-              );
-          });
-          if (user.sessionID === null) {
-            user
-              .update({ sessionID: crypto.randomBytes(32).toString("hex") })
-              .then(() => {
-                func(true);
-              })
-              .catch((err) => res.status(500).send("Error -> " + err));
-            return;
-          }
-        }
-        func(result);
       } else {
-        bcrypt
-          .compare(req.body.password, user.password)
-          .then((result) => {
-            if (result === true && user.sessionID === null) {
-              user
-                .update({ sessionID: crypto.randomBytes(32).toString("hex") })
-                .then(() => {
-                  func(true);
-                })
-                .catch((err) => res.status(500).send("Error -> " + err));
-              return;
-            }
-            func(result);
-          })
-          .catch((err) => res.status(500).send("Error -> " + err));
+        res.status(401).send("Wrong passord");
       }
+    };
+
+    if (user.password.indexOf("$md5$") === 0) {
+      const hash = crypto.createHash("md5");
+      hash.update(req.body.password);
+      // right, but old password hash
+      let result = user.password.substring(5) === hash.digest("hex");
+      if (result) {
+        const newHash = await bcrypt.hash(req.body.password, 10);
+        
+        try {
+          await prisma.user.update({ where: { name: req.body.name }, data: { password: newHash } });
+
+          console.log("password hash updated");
+        } catch (e) {
+          console.error("Error while updating password hash : " + e);
+        }
+
+        if (user.sessionID === null) {
+          try {
+            await prisma.user.update({ where: { name: req.body.name }, data: { sessionID: crypto.randomBytes(32).toString("hex") } });
+          } catch (e) {
+            res.status(500).send("Error -> " + e);
+          }
+
+          return;
+        }
+      }
+      
+      func(result);
+    } else {
+      const result = await bcrypt.compare(req.body.password, user.password);
+
+      if (result && user.sessionID === null) {
+        try {
+          await prisma.user.update({ where: { name: req.body.name }, data: { sessionID: crypto.randomBytes(32).toString("hex") } });
+          
+          func(true);
+        } catch (e) {
+          res.status(500).send("Error -> " + e);
+        }
+
+        return;
+      }
+
+      func(result);
     }
-  });
+  }
 });
 
-app.use((req, res, next) => {
+app.use(async (req, res, next) => {
   if (req.cookies.auth === undefined) {
     res.status(401).send("not authenticated");
     return;
   }
 
-  User.findOne({ where: { sessionID: req.cookies.auth } })
-    .then((user) => {
-      if (user === null) {
-        res.status(401).send("not authenticated");
-      } else {
-        const request: any = req;
-        request.user = user;
-        next();
-      }
-    })
-    .catch((err) => {
-      res.status(500).send("Error -> " + err);
-    });
+  let user: User;
+
+  try {
+    user = await prisma.user.findUnique({ where: { sessionID: req.cookies.auth } });
+
+    if (user === null) {
+      res.status(401).send("not authenticated");
+    } else {
+      const request: any = req;
+      request.user = user;
+      next();
+    }
+  } catch (e) {
+    res.status(500).send("Error -> " + e);
+  }
 });
 
 app.post("/api/logout", (req, res) => {
