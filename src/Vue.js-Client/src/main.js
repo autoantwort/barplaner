@@ -41,7 +41,7 @@ Vue.config.productionTip = false;
 axios.interceptors.response.use(undefined, function(error) {
     if (error.response !== undefined && error.response.status === 401) {
         Roles.setUser(null);
-        router.push({ name: 'login' });
+        router.push({ name: 'login' }).catch(console.error);
     }
     return Promise.reject(error);
 });
