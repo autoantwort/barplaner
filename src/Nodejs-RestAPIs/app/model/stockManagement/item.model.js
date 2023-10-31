@@ -47,7 +47,7 @@ module.exports = (sequelize, Sequelize, Image, ItemGroup, Position) => {
     }, {
         hooks: {
             beforeSave: (item, options) => {
-                if (item._changed.name === true) {
+                if (item._changed.has("name")) {
                     item.nameColognePhonetics = colognePhonetics.convert(item.name);
                 }
             },
