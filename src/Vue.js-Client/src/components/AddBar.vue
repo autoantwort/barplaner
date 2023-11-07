@@ -138,7 +138,7 @@ export default {
         description: this.bar.description,
         public: this.bar.public,
         start: parseDate(this.bar.start),
-        end: parseDate(this.bar.end),
+        end: this.bar.end === "" ? null : parseDate(this.bar.end),
         numberOfPersonsToClean: this.bar.numberOfPersonsToClean
       };
 
