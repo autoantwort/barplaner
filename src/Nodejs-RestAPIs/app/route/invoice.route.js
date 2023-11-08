@@ -7,6 +7,7 @@ module.exports = function(app) {
     app.delete('/api/invoice/:id', invoice.deleteInvoice);
     app.get('/api/invoice/:id/entries', invoice.getInvoiceEntries);
     app.get('/api/invoice/:id/analyse', invoice.analyseInvoice);
+    app.get('/api/invoice/analyseArticleIdentifier/:identifier', invoice.analyseArticleIdentifier);
 
     app.post('/api/invoice', invoice.create);
     app.delete('/api/invoice/entry/:id/itemLink', invoice.unlinkItemFromEntry);

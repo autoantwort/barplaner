@@ -52,6 +52,9 @@ export default {
         imageURL: this.imageURL,
       };
     },
+    setImageURL(url) {
+      this.imageURL = url;
+    },
     loadImageFromFile(event) {
       this.imageURL = URL.createObjectURL(event.target.files[0]);
       this.imageBlob = event.target.files[0];

@@ -479,6 +479,14 @@ export default {
       type: Number,
       default: null,
     },
+    netPrice: {
+      type: Number,
+      default: null,
+    },
+    grossPrice: {
+      type: Number,
+      default: null,
+    },
   },
   data() {
     return {
@@ -487,7 +495,6 @@ export default {
       existingItems: [],
       errorString: "",
       reason: null,
-      entnahme: null,
       priceAccuracy: null,
       currentItemStock: null,
       change: null,
@@ -543,6 +550,7 @@ export default {
         this.einzelNetto = round(this.gesamtNetto / Math.abs(this.change));
         this.updateBrotto();
       }
+      if (this.reason === null && this.netPrice !== null) this.reason = "bought"; // Wenn das erste mal nen Menge gewählt wird und wir von "Add Item" kommen
     },
     realTax: function (tax) {
       if (tax >= 0 && this.priceFrom) {
@@ -682,6 +690,13 @@ export default {
                 this.item = item;
                 break;
               }
+            }
+            this.einzelNetto = this.netPrice;
+            this.einzelBrotto = this.grossPrice;
+            if (this.grossPrice !== null) {
+                this.priceFrom = "einzelBrotto";
+                this.tax = Math.round(((this.grossPrice / this.netPrice) - 1) * 100);
+                this.priceAccuracy = "researched";
             }
           }
         })

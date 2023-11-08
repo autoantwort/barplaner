@@ -9,9 +9,10 @@ const Op = db.Sequelize.Op;
 const File = require("./file.controller");
 const Axios = require("axios");
 const PDFParser = require("pdf2json");
+const analyser = require("../util/analyseBarcode");
 
 // Post a Invoice
-exports.create = async(req, res) => {
+exports.create = async (req, res) => {
     if (!req.files || Object.keys(req.files).length !== 1) {
         return res.status(400).send("The request must contain one pdf file");
     }
@@ -94,7 +95,7 @@ exports.getInvoiceEntries = (req, res) => {
     });
 };
 
-exports.deleteInvoice = async(req, res) => {
+exports.deleteInvoice = async (req, res) => {
     try {
         const invoice = await Invoice.findByPk(req.params.id);
         if (invoice === null) {
@@ -116,7 +117,7 @@ exports.deleteInvoice = async(req, res) => {
     }
 };
 
-exports.setItem = async(req, res) => {
+exports.setItem = async (req, res) => {
     try {
         if (req.params.id === undefined) {
             return res.status(400).send("No id given");
@@ -138,7 +139,7 @@ exports.setItem = async(req, res) => {
     }
 };
 
-exports.unlinkItemFromEntry = async(req, res) => {
+exports.unlinkItemFromEntry = async (req, res) => {
     try {
         if (req.params.id === undefined) {
             return res.status(400).send("No id given");
@@ -164,7 +165,7 @@ exports.unlinkItemFromEntry = async(req, res) => {
     }
 };
 
-exports.linkItemWithEntry = async(req, res) => {
+exports.linkItemWithEntry = async (req, res) => {
     try {
         if (req.params.id === undefined) {
             return res.status(400).send("No entry id given");
@@ -207,7 +208,7 @@ const parseGermanDate = s => {
 }
 
 const exportForMetro = (invoice, text) => {
-    return new Promise(async(resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
         const literRegex = /^([0-9]+,[0-9]+)l?/;
         const liter2Regex = /^([0-9]+(,[0-9]+)?)l/;
         const kgRegex = /([0-9]+(,[0-9]+)?)kg/i;
@@ -344,63 +345,27 @@ const exportForMetro = (invoice, text) => {
                             stockItemId: entry ? entry.stockItemId : null,
                             alcoholByVolume: item.alk,
                         }).then(invoiceEntry => {
-                            // habe auf der Seite https://produkte.metro.de/shop/search mal geschaut welche Requests so gemacht werden wenn man ein Produkt sucht
-                            Axios
-                                .get("https://produkte.metro.de/explore.articlesearch.v1/search?language=de-DE&country=DE&categories=false&facets=false&query=" + item.articleNumber)
-                                .then(res => {
-                                    const data = res.data;
-                                    if (data.resultIds.length === 0) { // No item found for the article number
-                                        return resolve();
-                                    } else if (data.resultIds.length > 1) {
-                                        console.warn("Found to many metro items: ", data.resultIds, " for ", item.bez, " Art.Nr. ", item.articleNumber);
-                                        return resolve();
+                            console.log("invoiceEntry", invoiceEntry);
+                            analyser.getItemFromMetro(item.articleNumber).then((item) => {
+                                console.log("invoiceEntry + item", invoiceEntry, item);
+                                if (item) {
+                                    if (invoiceEntry.amount === null) {
+                                        invoiceEntry.amount = item.amount;
+                                        invoiceEntry.unit = item.unit;
                                     }
-                                    const qids = data.resultIds.map(i => "ids=" + i).join("&");
-                                    Axios.get("https://produkte.metro.de/evaluate.article.v1/betty-variants?country=DE&locale=de-DE&storeIds=00017&details=true&" + qids, {
-                                        headers: {
-                                            "CallTreeId": "BTEV-548fafde-ff26-4420-a251-6ee5230188d5",
-                                            "Host": "produkte.metro.de",
-                                        }
-                                    }).then(res => {
-                                        const data = res.data;
-                                        for (let id in data.result) {
-                                            //console.log("got a result for ", item.articleNumber, item.bez);
-                                            const article = data.result[id];
-                                            for (let variantKey in article.variants) { // gibt in der Regel nur eine
-                                                const variant = article.variants[variantKey];
-                                                for (let bundleId in variant.bundles) { // Packungsgrößen, z.B. ein Kasten und eine Flasche
-                                                    const bundle = variant.bundles[bundleId];
-                                                    if (pack !== "KG" && toNumber(bundle.bundleSize) !== item.kolli) {
-                                                        continue; // wir haben wohl ein anderes bundle gekauft
-                                                    }
-                                                    if (invoiceEntry.amount === null) {
-                                                        const v = bundle.contentData.netContentVolume;
-                                                        if (v.uom === "ML") {
-                                                            invoiceEntry.unit = "ml";
-                                                        } else if (v.uom === "GRAM") {
-                                                            invoiceEntry.unit = "gramm";
-                                                        }
-                                                        invoiceEntry.amount = v.value;
-                                                    }
-                                                    invoiceEntry.productSite = "https://produkte.metro.de/shop/pv/" + id + "/" + variantKey + "/" + bundleId;
-                                                    invoiceEntry.images = JSON.stringify(bundle.details.media.images.map(o => o.url.replace("{?w,h,mode}", "")));
-                                                    invoiceEntry.save().then(resolve).catch(err => {
-                                                        console.error(err);
-                                                        resolve(); // don't fail completely because of this
-                                                    });
-                                                    return; // stop search
-                                                }
-                                            }
-                                        }
-                                        resolve(); // Wir haben nichts gefunden :(
-                                    }).catch(err => {
-                                        console.error("Network Error", err);
+                                    invoiceEntry.productSite = item.productSite;
+                                    invoiceEntry.images = JSON.stringify(item.images);
+                                    invoiceEntry.save().then(resolve).catch(err => {
+                                        console.error(err);
                                         resolve(); // don't fail completely because of this
                                     });
-                                }).catch(err => {
-                                    console.error("Network Error", err);
-                                    resolve(); // don't fail completely because of this
-                                });
+                                } else {
+                                    resolve();
+                                }
+                            }).catch(err => {
+                                console.error("Network Error", err);
+                                resolve(); // don't fail completely because of this
+                            });
                         }).catch(e => {
                             console.error(e);
                             reject(e);
@@ -424,7 +389,7 @@ exports.analyseInvoice = (req, res) => {
         if (count > 0) {
             return res.status(400).send("Analysis has already been carried out");
         }
-        let pdfParser = new PDFParser(null /* context */ , true /* needRawText */ );
+        let pdfParser = new PDFParser(null /* context */, true /* needRawText */);
         pdfParser.on("pdfParser_dataError", errData => res.status(500).send("Error while parsing PDF: " + errData.parserError));
         pdfParser.on("pdfParser_dataReady", pdfData => {
             const content = pdfParser.getRawTextContent();
@@ -434,7 +399,7 @@ exports.analyseInvoice = (req, res) => {
                         where: {
                             invoiceId: invoice.id,
                         },
-                        include:  [{
+                        include: [{
                             model: Item,
                         }],
                     }).then(entries => {
@@ -450,4 +415,8 @@ exports.analyseInvoice = (req, res) => {
         });
         pdfParser.loadPDF(File.getFilePathForId(invoice.fileId));
     }).catch(e => res.status(500).send("Error: " + e))
+};
+
+exports.analyseArticleIdentifier = async (req, res) => {
+    res.send(await analyser.analyseBarcode(req.params.identifier));
 };

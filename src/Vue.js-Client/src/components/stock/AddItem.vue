@@ -15,6 +15,12 @@
           <div class="form-group">
             <label for="barcode">Barcode (Scan with the barcode scanner)</label>
             <barcode-input v-model="item.barcode" />
+            <div class="d-flex align-items-center p-1" v-if="analyzing">
+              <div class="spinner-border mr-2" role="status">
+                <span class="sr-only">Analyzing...</span>
+              </div>
+              <span>Analyzing...</span>
+            </div>
           </div>
           <div class="form-group">
             <label for="articleNumber">Article Number (e.g. ASIN for Amazon, Art.-Nr. for Kachouri)</label>
@@ -113,9 +119,47 @@ export default {
         internalNote: null,
       },
       errorString: "",
+      analyzing: false,
+      netPrice: null,
+      grossPrice: null,
     };
   },
+  watch: {
+    "item.barcode": async function (newVal, oldVal) {
+      this.analyzing = true;
+      if (this.timer) {
+        clearTimeout(this.timer);
+        this.timer = null;
+      }
+      const oldLength = oldVal?.length ?? 0;
+      if (Math.abs(newVal.length - oldLength) > 3 || newVal.length === oldLength) {
+        // text pasted or barcode scanned => do it directly
+        this.analyzeBarcode(newVal, oldVal);
+        return;
+      }
+      this.timer = setTimeout(() => {
+        this.analyzeBarcode(newVal, oldVal);
+      }, 800);
+    }
+  },
   methods: {
+    async analyzeBarcode(newVal, oldVal) {
+      let res = await http.get("/invoice/analyseArticleIdentifier/" + newVal);
+
+      if (res.data || oldVal) {
+        this.item.name = res.data?.name;
+        this.item.articleNumber = res.data?.articleNumber;
+        this.item.seller = res.data?.seller ?? "Unknown";
+        this.item.amount = res.data?.amount;
+        this.item.unit = res.data?.unit ?? "Units";
+        this.item.alcoholByVolume = res.data?.alk;
+        this.item.website = res.data?.productSite;
+        this.$refs.imageInput.setImageURL(res.data?.images?.[0]);
+        this.netPrice = res.data?.netPrice;
+        this.grossPrice = res.data?.grossPrice;
+      }
+      this.analyzing = false;
+    },
     /* eslint-disable no-console */
     async addPosition(redirectAfter) {
       //check if form is valid
@@ -185,7 +229,7 @@ export default {
                 if (redirectAfter === "addStockChange") {
                   this.$router.push({
                     name: "addStockChange",
-                    params: { itemId: response.data.id },
+                    params: { itemId: response.data.id, grossPrice: this.grossPrice, netPrice: this.netPrice },
                   });
                 } else {
                   this.$router.push(redirectAfter);
@@ -212,5 +256,4 @@ export default {
 /* eslint-enable no-console */
 </script>
 
-<style>
-</style>
+<style></style>
