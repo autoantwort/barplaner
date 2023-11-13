@@ -172,6 +172,13 @@ function sendBarInfo(bar, userID) {
                     msg.addButtonToRow("Ich komme", 'state', 'present');
                     msg.addButtonToRow("Ich komme nicht", 'state', 'absent');
                     msg.sendMessage(bar.start).catch(console.error);
+                }).catch((e) => {
+                    console.error(d.user.name, JSON.stringify(e), e.response.body);
+                    if(e.response.body.error_code === 403) {
+                        d.user.update({
+                            telegramID: "login pin: " + (Math.random() * 1000000).toFixed(0),
+                        }).catch(console.error);
+                    }
                 });
             });
             resolve();
