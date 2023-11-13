@@ -189,8 +189,14 @@ export default {
     }
     /* eslint-enable no-console */
   },
-  mounted() {
+  async mounted() {
     this.user = Roles.getUser();
+    try {
+      this.user = (await http.get("/user/" + this.user.id)).data;
+      Roles.setUser(this.user);
+    } catch (error) {
+      console.log(error); 
+    }
   }
 };
 </script>

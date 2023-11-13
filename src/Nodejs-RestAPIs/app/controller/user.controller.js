@@ -219,8 +219,7 @@ exports.userRolesTable = (req, res) => {
 // Find a User by Id
 exports.findById = (req, res) => {
     User.findByPk(req.params.userID, {
-        raw: true,
-        attributes: ['active', 'birthday', 'email', 'experienced_cleaner', 'gitLabID', 'id', 'name', 'phone', 'telegramID'],
+        attributes: ['active', 'birthday', 'email', 'experienced_cleaner', 'gitLabID', 'id', 'name', 'phone', 'telegramID', 'only_show_gitlab_notifications_if_assigned'],
     }).then(user => {
         res.send(user);
     }).catch(err => {
