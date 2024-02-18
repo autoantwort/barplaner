@@ -94,7 +94,7 @@
       <div v-if="loading === true" class="justify-content-center" style="display: flex">
         <b-spinner class="center" label="Loading..."></b-spinner>
       </div>
-      <img v-if="selectedImageId" style="width: 100%; height: 80vh; object-fit: contain;" :src="baseURL + selectedImageId" v-on:load="loading = false" />
+      <img v-if="selectedImageId" style="width: 100%; height: 80dvh; object-fit: contain;" :src="baseURL + selectedImageId" v-on:load="loading = false" />
     </b-modal>
   </div>
 </template>
