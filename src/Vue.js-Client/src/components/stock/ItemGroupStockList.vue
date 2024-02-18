@@ -76,6 +76,9 @@ export default {
               i.buy = "";
             }
           }
+          this.itemGroups.sort((a, b) => {
+            return (a.inStock - a.idealCount) > (b.inStock - b.idealCount);
+          });
           this.filteredItemGroups = this.itemGroups;
         })
         .catch((e) => {
