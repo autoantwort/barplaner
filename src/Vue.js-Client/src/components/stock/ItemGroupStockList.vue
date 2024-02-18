@@ -77,7 +77,7 @@ export default {
             }
           }
           this.itemGroups.sort((a, b) => {
-            return (a.inStock - a.idealCount) > (b.inStock - b.idealCount);
+            return (a.inStock - a.idealCount) - (b.inStock - b.idealCount);
           });
           this.filteredItemGroups = this.itemGroups;
         })
