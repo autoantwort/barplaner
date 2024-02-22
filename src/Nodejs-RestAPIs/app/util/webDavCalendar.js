@@ -92,7 +92,7 @@ for (const config of env.webDavCalendars) {
                     start: {
                         [Op.gt]: oldest,
                     },
-                    public: true,
+                    ...(config.publishPrivateEvents || { public: true}),
                 }
             }).then(bars => {
                 for (const bar of bars) {
