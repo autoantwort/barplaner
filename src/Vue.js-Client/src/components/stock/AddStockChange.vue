@@ -85,19 +85,25 @@
           </div>
           <div class="form-group" v-if="change !== null">
             <label for="itemGroupMinCount">Reason</label>
-            <div class="form-check mb-2" v-if="sign === '-'">
+            <div class="form-check mb-2" v-if="sign === '+'">
+              <input class="form-check-input" type="radio" v-model="reason" name="reason" id="bought" value="bought" />
+              <label class="form-check-label" for="bought">
+                <strong>Eingekauft:</strong> Wenn wir etwas bei der Metro, Rewe, etc kaufen. Aber auch, wenn wir einer
+                Vermietung etwas abkaufen (In Notiz erwähnen)
+              </label>
+            </div>
+            <div class="form-check mb-2" v-if="sign === '+'">
               <input
                 class="form-check-input"
                 type="radio"
                 v-model="reason"
                 name="reason"
-                id="rc"
-                value="rentalConsumption"
-                required
+                id="ccdb"
+                value="correctedConsumptionDuringBar"
               />
-              <label class="form-check-label" for="rc">
-                <strong>Vermietung:</strong> Wenn die Vermietung was verbraucht. Nicht wenn wir was von der Vermietung
-                abkaufen => Eingekauft
+              <label class="form-check-label" for="ccdb">
+                <strong>Korrektur Verbrauch während regulärer Bar:</strong> Was wir nach einer Bar wieder zurück ins Lager
+                räumen
               </label>
             </div>
             <div class="form-check mb-2" v-if="sign === '+'">
@@ -115,6 +121,20 @@
                 Sachen im Lager haben
               </label>
             </div>
+            <div class="form-check mb-2" v-if="sign === '+'">
+              <input
+                class="form-check-input"
+                type="radio"
+                v-model="reason"
+                name="reason"
+                id="receivedDonation"
+                value="receivedDonation"
+              />
+              <label class="form-check-label" for="receivedDonation">
+                <strong>Erhaltene Spende:</strong> Wenn wir etwas Geschenkt bekommen. Z.b. die Getränke der Mitglieder beim
+                Baressen
+              </label>
+            </div>
             <div class="form-check mb-2" v-if="sign === '-'">
               <input
                 class="form-check-input"
@@ -129,18 +149,19 @@
                 sowas wie Baressen (Interner freier Verbrauch), Sommerfest (Weggegeben / Spende)
               </label>
             </div>
-            <div class="form-check mb-2" v-if="sign === '+'">
+            <div class="form-check mb-2" v-if="sign === '-'">
               <input
                 class="form-check-input"
                 type="radio"
                 v-model="reason"
                 name="reason"
-                id="ccdb"
-                value="correctedConsumptionDuringBar"
+                id="rc"
+                value="rentalConsumption"
+                required
               />
-              <label class="form-check-label" for="ccdb">
-                <strong>Korrektur Verbrauch während regulärer Bar:</strong> Was wir nach einer Bar wieder zurück ins Lager
-                räumen
+              <label class="form-check-label" for="rc">
+                <strong>Vermietung:</strong> Wenn die Vermietung was verbraucht. Nicht wenn wir was von der Vermietung
+                abkaufen => Eingekauft
               </label>
             </div>
             <div class="form-check mb-2" v-if="sign === '-'">
@@ -167,27 +188,6 @@
               />
               <label class="form-check-label" for="iPC">
                 <strong>Interner bezahlter Verbrauch:</strong> Wenn man sich privat Getränke nimmt und diese bezahlt
-              </label>
-            </div>
-            <div class="form-check mb-2" v-if="sign === '+'">
-              <input class="form-check-input" type="radio" v-model="reason" name="reason" id="bought" value="bought" />
-              <label class="form-check-label" for="bought">
-                <strong>Eingekauft:</strong> Wenn wir etwas bei der Metro, Rewe, etc kaufen. Aber auch, wenn wir einer
-                Vermietung etwas abkaufen (In Notiz erwähnen)
-              </label>
-            </div>
-            <div class="form-check mb-2" v-if="sign === '+'">
-              <input
-                class="form-check-input"
-                type="radio"
-                v-model="reason"
-                name="reason"
-                id="receivedDonation"
-                value="receivedDonation"
-              />
-              <label class="form-check-label" for="receivedDonation">
-                <strong>Erhaltene Spende:</strong> Wenn wir etwas Geschenkt bekommen. Z.b. die Getränke der Mitglieder beim
-                Baressen
               </label>
             </div>
             <div class="form-check mb-2" v-if="sign === '-'">
