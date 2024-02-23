@@ -31,17 +31,17 @@
           <li class="nav-item">
             <router-link class="nav-link" to="/duty">Putzen</router-link>
           </li>
-          <li class="nav-item">
-            <router-link class="nav-link" to="/surveyList">Umfragen</router-link>
-          </li>
           <li class="nav-item" v-if="cleaningAdmin">
             <router-link class="nav-link" to="/settings">Settings</router-link>
           </li>
           <li class="nav-item">
-            <router-link class="nav-link" to="/remoteVolumeControl">Remote Volume</router-link>
+            <router-link class="nav-link" to="/remoteVolumeControl">Volume</router-link>
           </li>
           <li class="nav-item">
-            <router-link class="nav-link" to="/remoteControlPane">Remote Control Pane</router-link>
+            <router-link class="nav-link" to="/remoteControlPane">Control Pane</router-link>
+          </li>
+          <li class="nav-item">
+            <router-link class="nav-link" to="/addStockChange">Add Stock Change</router-link>
           </li>
           <b-nav-item-dropdown text="Lager" right>
             <b-dropdown-item to="/addItem">Add Item</b-dropdown-item>
