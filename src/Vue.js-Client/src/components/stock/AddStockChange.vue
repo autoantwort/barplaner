@@ -18,20 +18,21 @@
           <div v-if="item">
             <ul class="pagination">
               <li class="page-item" :class="{ active: sign == '+' }">
-                <span class="page-link" v-on:click="paginatorClicked(99)">Hinzugabe</span>
-              </li>
-              <li class="page-item" v-for="i of [1, 2, 3, 5, 6]" :key="i">
-                <span class="page-link" v-on:click="paginatorClicked(i)">{{ i }}</span>
+                <span class="page-link" v-on:click="sign = '+';paginatorClicked()">Hinzugabe</span>
               </li>
               <li class="page-item" :class="{ active: sign == '-' }">
-                <span class="page-link" v-on:click="paginatorClicked(-99)">Entnahme</span>
-              </li>
-              <li class="page-item" v-for="i of [1, 2, 3, 5, 6]" :key="-i">
-                <span class="page-link" v-on:click="paginatorClicked(-i)">{{ i }}</span>
+                <span class="page-link" v-on:click="sign = '-';paginatorClicked()">Entnahme</span>
               </li>
             </ul>
           </div>
-          <div class="form-group was-validated" v-if="sign !== null">
+          <div v-if="sign !== null">
+            <ul class="pagination">
+              <li class="page-item" v-for="i of [1, 2, 3, 4, 5, 6, 7, 8, 10, 12]" :key="i">
+                <span class="page-link" v-on:click="change=i;paginatorClicked()">{{ i }}</span>
+              </li>
+            </ul>
+          </div>
+          <div class="form-group was-validated" v-if="change !== null">
             <label for="itemGroupName">Lagerstandsänderung</label>
             <br />
             <div class="d-flex justify-content-between">
@@ -82,7 +83,7 @@
               vergessen hat einen Einkauf einzutragen. Am besten in die Gruppe schreiben und Bescheid geben.
             </div>
           </div>
-          <div class="form-group" v-if="sign !== null">
+          <div class="form-group" v-if="change !== null">
             <label for="itemGroupMinCount">Reason</label>
             <div class="form-check mb-2" v-if="sign === '-'">
               <input
@@ -240,7 +241,7 @@
               </table>
             </div>
           </div>
-          <div class="form-group was-validated" v-if="sign !== null">
+          <div class="form-group was-validated" v-if="change !== null">
             <label for="itemGroupName">Notiz</label>
             <textarea
               type="text"
@@ -448,10 +449,10 @@
             </div>
           </div>
           <div class="mt-2 text-danger" v-if="errorString.length !== 0">{{ errorString }}</div>
-          <button v-if="sign !== null" type="button" class="btn btn-success my-3" v-on:click="addChange('another')">
+          <button v-if="change !== null" type="button" class="btn btn-success my-3" v-on:click="addChange('another')">
             Add Change and add similar
           </button>
-          <button v-if="sign !== null" type="button" class="btn btn-success ml-own" v-on:click="addChange('list')">
+          <button v-if="change !== null" type="button" class="btn btn-success ml-own" v-on:click="addChange('list')">
             Add Change and view list
           </button>
         </form>
@@ -606,14 +607,11 @@ export default {
   },
   methods: {
     phoneticsFilter,
-    paginatorClicked(num) {
-      if (num > 0) this.sign = "+";
-      else this.sign = "-";
-      if (Math.abs(num) !== 99) {
-        this.change = Math.abs(num);
+    paginatorClicked() {
+      if (this.sign === null) {
+        return;
       }
-      if (this.change === null) this.result = null;
-      else this.result = this.currentItemStock + (this.sign === "+" ? 1 : -1) * this.change;
+      this.result = this.currentItemStock + (this.sign === "+" ? 1 : -1) * this.change;
     },
     onInputForChange() {
       this.result = this.currentItemStock + (this.sign === "+" ? 1 : -1) * this.change;
