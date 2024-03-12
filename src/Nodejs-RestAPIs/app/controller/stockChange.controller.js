@@ -21,7 +21,7 @@ const nextDay = (date) => {
 
 // Post a Stock Change
 exports.create = (req, res) => {
-    StockChange.create({...req.body, userId: req.user.id })
+    StockChange.create({ ...req.body, userId: req.user.id })
         .then(o => res.status(201).send(o))
         .catch(e => res.status(400).send(e));
 };
@@ -216,25 +216,25 @@ exports.getStockChangesForItemGroup = (req, res) => {
 };
 
 exports.getItemGroupStock = (req, res) => {
-    StockChange.findAll({
-        attributes: [
-            ...additionalAttributes.attributes.include, [sequelize.literal('`stockItem->itemGroup`.`id`'), "id"],
-            [sequelize.literal('`stockItem->itemGroup`.`name`'), "name"],
-            [sequelize.literal('`stockItem->itemGroup`.`nameColognePhonetics`'), "nameColognePhonetics"],
-            [sequelize.literal('`stockItem->itemGroup`.`minimumCount`'), "minimumCount"],
-            [sequelize.literal('`stockItem->itemGroup`.`idealCount`'), "idealCount"],
-        ],
-        include: [{
-            model: Item,
-            required: true,
-            attributes: [],
-            include: [{
-                model: ItemGroup,
-                required: true,
+    ItemGroup.findAll({
+        include: [
+            {
+                model: Item,
                 attributes: [],
-            }],
-        }],
-        group: ["stockItem.itemGroup.id"],
+                include: [
+                    {
+                        model: StockChange,
+                        attributes: [],
+                    },
+                ],
+            },
+        ],
+        attributes: {
+            include: [
+                [sequelize.fn('COALESCE', sequelize.fn('SUM', sequelize.col('stockItems.stockChanges.amount')), 0), 'inStock'],
+            ]
+        },
+        group: ['itemGroup.id'],
     }).then(stock => {
         res.send(stock);
     }).catch(err => {
