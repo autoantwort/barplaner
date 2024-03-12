@@ -91,10 +91,7 @@
       <positionImage :position="selectedPosition"></positionImage>
     </b-modal>
     <b-modal ref="image" hide-footer no-fade centered :title="selectedItem && selectedItem.name">
-      <div v-if="loading === true" class="justify-content-center" style="display: flex">
-        <b-spinner class="center" label="Loading..."></b-spinner>
-      </div>
-      <img v-if="selectedImageId" style="width: 100%; height: 80dvh; object-fit: contain;" :src="baseURL + selectedImageId" v-on:load="loading = false" />
+      <img v-if="selectedImageId" style="width: 100%; height: 80dvh; object-fit: contain;" :src="baseURL + selectedImageId" />
     </b-modal>
   </div>
 </template>
@@ -113,7 +110,6 @@ export default {
       selectedPosition: null,
       selectedItem: null,
       selectedImageId: null,
-      loading: false,
     };
   },
   components: {
@@ -131,7 +127,6 @@ export default {
     openImage(item) {
       this.selectedImageId = null;
       this.selectedItem = item;
-      this.loading = true;
       http
         .get("/image/" + item.imageId)
         .then((response) => {
