@@ -678,7 +678,7 @@ export default {
       }
     },
     retrieveItems() {
-      http
+      return http
         .get("/itemsForSelect")
         .then((response) => {
           this.existingItems = response.data;
@@ -760,15 +760,7 @@ export default {
           }
         });
     },
-  },
-  mounted() {
-    this.retrieveItems();
-  },
-
-  created() {
-    this.webSocket = new WebSocket(http.defaults.baseWsURL + "/scannerConsumer");
-    this.webSocket.onmessage = (e) => {
-      const barcode = e.data.trim();
+    onBarcode(barcode) {
       const item = this.existingItems.find((i) => i.barcode === barcode);
       if (item === undefined) {
         const h = this.$createElement;
@@ -803,6 +795,19 @@ export default {
           variant: "info",
         });
       }
+    },
+  },
+  mounted() {
+    this.retrieveItems().then(() => {
+      this.$route.query.barcode && this.onBarcode(this.$route.query.barcode);
+    })
+  },
+
+  created() {
+    this.webSocket = new WebSocket(http.defaults.baseWsURL + "/scannerConsumer");
+    this.webSocket.onmessage = (e) => {
+      const barcode = e.data.trim();
+      this.onBarcode(barcode);
     };
   },
   beforeDestroy() {
