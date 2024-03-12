@@ -24,7 +24,7 @@ export default {
           "Barcode Detection API is not supported in this browser (Probably Safari or Firefox). " +
           "Please use Chrome or some Chromium-based browser (e.g. Edge, Opera, Brave, Vivaldi, ...)\n\n" +
           "You can also use a Scanner App and specify https://orga.symposion.hilton.rwth-aachen.de/#/addStockChange?barcode={code} as the search URL.\n" +
-          "On IOS you can for example use 'QRbot' (Settings ➔ Search Options) , on Android 'QR & Barcode Scanner' (Einstallungen ➔ Scrollen ➔ Kundenspezifische Maßnahme). Select 'Products' as category in both apps."
+          "On IOS you can for example use 'QRbot' (Settings ➔ Search Options) , on Android 'Qr & Barcode Scanner von Simple Design Ltd.' (Einstallungen ➔ Scrollen ➔ Kundenspezifische Maßnahme). Select 'Products' as category in both apps."
         );
         return;
       }
