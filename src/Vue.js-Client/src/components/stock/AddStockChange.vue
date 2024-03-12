@@ -2,17 +2,21 @@
   <div class="container">
     <div class="row mt-2">
       <div class="col-12 col-md-8 offset-md-2 col-lg-6 offset-lg-3">
+        <barcode-scanner ref="scanner" :callback="onBarcode" />
         <form ref="form">
           <div class="form-group">
             <label>Item</label>
-            <v-select
-              class="border-primary"
-              :searchable="true"
-              :options="existingItems"
-              :filterFunction="phoneticsFilter"
-              v-model="item"
-              required
-            />
+            <div class="form-row">
+              <v-select
+                class="border-primary col-10"
+                :searchable="true"
+                :options="existingItems"
+                :filterFunction="phoneticsFilter"
+                v-model="item"
+                required
+              />
+              <button class="btn btn-success btn-sm" @click="$refs.scanner.loadDevicesAndPlay()">Scan</button>
+          </div>
             <div v-if="item === null" class="invalid-feedback" style="display: block">Please select an item.</div>
           </div>
           <div v-if="item">
@@ -466,6 +470,7 @@ import http from "../../http-common";
 import VSelect from "./../vue-bootstrap-select";
 import phoneticsFilter from "./../../phoneticsFilter";
 import AddPosition from "./AddPosition";
+import BarcodeScanner from "./components/BarcodeScanner.vue";
 import { getGermanReason, getFilterFunction } from "./changeUtil";
 const round = (v) => Math.round(v * 1000) / 1000;
 
@@ -474,6 +479,7 @@ export default {
   components: {
     VSelect,
     AddPosition,
+    BarcodeScanner,
   },
   props: {
     itemId: {
