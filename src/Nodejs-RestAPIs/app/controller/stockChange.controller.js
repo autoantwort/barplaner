@@ -91,6 +91,7 @@ exports.getStockChanges = (req, res) => {
 exports.getItemStock = (req, res) => {
     Item.findAll({
         attributes: [
+            "id",
             "name",
             "nameColognePhonetics",
             [sequelize.fn('COALESCE', sequelize.fn('SUM', sequelize.col('stockChanges.amount')), 0), "inStock"],
