@@ -24,15 +24,15 @@
               <tbody>
                 <tr v-for="item in filteredItems" :key="item.id">
                   <td>
-                    <router-link :to="{ name: 'item', params: { itemId: item.itemId } }">{{
-                      item.stockItem.name
+                    <router-link :to="{ name: 'item', params: { itemId: item.id } }">{{
+                      item.name
                     }}</router-link>
                   </td>
                   <td>
                     <router-link
-                      v-if="item.stockItem.itemGroup"
-                      :to="{ name: 'itemGroup', params: { itemGroupId: item.stockItem.itemGroup.id } }"
-                      >{{ item.stockItem.itemGroup.name }}</router-link
+                      v-if="item.itemGroup"
+                      :to="{ name: 'itemGroup', params: { itemGroupId: item.itemGroup.id } }"
+                      >{{ item.itemGroup.name }}</router-link
                     >
                   </td>
                   <td>{{ item.inStock }}</td>
@@ -79,9 +79,6 @@ export default {
         .get("/itemStock")
         .then((response) => {
           this.filteredItems = this.items = response.data;
-          for (let item of this.items) {
-            item.nameColognePhonetics = item.stockItem.nameColognePhonetics;
-          }
         })
         .catch((e) => {
           console.error(e);

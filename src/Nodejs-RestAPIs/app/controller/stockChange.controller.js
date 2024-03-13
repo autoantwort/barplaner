@@ -87,30 +87,25 @@ exports.getStockChanges = (req, res) => {
     });
 };
 
-const additionalAttributes = {
-    attributes: {
-        include: [
-            [sequelize.fn('SUM', sequelize.col('stockChange.amount')), "inStock"],
+// get current Stock
+exports.getItemStock = (req, res) => {
+    Item.findAll({
+        attributes: [
+            "name",
+            "nameColognePhonetics",
+            [sequelize.fn('COALESCE', sequelize.fn('SUM', sequelize.col('stockChanges.amount')), 0), "inStock"],
             [sequelize.fn('ROUND', sequelize.fn('MIN', sequelize.col('brottoPrice')), 2), "minBrottoPrice"],
             [sequelize.fn('ROUND', sequelize.fn('MAX', sequelize.col('brottoPrice')), 2), "maxBrottoPrice"],
             [sequelize.fn('ROUND', sequelize.fn('AVG', sequelize.col('brottoPrice')), 2), "avgBrottoPrice"],
         ],
-    },
-};
-
-// get current Stock
-exports.getItemStock = (req, res) => {
-    StockChange.findAll({
-        ...additionalAttributes,
-        group: "itemId",
         include: [{
-            attributes: ["name", "nameColognePhonetics"],
-            model: Item,
-            include: [{
-                attributes: ["id", "name"],
-                model: ItemGroup,
-            }],
+            model: StockChange,
+            attributes: [],
+        }, {
+            model: ItemGroup,
+            attributes: ["id", "name"],
         }],
+        group: "itemId",
     }).then(stock => {
         res.send(stock);
     }).catch(err => {
@@ -119,18 +114,20 @@ exports.getItemStock = (req, res) => {
 };
 
 exports.getStockForItem = (req, res) => {
-    StockChange.findAll({
+    Item.findAll({
         where: {
-            itemId: req.params.itemId,
+            id: req.params.itemId,
         },
-        ...additionalAttributes,
+        attributes: [],
+        include: [{
+            model: StockChange,
+            attributes: [
+                [sequelize.fn('COALESCE', sequelize.fn('SUM', sequelize.col('stockChanges.amount')), 0), "inStock"]
+            ],
+        }],
         group: "itemId",
     }).then(stock => {
-        if (stock.length === 0) {
-            res.send({ inStock: 0 });
-        } else {
-            res.send(stock[0]);
-        }
+        res.send(stock[0].stockChanges[0]);
     }).catch(err => {
         res.status(500).send("Error -> " + err);
     });
