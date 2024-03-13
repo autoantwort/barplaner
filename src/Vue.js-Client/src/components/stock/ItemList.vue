@@ -3,10 +3,10 @@
     <div class="row">
       <div class="col-12 offset-md-1 col-md-10">
         <div class="d-flex justify-content-end">
-          <router-link class="btn btn-success mt-3 mr-3" to="/addItem">Add Item</router-link>
+          <router-link class="btn btn-success m-3" to="/addItem">Add Item</router-link>
         </div>
         <div class="form-group">
-          <input type="text" class="mt-3 form-control" placeholder="Search" v-on:input="filter" />
+          <barcode-input placeholder="Search" v-on:input="filter" />
         </div>
         <div class="mt-3 mb-3">
           <div v-if="items.length !== 0" class="table-responsive">
@@ -100,6 +100,7 @@
 import http from "../../http-common";
 import phoneticsFilter from "../../phoneticsFilter";
 import PositionImage from "./PositionImage";
+import BarcodeInput from "./components/BarcodeInput.vue";
 
 export default {
   name: "item-list",
@@ -114,11 +115,12 @@ export default {
   },
   components: {
     PositionImage,
+    BarcodeInput,
   },
   methods: {
     /* eslint-disable no-console */
-    filter(event) {
-      this.filteredItems = phoneticsFilter(this.items, event.target.value);
+    filter(value) {
+      this.filteredItems = phoneticsFilter(this.items, value, (item) => item.barcode === value);
     },
     openModal(position) {
       this.selectedPosition = position;

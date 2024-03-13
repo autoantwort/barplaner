@@ -1,23 +1,32 @@
 <template>
-  <input
-    type="text"
-    class="form-control"
-    id="barcode"
-    :value="value"
-    ref="barcode"
-    v-on:input="onInput"
-    name="barcode"
-    v-on:keyup.enter="$emit('enter')"
-  />
+  <fragment>
+    <barcode-scanner ref="scanner" :callback="onBarcodeInput" />
+    <div class="input-group">
+      <input type="text" class="form-control" ref="barcode" v-on:input="onInput" v-on:keyup.enter="$emit('enter')" :placeholder="placeholder" />
+      <div class="input-group-append">
+        <button class="btn btn-success" type="button" v-on:click="$refs.scanner.loadDevicesAndPlay()">
+          Scan
+        </button>
+      </div>
+    </div>
+  </fragment>
 </template>
 
 <script>
+import BarcodeScanner from "./BarcodeScanner.vue";
 import http from "../../../http-common";
 
 export default {
   name: "barcode-input",
-  props: ["value"],
+  props: ["value", "placeholder"],
+  components: {
+    BarcodeScanner,
+  },
   methods: {
+    onBarcodeInput(value) {
+      this.$emit("input", value);
+      this.$refs.barcode.value = value;
+    },
     onInput(e) {
       this.$emit("input", e.target.value.trim());
     },
@@ -35,5 +44,4 @@ export default {
   },
 };
 </script>
-<style>
-</style>
+<style></style>
