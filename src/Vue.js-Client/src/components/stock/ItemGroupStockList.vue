@@ -69,15 +69,18 @@ export default {
               } else {
                 i.buy = "Buy";
               }
+              i.rank = i.inStock - i.idealCount;
             } else if (i.inStock < i.idealCount) {
               i.buy = "Buy " + (i.idealCount - i.inStock) + " items";
               i.class = "table-warning";
+              i.rank = 100 + i.inStock - i.idealCount;
             } else {
               i.buy = "";
+              i.rank = 200 + i.inStock - i.idealCount;
             }
           }
           this.itemGroups.sort((a, b) => {
-            return (a.inStock - a.idealCount) - (b.inStock - b.idealCount);
+            return (a.rank) - (b.rank);
           });
           this.filteredItemGroups = this.itemGroups;
         })
