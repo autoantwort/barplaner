@@ -7,7 +7,7 @@ export default (array, searchedValue, additionalFilter) => {
     const exactMatches = [];
     return exactMatches.concat(array.filter(p => {
         const resultColognePhonetics = () => {
-            if (p.name.search(r) !== -1) {
+            if ((p.name ?? p.text).search(r) !== -1) {
                 exactMatches.push(p);
                 return false;
             }
