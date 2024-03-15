@@ -128,7 +128,7 @@ exports.getStockForItem = (req, res) => {
         }],
         group: "itemId",
     }).then(stock => {
-        res.send(stock[0].stockChanges[0]);
+        res.send(stock[0].stockChanges[0] ?? {inStock: 0});
     }).catch(err => {
         res.status(500).send("Error -> " + err);
     });
