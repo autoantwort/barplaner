@@ -158,7 +158,10 @@ exports.getAllBarsWithBarduties = (req, res) => {
             BarDuty.findAll({
                 raw: true,
                 order: [
-                    ['state', 'DESC']
+                    ['state', 'DESC'],
+                    ['job', 'ASC'],
+                    ['from', 'ASC'],
+                    ['to', 'ASC'],
                 ],
                 // do this manually, then we are faster
                 // include: [{
