@@ -61,7 +61,11 @@ export default {
         .get("/itemGroupStock")
         .then((response) => {
           this.itemGroups = response.data;
+          const nonNull = (e, other) => e ? e : other;
           for (let i of this.itemGroups) {
+            // Folgende Zeile ist in langer Diskussion entstanden und durch viel experimentieren entstanden
+            // rank ist Faktor von minimumCount zu inStock multipliziert mit Faktor von idealCount zu minimumCount, darauf addiert eine gewichtete Differenz von idealCount zu inStock um Sachen die oft verbraucht werden zu bevorzugen. Falls zwei Items den gleichen Rank haben, entscheidet die Differenz von idealCount zu minimumCount.
+            i.rank = (i.minimumCount / nonNull(i.inStock, 0.001)) * (nonNull(i.idealCount, i.minimumCount) / nonNull(i.minimumCount, 1)) + ((nonNull(i.idealCount, i.inStock - 1) - i.inStock)) * 0.5 + (nonNull(i.idealCount, i.minimumCount) - i.minimumCount) / 100;
             if (i.inStock < i.minimumCount) {
               i.class = "table-danger";
               if (i.idealCount) {
@@ -69,18 +73,15 @@ export default {
               } else {
                 i.buy = "Buy";
               }
-              i.rank = i.inStock - i.idealCount;
             } else if (i.inStock < i.idealCount) {
               i.buy = "Buy " + (i.idealCount - i.inStock) + " items";
               i.class = "table-warning";
-              i.rank = 100 + i.inStock - i.idealCount;
             } else {
               i.buy = "";
-              i.rank = 200 + i.inStock - i.idealCount;
             }
           }
           this.itemGroups.sort((a, b) => {
-            return (a.rank) - (b.rank);
+            return b.rank - a.rank;
           });
           this.filteredItemGroups = this.itemGroups;
         })
