@@ -68,7 +68,7 @@
                 <td>
                   <router-link :to="{ name: 'item', params: { itemId: item.id } }">{{ item.name }}</router-link>
                 </td>
-                <td>{{ item.seller }}</td>
+                <td><a v-if="item.website" :href="item.website">{{ item.seller }}</a><template v-else>{{ item.seller }}</template></td>
                 <td>{{ item.amount }} {{ item.unit }}</td>
                 <td>{{ item.inStock }}</td>
                 <td>{{ item.minBrottoPrice }}</td>
