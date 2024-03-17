@@ -205,6 +205,9 @@ exports.getStockChangesForItemGroup = (req, res) => {
                     id: req.params.itemGroupId,
                 },
             }],
+        }, {
+            model: InvoiceEntry,
+            attributes: ['invoiceId'],
         }],
     }).then(changes => {
         res.send(changes);

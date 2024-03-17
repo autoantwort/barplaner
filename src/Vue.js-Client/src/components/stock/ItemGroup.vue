@@ -77,6 +77,9 @@
             </tbody>
           </table>
         </div>
+        <div class="row" v-if="stockChanges && stockChanges.length > 0">
+          <stock-changes-list :changes="stockChanges" :showItem="true" />
+        </div>
       </div>
     </div>
   </div>
@@ -86,6 +89,7 @@
 import http from "../../http-common";
 import GenericInputComponent from "./components/GenericInputComponent";
 import EditPositionComponent from "./components/EditPositionComponent";
+import StockChangesList from "./StockChangesList";
 
 export default {
   name: "itemGroup",
@@ -98,12 +102,14 @@ export default {
   components: {
     GenericInputComponent,
     EditPositionComponent,
+    StockChangesList,
   },
   data() {
     return {
       items: "",
       realItemGroup: null,
       itemStock: [],
+      stockChanges: [],
       inStock: null,
     };
   },
@@ -144,6 +150,15 @@ export default {
         })
         .catch(console.error);
     },
+    retrieveStockChanges() {
+      const itemGroupId = this.itemGroup !== null ? this.itemGroup.id : this.$route.params.itemGroupId;
+      http
+        .get("/itemGroup/" + itemGroupId + "/stockChanges")
+        .then((response) => {
+          this.stockChanges = response.data;
+        })
+        .catch(console.error);
+    },
   },
   mounted() {
     if (this.itemGroup === null) {
@@ -155,6 +170,7 @@ export default {
       }
     }
     this.retrieveItemStock();
+    this.retrieveStockChanges();
   },
   /* eslint-enable no-console */
 };
