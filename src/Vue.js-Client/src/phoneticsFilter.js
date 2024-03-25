@@ -6,18 +6,15 @@ export default (array, searchedValue, additionalFilter) => {
     const r = new RegExp(searchedValue, "i");
     const exactMatches = [];
     return exactMatches.concat(array.filter(p => {
-        const resultColognePhonetics = () => {
-            if ((p.name ?? p.text).search(r) !== -1) {
-                exactMatches.push(p);
+        if ((p.name ?? p.text).search(r) !== -1 || otherFilter(p)) {
+            exactMatches.push(p);
+            return false;
+        }
+        for (let s of v) {
+            if (p.nameColognePhonetics.search(s) === -1) {
                 return false;
             }
-            for (let s of v) {
-                if (p.nameColognePhonetics.search(s) === -1) {
-                    return false;
-                }
-            }
-            return true;
         }
-        return resultColognePhonetics() || otherFilter(p);
+        return true;
     }));
 };

@@ -14,6 +14,12 @@ module.exports = (sequelize, Sequelize, Image, ItemGroup, Position) => {
             defaultValue: null,
             unique: 'uniqueBarcodeAtSeller'
         },
+        barcodePack: {
+            type: Sequelize.STRING,
+            allowNull: true,
+            defaultValue: null,
+            unique: true
+        },
         articleNumber: {
             type: Sequelize.STRING,
             allowNull: true,

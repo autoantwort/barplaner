@@ -68,7 +68,7 @@ export default {
   methods: {
     /* eslint-disable no-console */
     filter(value) {
-      this.filteredItems = phoneticsFilter(this.items, value, (item) => item.barcode === value);
+      this.filteredItems = phoneticsFilter(this.items, value, (item) => item.barcode === value || item.barcodePack === value);
     },
     print(price) {
       if (price === null) return null;

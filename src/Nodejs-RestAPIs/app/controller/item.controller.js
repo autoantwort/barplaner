@@ -87,6 +87,7 @@ exports.getAllForSelect = (req, res) => {
             ['name', 'text'],
             'nameColognePhonetics',
             'barcode',
+            'barcodePack'
         ],
     }).then(items => {
         res.send(items);

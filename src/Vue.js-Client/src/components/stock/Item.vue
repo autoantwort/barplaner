@@ -15,7 +15,11 @@
         </div>
         <div class="form-group row">
           <label class="col-3">Barcode</label>
-          <edit-barcode-component :object="realItem" property="barcode" endpoint="/item/:id" />
+          <edit-barcode-component :object="realItem" property="barcode"/>
+        </div>
+        <div class="form-group row">
+          <label class="col-3">Barcode of Carton</label>
+          <edit-barcode-component :object="realItem" property="barcodePack"/>
         </div>
         <div class="form-group row">
           <label class="col-3">Article Number</label>

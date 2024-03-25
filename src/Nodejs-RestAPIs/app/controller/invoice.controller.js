@@ -158,6 +158,10 @@ exports.unlinkItemFromEntry = async (req, res) => {
             item.barcode = null;
             await item.save();
         }
+        if (item.barcodePack === entry.gtinPack) {
+            item.barcodePack = null;
+            await item.save();
+        }
         res.send();
     } catch (error) {
         console.error(error);
@@ -185,6 +189,9 @@ exports.linkItemWithEntry = async (req, res) => {
         await entry.save();
         if (item.barcode === null) {
             item.barcode = entry.gtin;
+        }
+        if (item.barcodePack === null) {
+            item.barcodePack = entry.gtinPack;
         }
         if (item.articleNumber === null) {
             item.articleNumber = entry.articleNumber;
@@ -239,8 +246,9 @@ const exportForMetro = (invoice, text) => {
             if (line.startsWith("  ") && line[8] === '.') {
                 const item = {};
                 item.articleNumber = line.substring(2, 8);
-                item.barcode = line.substring(11, 24).trim();
+                const barcode = line.substring(11, 24).trim();
                 const pack = line.substring(58, 60);
+                const barcodeIsPack = (pack === "KT" || pack === "TY");
                 let bez = line.substring(26, 56);
                 item.einzelPreis = toNumber(line.substring(63, 71));
                 item.kolli = toNumber(line.substring(77, 82)); // Sachen in einer Packung. Z.B. 12 Flaschen im Kasten
@@ -300,7 +308,10 @@ const exportForMetro = (invoice, text) => {
                         attributes: ["stockItemId"],
                         where: {
                             articleNumber: item.articleNumber,
-                            gtin: item.barcode,
+                            [Op.or]: [
+                                { gtin: barcode },
+                                { gtinPack: barcode },
+                            ],
                             stockItemId: {
                                 [Op.not]: null,
                             },
@@ -320,7 +331,10 @@ const exportForMetro = (invoice, text) => {
                             // noch gab es kein InvoiceEntry der gemappt wurde, aber vielleicht gibt es ja ein Item von einem Seller mit dem richtigen Barcode
                             const items = await Item.findAll({
                                 where: {
-                                    barcode: item.barcode,
+                                    [Op.or]: [
+                                        { barcode: barcode },
+                                        { barcodePack: barcode },
+                                    ],
                                     [Op.or]: [{
                                         seller: null,
                                     }, {
@@ -335,7 +349,7 @@ const exportForMetro = (invoice, text) => {
                         InvoiceEntry.create({
                             itemDescription: item.bez,
                             articleNumber: item.articleNumber,
-                            gtin: item.barcode,
+                            ...(barcodeIsPack ? {gtinPack: barcode} : {gtin: barcode}),
                             quantity: item.menge * item.kolli,
                             netPrice: item.einzelPreis,
                             brottoPrice: item.einzelPreis * taxMap[item.tax],

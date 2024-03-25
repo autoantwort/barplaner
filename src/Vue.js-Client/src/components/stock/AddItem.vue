@@ -13,7 +13,7 @@
             <image-input ref="imageInput" />
           </div>
           <div class="form-group">
-            <label for="barcode">Barcode (Scan with the barcode scanner)</label>
+            <label for="barcode">Barcode of the Bottle (Scan with the barcode scanner)</label>
             <barcode-input v-model="item.barcode" />
             <div class="d-flex align-items-center p-1" v-if="analyzing">
               <div class="spinner-border mr-2" role="status">

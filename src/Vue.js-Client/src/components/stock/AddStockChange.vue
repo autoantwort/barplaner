@@ -767,7 +767,7 @@ export default {
         });
     },
     onBarcode(barcode) {
-      const item = this.existingItems.find((i) => i.barcode === barcode);
+      const item = this.existingItems.find((i) => i.barcode === barcode || i.barcodePack === barcode);
       if (item === undefined) {
         const h = this.$createElement;
         const vNodesMsg = h("p", [

@@ -1,15 +1,15 @@
 <template>
-  <fragment>
+  <div>
     <barcode-scanner ref="scanner" :callback="onBarcodeInput" />
     <div class="input-group">
-      <input type="text" class="form-control" ref="barcode" v-on:input="onInput" v-on:keyup.enter="$emit('enter')" :placeholder="placeholder" />
+      <input v-bind="$attrs" type="text" class="form-control" ref="barcode" v-on:input="onInput" v-on:keyup.enter="$emit('enter')" :placeholder="placeholder" />
       <div class="input-group-append">
         <button class="btn btn-success" type="button" v-on:click="$refs.scanner.loadDevicesAndPlay()">
           Scan
         </button>
       </div>
     </div>
-  </fragment>
+  </div>
 </template>
 
 <script>

@@ -1,6 +1,6 @@
 <template>
   <edit-component ref="edit" :onSave="save" :onEdit="edit">
-    <label>{{ object.barcode }}</label>
+    <label>{{ object[property] }}</label>
     <template v-slot:edit>
       <barcode-input v-model="barcodeValue" v-on:enter="$refs.edit.save" />
     </template>
@@ -23,6 +23,10 @@ export default {
     object: {
       type: Object,
     },
+    property: {
+      type: String,
+      default: "barcode",
+    },
   },
   data() {
     return {
@@ -34,14 +38,14 @@ export default {
       const value = this.barcodeValue;
       const barcode = value && value.length > 0 ? value : null;
       http
-        .put("/item/" + this.object.id, { barcode })
+        .put("/item/" + this.object.id, { [this.property]: barcode })
         .then((response) => {
-          this.object.barcode = response.data.barcode;
+          this.object[this.property] = response.data[this.property];
         })
         .catch(alert);
     },
     edit() {
-      this.barcodeValue = this.object.barcode;
+      this.barcodeValue = this.object[this.property];
     },
   },
 };

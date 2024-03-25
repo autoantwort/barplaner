@@ -174,6 +174,7 @@
       lazy
       :size="modalSize"
       v-on:ok="updateModalClicked"
+      :ok-disabled="!currentEntry?.gtin && !updatedItem.barcode"
     >
       <form ref="editForm" class="container-fluid">
         <div class="row mb-3" v-if="currentItem">
@@ -202,6 +203,11 @@
               <button class="btn btn-light" v-on:click="updatedItem.name = currentItem.name">{{ currentItem.name }}</button>
             </div>
           </div>
+        </div>
+        <div class="form-group was-validated" v-if="!currentEntry?.gtin">
+          <label for="name">Barcode of Bottle</label>
+          <barcode-input v-model="updatedItem.barcode" required/>
+          <div class="invalid-feedback" :style="{display: updatedItem.barcode ? 'none' : 'block'}">Required</div>
         </div>
         <div class="form-group">
           <label for="name">Content</label>
@@ -392,6 +398,7 @@ import phoneticsFilter from "./../../phoneticsFilter";
 import ContentInput from "./components/ContentInput";
 import PercentInput from "./components/PercentInput";
 import ItemGroupCard from "./components/ItemGroupCard";
+import BarcodeInput from "./components/BarcodeInput.vue";
 
 function parseDate(input) {
   if (input === undefined) return undefined;
@@ -409,6 +416,7 @@ export default {
     ContentInput,
     PercentInput,
     ItemGroupCard,
+    BarcodeInput,
   },
   props: {
     invoice: {
@@ -436,6 +444,7 @@ export default {
         name: null,
         amount: null,
         unit: null,
+        barcode: null,
         alcoholByVolume: null,
         selectedImageIndex: null,
       },
@@ -555,6 +564,7 @@ export default {
       this.modalSize = "lg";
       this.currentEntry = entry;
       this.currentItem = null;
+      this.updatedItem.barcode = entry.gtin;
       this.updatedItem.name = entry.itemDescription;
       this.updatedItem.amount = entry.amount;
       this.updatedItem.unit = entry.unit || "Units";
@@ -586,14 +596,16 @@ export default {
       }
       this.$refs.editInvoice.show();
     },
-    async updateModalClicked() {
+    async updateModalClicked(bvModalEvent) {
       if (this.$refs.editForm.checkValidity() === false) {
+        bvModalEvent.preventDefault();
         return;
       }
       const data = {
         name: this.updatedItem.name,
-        barcode: this.currentEntry.gtin || this.currentItem.barcode,
-        articleNumber: this.currentEntry.articleNumber || this.currentItem.articleNumber,
+        barcode: this.currentEntry.gtin || this.updatedItem.barcode,
+        barcodePack: this.currentEntry.gtinPack || this.updatedItem.barcodePack,
+        articleNumber: this.currentEntry.articleNumber || this.updatedItem.articleNumber,
         seller: this.realInvoice.seller,
         amount: this.updatedItem.amount,
         unit: this.updatedItem.unit,

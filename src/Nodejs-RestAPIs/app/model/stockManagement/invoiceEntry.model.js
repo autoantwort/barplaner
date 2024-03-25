@@ -10,6 +10,9 @@ module.exports = (sequelize, Sequelize, Invoice, Item) => {
         gtin: { // Global Trade Item Number formerly European Article Number (EAN)
             type: Sequelize.STRING,
         },
+        gtinPack: { // gtin of the pack
+            type: Sequelize.STRING,
+        },
         quantity: { // how often was the item bought
             type: Sequelize.INTEGER,
             allowNull: false,
