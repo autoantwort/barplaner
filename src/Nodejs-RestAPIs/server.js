@@ -7,6 +7,7 @@ var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 var env = require('./app/config/env');
 const fileUpload = require('express-fileupload');
+const Sequelize = require('sequelize');
 
 if (env.staticVue === true)
     app.use(express.static("../Vue.js-Client/dist"));
@@ -74,9 +75,7 @@ const crypto = require('crypto');
 const User = db.User;
 app.post('/api/login', (req, res) => {
     User.findOne({
-        where: {
-            name: req.body.name
-        }
+        where: Sequelize.where(Sequelize.fn('lower', Sequelize.col('name')), Sequelize.fn('lower', req.body.name)),
     }).then(user => {
         if (user === null) {
             res.status(401).send("User not exists");
