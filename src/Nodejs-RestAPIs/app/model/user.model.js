@@ -7,6 +7,11 @@ module.exports = (sequelize, Sequelize) => {
         password: {
             type: Sequelize.STRING
         },
+        passwordResetKey: {
+            type: Sequelize.STRING,
+            allowNull: true,
+            defaultValue: null,
+        },
         email: {
             type: Sequelize.STRING,
             allowNull: true,

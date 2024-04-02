@@ -14,6 +14,7 @@
               <input type="password" class="form-control" v-bind:class="{ 'is-invalid': wrongData }" id="pwd" required v-model="password" name="password">
             </div>
             <button type="submit" class="btn btn-primary" v-on:click="login" >Login</button>
+            <button type="button" class="btn btn-warning ml-3" v-on:click="resetPassword" >Reset Password</button>
           </form>
           <!--<div class="card-footer">Footer</div> -->
         </div>
@@ -59,6 +60,9 @@ export default {
           }   
           console.log(e);
         });
+    },
+    resetPassword() {
+      this.$router.push("requestPasswordReset");
     },
     /* eslint-enable no-console */
   }

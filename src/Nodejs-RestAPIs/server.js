@@ -125,6 +125,10 @@ app.post('/api/login', (req, res) => {
         }
     });
 });
+const user = require('./app/controller/user.controller.js');
+app.post('/api/users/sendPasswordResetLink', user.sendPasswordResetLink);
+app.post('/api/users/validPasswortResetKey', user.validPasswordResetKey);
+app.post('/api/users/resetPasswort', user.resetPasswort);
 app.use((req, res, next) => {
     if (req.cookies.auth === undefined) {
         res.status(401).send("not authenticated");

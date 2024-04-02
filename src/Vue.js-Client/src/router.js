@@ -1,6 +1,8 @@
 import Vue from "vue";
 import Router from "vue-router";
 import Login from "./components/Login.vue";
+import RequestPasswordReset from "./components/RequestPasswordReset.vue";
+import ResetPassword from "./components/ResetPassword.vue";
 import Restricted from "./components/Restricted.vue";
 import AddBar from "./components/AddBar.vue";
 import AddUser from "./components/AddUser.vue";
@@ -47,6 +49,17 @@ export default new Router({
                     next({ name: 'bar-list' });
                 }
             },
+        },
+        {
+            path: "/requestPasswordReset",
+            name: "requestPasswordReset",
+            component: RequestPasswordReset,
+        },
+        {
+            path: "/resetPassword/:token",
+            name: "resetPassword",
+            component: ResetPassword,
+            props: true,
         },
         {
             path: '/logout',

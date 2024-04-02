@@ -1,4 +1,6 @@
+const nodemailer = require('nodemailer');
 const db = require('../config/db.config.js');
+const config = require('../config/env.js');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const Bar = db.Bar;
@@ -7,6 +9,8 @@ const Role = db.Role;
 const UserRoles = db.UserRoles;
 const BarDuty = db.BarDuty;
 const Op = db.Sequelize.Op;
+
+let transporter = nodemailer.createTransport(config.mailServer);
 
 let UserAdminRole = null;
 let CleaningAdminRole = null;
@@ -87,6 +91,66 @@ exports.create = (req, res) => {
         }
     }).catch(err => res.status(500).send("Error -> " + err));
 };
+
+exports.validPasswordResetKey = (req, res) => {
+    User.findOne({ where: { passwordResetKey: req.body.token } }).then(async user => {
+        if (user === null) {
+            return res.status(404).send("Token not found");
+        }
+        res.send("Token found");
+    }).catch(err => {
+        res.status(500).send(err);
+    });
+};
+
+exports.resetPasswort = (req, res) => {
+    if (req.body.password === undefined || req.body.token === undefined) {
+        return res.status(400).send("password or token not defined" + JSON.stringify(req.body));
+    }
+    if (req.body.password.length < 8) {
+        return res.status(400).send("password is to short, min 8 chars")
+    }
+    User.findOne({ where: { passwordResetKey: req.body.token } }).then(async user => {
+        if (user === null) {
+            return res.status(404).send("Token not found");
+        }
+        const hash = await bcrypt.hash(req.body.password, 10);
+        user.password = hash;
+        user.save();
+        res.send("Password updated");
+    }).catch(err => {
+        res.status(500).send(err);
+    });
+};
+
+exports.sendPasswordResetLink = (req, res) => {
+    User.findOne({where: {
+        email: req.body.mail
+    }}).then(user => {
+        if(!user){
+            return res.status(404).send("Unknown mail address.")
+        }
+        user.passwordResetKey = crypto.randomBytes(32).toString('hex');
+        user.save();
+        // Setup email data
+        let mailOptions = {
+            from: config.mailServer.auth.user,
+            to: user.email,
+            subject: 'Password reset Barplaner',
+            text: 'To reset your password, please click the following link: ' + config.frontendURL + '/#/resetPassword/' + user.passwordResetKey
+        };
+        // Send mail with defined transport object
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.log('Error occurred:', error);
+                return res.status(500).send("Error while sending mail: " + error);
+            }
+            res.send("Mail sent");
+        });
+    }).catch(err => {
+        res.status(500).send("Error -> " + err);
+    });
+}
 
 exports.getRoles = (req, res) => {
     User.findByPk(req.params.userID).then(user => {

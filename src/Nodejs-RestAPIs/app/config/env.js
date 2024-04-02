@@ -18,6 +18,7 @@ const env = {
     resetDatabase: false,
     loadOldData: false,
     baseURL: "http://localhost:8080",
+    frontendURL: "http://localhost:4200",
     staticVue: false,
     gitLabAccessToken: '', // Insert your access token (Create access token here: https://git.rwth-aachen.de/-/profile/personal_access_tokens)
     gitLabBrowser: {
@@ -77,6 +78,15 @@ const env = {
         sendDaysBefore: [0, 1], // wie viel Tage vorher senden
         sendTime: 20, // um wie viel Uhr senden
     },
+    mailServer: {
+        host: 'mail.hilton.rwth-aachen.de',
+        port: 587, // or 25, or any other port your SMTP server uses
+        secure: false, // true for 465, false for other ports
+        auth: {
+            user: 'noreply@hilton.rwth-aachen.de',
+            pass: '***'
+        }
+    }
 };
 
 module.exports = env;
