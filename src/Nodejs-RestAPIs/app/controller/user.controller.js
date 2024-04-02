@@ -9,6 +9,7 @@ const Role = db.Role;
 const UserRoles = db.UserRoles;
 const BarDuty = db.BarDuty;
 const Op = db.Sequelize.Op;
+const Sequelize = db.Sequelize;
 
 let transporter = nodemailer.createTransport(config.mailServer);
 
@@ -124,10 +125,10 @@ exports.resetPasswort = (req, res) => {
 };
 
 exports.sendPasswordResetLink = (req, res) => {
-    User.findOne({where: {
-        email: req.body.mail
-    }}).then(user => {
-        if(!user){
+    User.findOne({
+        where: Sequelize.where(Sequelize.fn('lower', Sequelize.col('email')), Sequelize.fn('lower', req.body.mail)),
+    }).then(user => {
+        if (!user) {
             return res.status(404).send("Unknown mail address.")
         }
         user.passwordResetKey = crypto.randomBytes(32).toString('hex');
