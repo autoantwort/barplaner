@@ -1,3 +1,5 @@
+const reasons = require('../../../../common/stockChangeReasons.js').reasonNames;
+
 module.exports = (sequelize, Sequelize, Item, User, InvoiceEntry) => {
     const StockChange = sequelize.define('stockChange', {
         date: {
@@ -27,7 +29,7 @@ module.exports = (sequelize, Sequelize, Item, User, InvoiceEntry) => {
         },
         reason: {
             type: Sequelize.ENUM,
-            values: ['rentalConsumption', 'correctedRentalConsumption', 'consumedDuringBar', 'correctedConsumptionDuringBar', 'internalFreeConsumption', 'internalPayedConsumption', 'bought', 'receivedDonation', 'giveAway', 'discarded', 'sold', 'other'],
+            values: reasons,
         },
         note: {
             type: Sequelize.STRING(1024),
