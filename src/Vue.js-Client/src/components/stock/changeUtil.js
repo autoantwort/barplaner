@@ -1,31 +1,12 @@
+import { reasons } from "common/stockChangeReasons.js";
+
 const getGermanReason = reason => {
-    if (reason === "rentalConsumption") {
-        return "Vermietung";
-    } else if (reason === "correctedRentalConsumption") {
-        return "Korrektur Vermietung";
-    } else if (reason === "consumedDuringBar") {
-        return "Verbraucht während Bar";
-    } else if (reason === "correctedConsumptionDuringBar") {
-        return "Korrektur Verbrauch Bar";
-    } else if (reason === "internalFreeConsumption") {
-        return "Interner freier Verbrauch";
-    } else if (reason === "internalPayedConsumption") {
-        return "Interner bezahlter Verbrauch";
-    } else if (reason === "bought") {
-        return "Eingekauft";
-    } else if (reason === "receivedDonation") {
-        return "Erhaltene Spende";
-    } else if (reason === "giveAway") {
-        return "Weggegeben / Spende";
-    } else if (reason === "discarded") {
-        return "Weggeworfen";
-    } else if (reason === "sold") {
-        return "Verkauft";
-    } else if (reason === "other") {
-        return "Anderer Grund";
-    } else {
-        return "error: " + reason;
+    for (let reasonName of reasons) {
+        if (reasonName.name === reason) {
+            return reasonName.germanName;
+        }
     }
+    return "error: Reason unknown: " + reason;
 };
 
 const getFilterFunction = reason => {
