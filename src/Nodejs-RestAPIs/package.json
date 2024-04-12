@@ -25,6 +25,7 @@
         "express-fileupload": "^1.4.1",
         "express-ws": "^5.0.2",
         "ical-generator": "^1.10.0",
+        "mqtt": "^5.5.0",
         "mysql2": "^3.6.2",
         "node-html-parser": "^6.1.11",
         "node-telegram-bot-api": "^0.63.0",

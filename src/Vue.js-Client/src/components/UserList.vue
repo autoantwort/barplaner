@@ -1,12 +1,18 @@
 <template>
   <div class="container">
+    <div ref="print" class="row print-only" v-for="row in activeUsers">
+      <div class="col-3 d-flex justify-content-center align-items-center mb-4" v-for="user in row">
+        <barcode :value="10000 + user.id" :width="2" :height="100" :text="user.name" fontSize="25"></barcode>
+      </div>
+    </div>
     <div class="row">
       <div class="col-12 offset-md-1 col-md-10">
-        <div v-if="userAdmin" class="mt-3 text-right">
+        <div v-if="userAdmin" class="mt-3 text-right d-print-none">
+          <button class="btn btn-primary mr-3" v-on:click="print">Print Barcodes</button>
           <router-link class="btn btn-success" to="/addUser">Add User</router-link>
         </div>
-        <div class="mt-3 mb-3">
-          <div v-if="users.length!==0" class="table-responsive">
+        <div class="mt-3 mb-3 d-print-none">
+          <div v-if="users.length !== 0" class="table-responsive">
             <table class="table table-hover">
               <thead>
                 <tr>
@@ -20,25 +26,17 @@
               </thead>
               <tbody>
                 <tr v-for="user in users" :key="user.id">
-                  <td>{{user.name}}</td>
-                  <td>{{user.email}}</td>
-                  <td>{{user.birthday}}</td>
-                  <td>{{user.phone}}</td>
+                  <td>{{ user.name }}</td>
+                  <td>{{ user.email }}</td>
+                  <td>{{ user.birthday }}</td>
+                  <td>{{ user.phone }}</td>
                   <th v-if="userAdmin || loginedUser.id === user.id">
-                    <input
-                      type="checkbox"
-                      v-on:click="updateActive(user.id,$event)"
-                      v-model="user.active"
-                    >
+                    <input type="checkbox" v-on:click="updateActive(user.id, $event)" v-model="user.active">
                   </th>
                   <td v-else-if="user.active">Ja</td>
                   <td v-else>Nein</td>
                   <th v-if="cleaningAdmin">
-                    <input
-                      type="checkbox"
-                      v-on:click="updateExperiencedCleaner(user.id,$event)"
-                      v-model="user.experienced_cleaner"
-                    >
+                    <input type="checkbox" v-on:click="updateExperiencedCleaner(user.id, $event)" v-model="user.experienced_cleaner">
                   </th>
                   <td v-else-if="user.experienced_cleaner">Ja</td>
                   <td v-else>Nein</td>
@@ -57,13 +55,22 @@
 <script>
 import http from "../http-common";
 import Roles from "../roles";
+import VueBarcode from 'vue-barcode';
 // import VueSingleSelect from "vue-single-select";
+
+function groupBy(arr, number) {
+  let result = [];
+  for (let i = 0; i < arr.length; i += number) {
+    result.push(arr.slice(i, i + number));
+  }
+  return result;
+}
 
 export default {
   name: "user-list",
-  // components: {
-  //   VueSingleSelect
-  // },
+  components: {
+    'barcode': VueBarcode
+  },
   data() {
     return {
       users: [],
@@ -71,6 +78,11 @@ export default {
       cleaningAdmin: false,
       userAdmin: false
     };
+  },
+  computed: {
+    activeUsers() {
+      return groupBy(this.users.filter(user => user.active), 4);
+    }
   },
   methods: {
     /* eslint-disable no-console */
@@ -124,8 +136,10 @@ export default {
         .catch(e => {
           console.log(e);
         });
+    },
+    print() {
+      window.print();
     }
-
     /* eslint-enable no-console */
   },
   mounted() {
@@ -138,4 +152,13 @@ export default {
 </script>
 
 <style>
+.print-only {
+  display: none !important;
+}
+
+@media print {
+  .print-only {
+    display: flex !important;
+  }
+}
 </style>

@@ -86,7 +86,12 @@ const env = {
             user: 'noreply@hilton.rwth-aachen.de',
             pass: '***'
         }
-    }
+    },
+    mqtt: {
+        url: 'mqtt://mqtt.hilton.rwth-aachen.de',
+        username: 'barplaner',
+        password: '***',
+    },
 };
 
 module.exports = env;

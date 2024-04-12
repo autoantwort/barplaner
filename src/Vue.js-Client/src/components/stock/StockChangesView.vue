@@ -1,20 +1,62 @@
 <template>
   <div class="container">
-    <div class="row">
+    <div class="row print-only" v-for="row in reasons">
+      <div class="col-6 d-flex" style="margin-bottom: 3rem;" v-for="r in row">
+        <template v-if="r !== null">
+          <barcode :value="r.sign + (100 + r.id)" :width="2" :height="100" text=" "></barcode>
+          <div>
+            <h4 class="mt-1">{{ r.germanName }}</h4>
+            <p>{{ r?.description }}</p>
+          </div>
+        </template>
+      </div>
+    </div>
+    <div class="print-only page-break-before"></div>
+    <template v-for="i in 2">
+      <div class="row print-only mt-5">
+        <div class="col-4">
+          <barcode :value="commands.minusOne" :width="2" :height="100" text="Minus 1 Item"></barcode>
+        </div>
+        <div class="col-4">
+          <barcode :value="commands.cancel" :width="2" :height="100" text="Cancel"></barcode>
+        </div>
+        <div class="col-4">
+          <barcode :value="commands.done" :width="2" :height="100" text="Done"></barcode>
+        </div>
+      </div>
+      <div class="row print-only mt-4">
+        <div class="col-6">
+          <p>
+            White LED: Other items of item group in stock
+          </p>
+          <p>
+            <span style="color: blue;">Blue LED</span>: Items in stock
+          </p>
+          <p>
+            <span style="color: green;">Green</span>/<span style="color: red;">Red</span> LED: Items that gets added/removed
+          </p>
+          <p>
+            <span>Yellow LED</span>: Item stock is negative
+          </p>
+        </div>
+        <div class="col-6">
+          <p>
+            <span>Bright LED</span>: One item
+          </p>
+          <p>
+            <span>Dark LED</span>: 5 items
+          </p>
+        </div>
+      </div>
+    </template>
+    <div class="row d-print-none">
       <div class="col-12 offset-md-1 col-md-10">
         <div class="row mt-3">
           <div class="col-md-12 col-lg-6">
             <div class="input-group">
-              <b-form-datepicker
-                v-on:input="dateSelected"
-                v-model="selectedDate"
-                :disabled="datesSet === null"
-                start-weekday="1"
-                :date-format-options="{ year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'long' }"
-                :date-disabled-fn="isDateDisabled"
-                locale="de"
-                placeholder="Jump to date"
-              ></b-form-datepicker>
+              <b-form-datepicker v-on:input="dateSelected" v-model="selectedDate" :disabled="datesSet === null" start-weekday="1"
+                :date-format-options="{ year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'long' }" :date-disabled-fn="isDateDisabled" locale="de"
+                placeholder="Jump to date"></b-form-datepicker>
               <div class="input-group-append">
                 <span class="input-group-text" id="basic-addon2">Include:</span>
               </div>
@@ -29,11 +71,9 @@
             </div>
           </div>
 
-          <div class="col-7 text-right col-xs-8 col-md-9 mt-1 col-lg-3 mt-lg-0 text-md-center">
+          <div class="col-md-6 col-lg-6 mt-lg-0 d-flex justify-content-between">
             <button class="btn btn-primary" v-on:click="showLatestChanges">Latest Changes</button>
-          </div>
-
-          <div class="col-5 col-xs-4 col-md-3 mt-1 col-lg-3 mt-lg-0 text-right">
+            <button class="btn btn-primary" v-on:click="print">Print Reasons</button>
             <router-link class="btn btn-success" to="/addStockChange">Add Change</router-link>
           </div>
         </div>
@@ -74,6 +114,24 @@
 <script>
 import http from "../../http-common";
 import StockChangesList from "./StockChangesList";
+import VueBarcode from 'vue-barcode';
+import { reasons, addReasons, removeReasons, inventoryReason, commands } from "common/stockChangeReasons.js";
+
+function zipLists(list1, list2) {
+  const zipped = [];
+  const maxLength = Math.max(list1.length, list2.length);
+
+  for (let i = 0; i < maxLength; i++) {
+    zipped.push([list1[i] || null, list2[i] || null]);
+  }
+
+  return zipped;
+}
+
+
+const reasonsZipped = zipLists(addReasons, removeReasons);
+
+reasonsZipped[addReasons.length + 1][0] = inventoryReason;
 
 export default {
   name: "stockChangesView",
@@ -89,10 +147,13 @@ export default {
       offset: null,
       rangeFromQuery: false,
       olderChangesExists: false, // for the button 'Load older Changes'
+      reasons: reasonsZipped,
+      commands,
     };
   },
   components: {
     StockChangesList,
+    'barcode': VueBarcode
   },
   methods: {
     /* eslint-disable no-console */
@@ -234,6 +295,9 @@ export default {
         })
         .catch(console.error);
     },
+    print() {
+      window.print();
+    },
   },
   watch: {
     "$route.query"() {
@@ -280,14 +344,17 @@ export default {
 .tooltip {
   top: 10px !important;
 }
+
 /* Für die Animation wenn man einen Tag auswählt (Die Zeilen werden hervorgehoben): */
 @keyframes highlight {
   0% {
     background: #17a2b8;
   }
+
   30% {
     background: #17a2b8;
   }
+
   100% {
     background: none;
   }
@@ -296,10 +363,26 @@ export default {
 .highlight {
   animation: highlight 2s;
 }
+
 a:not([href]) {
   color: #007bff !important;
 }
+
 a:not([href]):hover {
   color: #0056b3 !important;
+}
+
+.print-only {
+  display: none !important;
+}
+
+@media print {
+  .print-only {
+    display: flex !important;
+  }
+
+  .page-break-before {
+    page-break-before: always;
+  }
 }
 </style>
