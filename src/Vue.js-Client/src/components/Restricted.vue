@@ -51,13 +51,13 @@
             <div class="dropdown-divider"></div>
             <b-dropdown-item to="/items">Items</b-dropdown-item>
             <b-dropdown-item to="/positions">Positions</b-dropdown-item>
-            <b-dropdown-item to="/itemGroups">ItemGroups</b-dropdown-item>
+            <b-dropdown-item to="/itemGroups">Item groups</b-dropdown-item>
             <div class="dropdown-divider"></div>
-            <b-dropdown-item to="/itemStock">ItemStock</b-dropdown-item>
-            <b-dropdown-item to="/itemGroupStock">ItemGroupStock</b-dropdown-item>
-            <b-dropdown-item to="/stockChanges">StockChanges</b-dropdown-item>
+            <b-dropdown-item to="/itemStock">Item stock</b-dropdown-item>
+            <b-dropdown-item to="/itemGroupStock">Shopping list</b-dropdown-item>
+            <b-dropdown-item to="/stockChanges">Stock changes</b-dropdown-item>
             <div class="dropdown-divider"></div>
-            <b-dropdown-item to="/addInvoice">Add Invoice</b-dropdown-item>
+            <b-dropdown-item to="/addInvoice">Add invoice</b-dropdown-item>
             <b-dropdown-item to="/invoices">Invoices</b-dropdown-item>
           </b-nav-item-dropdown>
           <li class="nav-item">
