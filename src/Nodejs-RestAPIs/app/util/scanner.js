@@ -214,7 +214,7 @@ const onBarcode = async (barcode) => {
     }
     const item = items[0];
     resetItemTimeout();
-    if (this.sign !== 'i') {
+    if (state.sign !== 'i') {
         if (state.change && state.change.itemId === item.id && state.change.reason === state.reason.name) {
             const amount = Number(state.change.amount);
             state.change.amount = `${Math.sign(amount) * (Math.abs(amount) + 1)}`;
