@@ -167,7 +167,7 @@ const onBarcode = async (barcode) => {
             state.user = null;
             state.reason = null;
             sendMQTTClear();
-            setChangeToNull();
+            return setChangeToNull();
         }
     }
     if (barcode.length === 4 && (barcode[0] === '+' || barcode[0] === '-' || barcode[0] === 'i')) {
