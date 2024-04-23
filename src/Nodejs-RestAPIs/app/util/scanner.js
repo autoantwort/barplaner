@@ -214,6 +214,13 @@ const onBarcode = async (barcode) => {
     }
     resetItemTimeout();
     const item = items[0];
+    if (state.change && state.change.itemId === item.id && state.change.reason === state.reason.name) {
+        const amount = Number(state.change.amount);
+        state.change.amount = `${Math.sign(amount) * (Math.abs(amount) + 1)}`;
+        sendMQTTChangeAmount(state.change.amount);
+        state.change.save();
+        return;
+    }
     sendMQTTItemName(item.name);
     sendMQTTItemAmount(item.stockChanges[0]?.dataValues.inStock || 0)
     if (item.itemGroupId) {
@@ -236,13 +243,6 @@ const onBarcode = async (barcode) => {
         sendMQTTGroupAmount("0")
     }
     if (state.sign !== 'i') {
-        if (state.change && state.change.itemId === item.id && state.change.reason === state.reason.name) {
-            const amount = Number(state.change.amount);
-            state.change.amount = `${Math.sign(amount) * (Math.abs(amount) + 1)}`;
-            sendMQTTChangeAmount(state.change.amount);
-            state.change.save();
-            return;
-        }
         state.change = await StockChange.create({
             itemId: item.id,
             userId: state.user?.id || null,
