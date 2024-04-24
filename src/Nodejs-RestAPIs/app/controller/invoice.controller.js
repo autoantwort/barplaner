@@ -330,17 +330,21 @@ const exportForMetro = (invoice, text) => {
                         if (entry === null) {
                             // noch gab es kein InvoiceEntry der gemappt wurde, aber vielleicht gibt es ja ein Item von einem Seller mit dem richtigen Barcode
                             const items = await Item.findAll({
-                                where: {
-                                    [Op.or]: [
-                                        { barcode: barcode },
-                                        { barcodePack: barcode },
-                                    ],
-                                    [Op.or]: [{
-                                        seller: null,
-                                    }, {
-                                        seller: "Metro",
-                                    }],
-                                }
+                                where: [
+                                    {
+                                        [Op.or]: [
+                                            { barcode: barcode },
+                                            { barcodePack: barcode },
+                                        ]
+                                    },
+                                    {
+                                        [Op.or]: [{
+                                            seller: null,
+                                        }, {
+                                            seller: "Metro",
+                                        }]
+                                    },
+                                ]
                             });
                             if (items.length === 1) {
                                 entry = { stockItemId: items[0].id, stockItem: items[0] };
@@ -349,7 +353,7 @@ const exportForMetro = (invoice, text) => {
                         InvoiceEntry.create({
                             itemDescription: item.bez,
                             articleNumber: item.articleNumber,
-                            ...(barcodeIsPack ? {gtinPack: barcode} : {gtin: barcode}),
+                            ...(barcodeIsPack ? { gtinPack: barcode } : { gtin: barcode }),
                             quantity: item.menge * item.kolli,
                             netPrice: item.einzelPreis,
                             brottoPrice: item.einzelPreis * taxMap[item.tax],
@@ -415,6 +419,8 @@ exports.analyseInvoice = (req, res) => {
                         },
                         include: [{
                             model: Item,
+                        }, {
+                            model: StockChange,
                         }],
                     }).then(entries => {
                         res.send({ invoice, entries });
