@@ -50,7 +50,7 @@ export default {
     },
     edit() {
       this.content.amount = this.object.amount;
-      this.content.unit = this.object.unit || "Units";
+      this.content.unit = this.object.unit || "ml";
     },
   },
 };

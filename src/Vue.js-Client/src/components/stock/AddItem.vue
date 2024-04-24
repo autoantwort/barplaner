@@ -113,7 +113,7 @@ export default {
         articleNumber: null,
         seller: "Unknown",
         amount: null,
-        unit: "Units",
+        unit: "ml",
         alcoholByVolume: null,
         website: null,
         internalNote: null,
@@ -151,7 +151,7 @@ export default {
         this.item.articleNumber = res.data?.articleNumber;
         this.item.seller = res.data?.seller ?? "Unknown";
         this.item.amount = res.data?.amount;
-        this.item.unit = res.data?.unit ?? "Units";
+        this.item.unit = res.data?.unit ?? "ml";
         this.item.alcoholByVolume = res.data?.alk;
         this.item.website = res.data?.productSite;
         this.$refs.imageInput.setImageURL(res.data?.images?.[0]);
