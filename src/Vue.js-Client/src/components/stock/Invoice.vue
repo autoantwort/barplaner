@@ -501,6 +501,7 @@ export default {
           })
           .then(() => {
             this.currentEntry.stockItem = item;
+            this.currentEntry.stockItemId = item.id;
           })
           .catch(alert);
       };
