@@ -6,6 +6,9 @@ exports.registerWebSocketListener = function (app) {
     app.ws('/shoppingListState', (ws, req) => {
         clients.add(ws);
         ws.send("Init:" + Array.from(selectedItems).join(","));
+        ws.on('error', err => {
+            console.error("Fehler bei einem Websocket unter /shoppingListState", err);
+        });
         ws.on('message', msg => {
             if (msg.startsWith("Add:")) {
                 selectedItems.add(msg.substring(4));

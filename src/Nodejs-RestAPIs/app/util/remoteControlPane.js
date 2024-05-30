@@ -7,6 +7,9 @@ function sendMessageToController(msg) {
 
 exports.registerClients = function(app) {
     app.ws('/controlPaneClient', (ws, req) => {
+        ws.on('error', err => {
+            console.error("Fehler bei einem Websocket unter /controlPaneClient", err);
+        });
         let name = "unnamed";
         clients[name] = { ws, data: {} };
         ws.on('message', msg => {
@@ -57,6 +60,9 @@ exports.registerClients = function(app) {
 };
 exports.registerMasters = app => {
     app.ws('/controlPaneMaster', (ws, req) => {
+        ws.on('error', err => {
+            console.error("Fehler bei einem Websocket unter /controlPaneMaster", err);
+        });
         controllers.push(ws);
         // send all know clients to the new master
         for (let c in clients) {

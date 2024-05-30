@@ -257,6 +257,9 @@ const onBarcode = async (barcode) => {
 
 exports.registerClients = function (app) {
     app.ws('/scanner', (ws, req) => {
+        ws.on('error', err => {
+            console.error("Fehler bei einem Websocket unter /scanner", err);
+        });
         ws.on('message', msg => {
             sendMessageToController(msg);
             onBarcode(msg);
@@ -268,6 +271,9 @@ exports.registerClients = function (app) {
 };
 exports.registerMasters = app => {
     app.ws('/scannerConsumer', (ws, req) => {
+        ws.on('error', err => {
+            console.error("Fehler bei einem Websocket unter /scannerConsumer", err);
+        });
         controllers.push(ws);
         ws.on('message', msg => {
             // I don't know what they want to send

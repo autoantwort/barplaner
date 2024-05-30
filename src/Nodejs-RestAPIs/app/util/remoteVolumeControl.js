@@ -9,6 +9,9 @@ exports.registerClients = function(app) {
     app.ws('/volumeClient', (ws, req) => {
         let name = "unnamed";
         clients[name] = ws;
+        ws.on('error', err => {
+            console.error("Fehler bei einem Websocket unter /volumeClient", err);
+        });
         ws.on('message', msg => {
             if (msg.startsWith("Name:")) {
                 const newName = msg.substring(5);
@@ -36,6 +39,9 @@ exports.registerClients = function(app) {
 };
 exports.registerMasters = app => {
     app.ws('/volumeMaster', (ws, req) => {
+        ws.on('error', err => {
+            console.error("Fehler bei einem Websocket unter /volumeMaster", err);
+        });
         controllers.push(ws);
         // send all know clients to the new master
         for (let c in clients) {
