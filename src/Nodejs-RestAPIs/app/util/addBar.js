@@ -23,7 +23,7 @@ exports.addBar = (barData, numberOfPersonsToClean) => {
                 where: {
                     active: true
                 }
-            }).then(users =>  {
+            }).then(users => {
                 for (let i = 0; i < users.length; ++i) {
                     users[i] = {
                         barID: bar.id,
@@ -65,10 +65,7 @@ exports.onBarAdded = callback => barAddedListener.push(callback);
  * @param {Bar} barObject the bar model instance 
  * @param {object} newBarData the new bar data with the same fields as the bar model instance
  */
-exports.changeBar = (barObject, newBarData) => {
-    if (barObject.facebookEventID === null) {
-        console.warn("Update a bar object with facebook data that has no facebookEventID");
-    }
+exports.changeBar = async (barObject, newBarData) => {
     if (!barObject.canceled && newBarData.canceled) {
         // if the bar was cancelled, delete all bar duties
         BarDuty.destroy({
@@ -82,7 +79,7 @@ exports.changeBar = (barObject, newBarData) => {
     }
     // if the previous for loop changed a property
     if (barObject.changed()) {
-        barObject.save();
+        await barObject.save();
         // update the email newsletter
         Newsletter.sendEmailForBar(barObject);
         barChangedListener.forEach(c => c(barObject));

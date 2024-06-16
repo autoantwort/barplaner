@@ -53,6 +53,7 @@ require("./app/util/telegram");
 require("./app/util/gitFileBrowser");
 require("./app/util/telegramNewsletter");
 require("./app/util/gitlab");
+require("./app/util/studibars");
 const remoteVolumeControl = require("./app/util/remoteVolumeControl");
 remoteVolumeControl.registerClients(app);
 const remoteControlPane = require("./app/util/remoteControlPane");
