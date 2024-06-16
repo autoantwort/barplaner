@@ -21,6 +21,7 @@ const eventToBar = event => {
         end: event.end ? new Date(event.end_date) : null,
         studibarsEventId: event.id,
         studibarsEventPosterURL: event.poster,
+        public: false,
     };
 };
 
