@@ -34,6 +34,16 @@ module.exports = (sequelize, Sequelize) => {
             allowNull: true,
             defaultValue: null,
         },
+        studibarsEventId: {
+            type: Sequelize.INTEGER,
+            allowNull: true,
+            defaultValue: null,
+        },
+        studibarsEventPosterURL: {
+            type: Sequelize.STRING(512),
+            allowNull: true,
+            defaultValue: null,
+        },
     });
     return Bar;
 };
