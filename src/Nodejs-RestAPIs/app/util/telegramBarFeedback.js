@@ -161,7 +161,7 @@ function sendBarInfo(bar, userID) {
                         }
                         message += haveToClean[haveToClean.length - 1] + " ";
                     }
-                    message += "putzen.";
+                    message += "putzen.\nFalls du nicht putzen kannst, suche dir bitte selbstständig Ersatz. Dies gilt auch wenn du angibst dass du nicht zur Bar kommst.\n";
                 } else {
                     message += "Du musst dieses Mal nicht putzen.";
                 }
@@ -203,6 +203,7 @@ const addBarMessageCreator = Telegram.registerResponseSystem("addBar", (message)
                 message.newText = "Welche Theke machst du?";
                 message.addButtonToRow('Biertheke', 'job', 'Biertheke');
                 message.addButtonToRow('Cocktailtheke', 'job', 'Cocktailtheke');
+                message.addButtonToRow('mal schauen', 'job', '');
                 message.sendUpdatedMessage();
             } else {
                 message.newText = "Schade!";
