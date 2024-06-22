@@ -2,11 +2,7 @@
   <div class="container">
     <div class="row mt-2">
       <div class="col-12 col-md-8 offset-md-2">
-        <div
-          v-if="!connected"
-          class="alert alert-danger text-center"
-          role="alert"
-        >Currently not connected</div>
+        <div v-if="!connected" class="alert alert-danger text-center" role="alert">Currently not connected</div>
         <table class="table">
           <thead>
             <tr>
@@ -18,24 +14,19 @@
           </thead>
           <tbody>
             <tr v-for="(client, index) in clients" :key="index">
-              <td>{{client.name}}</td>
-              <td class="text-right" style="padding-right: 0px">{{client.value}}%</td>
+              <td>{{ client.name }}</td>
+              <td class="text-right" style="padding-right: 0px">{{ client.value }}%</td>
               <td>
-                <input
-                  type="range"
-                  form="0"
-                  to="100"
-                  style="width: 100%"
-                  v-model="client.value"
-                  @input="updateDevice(client,$event.target.value)"
-                />
+                <input type="range" form="0" to="100" style="width: 100%" v-model="client.value" @input="updateDevice(client, $event.target.value)" />
               </td>
-                <td style="padding: .5rem; padding-left: 0px; padding-right: 0px;">
+              <td style="padding: .5rem; padding-left: 0px; padding-right: 0px;">
                 <div class="btn-group btn-group-sm" role="group" aria-label="First group">
-                  <button type="button" class="btn btn-secondary" :disabled="client.value<1"  v-on:click="updateDevice(client, client.value = Math.max(0, client.value-5))" >-5</button>
-                  <button type="button" class="btn btn-secondary" :disabled="client.value<1"  v-on:click="updateDevice(client, --client.value)" >-1</button>
-                  <button type="button" class="btn btn-secondary" :disabled="client.value>99" v-on:click="updateDevice(client, ++client.value)" >+1</button>
-                  <button type="button" class="btn btn-secondary" :disabled="client.value>99" v-on:click="updateDevice(client, client.value = Math.min(100, client.value-(-5)))" >+5</button>
+                  <button type="button" class="btn btn-secondary" :disabled="client.value < 1"
+                    v-on:click="updateDevice(client, client.value = Math.max(0, client.value - 5))">-5</button>
+                  <button type="button" class="btn btn-secondary" :disabled="client.value < 1" v-on:click="updateDevice(client, --client.value)">-1</button>
+                  <button type="button" class="btn btn-secondary" :disabled="client.value > 99" v-on:click="updateDevice(client, ++client.value)">+1</button>
+                  <button type="button" class="btn btn-secondary" :disabled="client.value > 99"
+                    v-on:click="updateDevice(client, client.value = Math.min(100, client.value - (-5)))">+5</button>
                 </div>
               </td>
             </tr>
@@ -62,12 +53,18 @@ export default {
     updateDevice(client, value) {
       this.webSocket.send(client.name + ":" + value / 100);
     },
-    initialize() {
+    initWebSocket() {
+      this.webSocket = new WebSocket(
+        http.defaults.baseWsURL + "/volumeMaster"
+      );
       this.webSocket.onopen = () => {
         this.connected = true;
       };
       this.webSocket.onclose = () => {
         this.connected = false;
+        setTimeout(() => {
+          this.initWebSocket();
+        }, 2000);
       };
       this.webSocket.onmessage = event => {
         const msg = event.data.split(":");
@@ -89,7 +86,7 @@ export default {
           }
         } else if (msg[0] === "Value") {
           const c = this.clients.find(c => c.name === msg[1]);
-          if (c !== undefined) {            
+          if (c !== undefined) {
             c.value = (Number(msg[2]) * 100).toFixed(0);
           }
         }
@@ -98,16 +95,14 @@ export default {
     /* eslint-enable no-console */
   },
   created() {
-    this.webSocket = new WebSocket(
-      http.defaults.baseWsURL + "/volumeMaster"
-    );
-    this.initialize();
+    this.initWebSocket();
   },
   beforeDestroy() {
-    this.webSocket.close();
+    if (this.webSocket) {
+      this.webSocket.close();
+    }
   }
 };
 </script>
 
-<style>
-</style>
+<style></style>

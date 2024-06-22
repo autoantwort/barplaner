@@ -2,122 +2,53 @@
   <div class="container">
     <div class="row mt-2">
       <div class="col-12">
-        <div
-          v-if="!connected"
-          class="alert alert-danger text-center"
-          role="alert"
-        >Currently not connected</div>
+        <div v-if="!connected" class="alert alert-danger text-center" role="alert">Currently not connected</div>
         <p v-if="isTouch" class="alert alert-info text-center" role="alert">
           Hold a item to move it.
           <br />
           <input type="checkbox" id="move" v-model="enableMove" />
           <label for="move" style="margin-left: 5px">Enable move</label>
         </p>
-        <div
-          v-if="cantMoveCount>0"
-          class="alert alert-warning text-center"
-          role="alert"
-        >In some control panels you don't have the rights to move the items</div>
+        <div v-if="cantMoveCount > 0" class="alert alert-warning text-center" role="alert">In some control panels you don't have the rights to move the items
+        </div>
         <div v-for="(client, key) in clients" :key="key">
-          <h2>{{client.name}}</h2>
-          <div
-            class="pane"
-            v-on:drop="handleDrop"
-            v-on:dragover="handleDragOver"
-            v-on:touchmove="handleTouchMove"
-            v-on:touchend="handleTouchEnd"
-            v-on:touchcancel="handleTouchEnd"
-            v-bind:style="{'touch-action'  : draggedItem !==null ? 'none':''}"
-            :canMoveItems="client.canMoveItems"
-          >
-            <div
-              class="item"
-              v-for="(item, ikey) in client.data"
-              :key="ikey"
-              v-bind:style="{ left: (mobilePositions ? item.mobileX : item.x)*70+'px', top: (mobilePositions ? item.mobileY : item.y)*70+'px', height: (item.type === 'DIMMER_GROUP') * 210  + 70 + 'px', width: (item.type !== 'DIMMER_GROUP') * 140  + 70 + 'px' }"
-              :id="key+ikey+'Root'"
-              v-on:dragstart="handleDragStart($event,client.name+'.'+ikey+'.')"
-              draggable="true"
-              v-on:mouseover="handleMouseOver"
-              v-on:touchstart="handleTouchStart($event,client.name+'.'+ikey+'.')"
-            >
-              <h5 class="text-center pb-4" v-bind:class="{'vertical-name':item.type !== 'DIMMER_GROUP'}">{{item.name}}</h5>
+          <h2>{{ client.name }}</h2>
+          <div class="pane" v-on:drop="handleDrop" v-on:dragover="handleDragOver" v-on:touchmove="handleTouchMove" v-on:touchend="handleTouchEnd"
+            v-on:touchcancel="handleTouchEnd" v-bind:style="{ 'touch-action': draggedItem !== null ? 'none' : '' }" :canMoveItems="client.canMoveItems">
+            <div class="item" v-for="(item, ikey) in client.data" :key="ikey"
+              v-bind:style="{ left: (mobilePositions ? item.mobileX : item.x) * 70 + 'px', top: (mobilePositions ? item.mobileY : item.y) * 70 + 'px', height: (item.type === 'DIMMER_GROUP') * 210 + 70 + 'px', width: (item.type !== 'DIMMER_GROUP') * 140 + 70 + 'px' }"
+              :id="key + ikey + 'Root'" v-on:dragstart="handleDragStart($event, client.name + '.' + ikey + '.')" draggable="true"
+              v-on:mouseover="handleMouseOver" v-on:touchstart="handleTouchStart($event, client.name + '.' + ikey + '.')">
+              <h5 class="text-center pb-4" v-bind:class="{ 'vertical-name': item.type !== 'DIMMER_GROUP' }">{{ item.name }}</h5>
 
               <div v-if="item.type === 'DIMMER_GROUP'" style="top:25%; position:absolute;width:100%;height:75%">
-                <input
-                  type="range"
-                  orient="vertical"
-                  v-model="item.value"
-                  min="0"
-                  max="255"
-                  step="1"
-                  v-on:input="webSocket.send(client.name + '.' + ikey + '.' + 'value:' + item.value)"
-                />
-                <div class="text-center" style="height:20%;width:100%;">{{item.value}}</div>
+                <input type="range" orient="vertical" v-model="item.value" min="0" max="255" step="1"
+                  v-on:input="webSocket.send(client.name + '.' + ikey + '.' + 'value:' + item.value)" />
+                <div class="text-center" style="height:20%;width:100%;">{{ item.value }}</div>
               </div>
               <div v-else-if="item.type === 'PROGRAMM'" class="icon-div">
-                <font-awesome-icon
-                  class="icon"
-                  v-show="item.running === 'false'"
-                  icon="play"
-                  v-on:click="webSocket.send(client.name + '.' + ikey + '.running:true');item.running='true';"
-                />
-                <font-awesome-icon
-                  class="icon"
-                  v-show="item.running === 'true'"
-                  icon="pause"
-                  v-on:click="webSocket.send(client.name + '.' + ikey + '.running:false');item.running='false';"
-                />
+                <font-awesome-icon class="icon" v-show="item.running === 'false'" icon="play"
+                  v-on:click="webSocket.send(client.name + '.' + ikey + '.running:true'); item.running = 'true';" />
+                <font-awesome-icon class="icon" v-show="item.running === 'true'" icon="pause"
+                  v-on:click="webSocket.send(client.name + '.' + ikey + '.running:false'); item.running = 'false';" />
               </div>
-              <div v-else-if="item.type === 'SWITCH_GROUP'" class="icon-div" :id="key+ikey">
-                <font-awesome-icon
-                  class="icon"
-                  v-show="item.activated === 'false'"
-                  icon="play"
-                  v-on:click="item.activated='true';webSocket.send(client.name + '.' + ikey + '.activated:true');"
-                />
-                <font-awesome-icon
-                  class="icon"
-                  v-show="switchShow(item.activated === 'true', key+ikey, item.activateCooldown, item.deactivateCooldown)"
-                  icon="pause"
-                  v-on:click="item.activated='false';webSocket.send(client.name + '.' + ikey + '.activated:false');"
-                />
+              <div v-else-if="item.type === 'SWITCH_GROUP'" class="icon-div" :id="key + ikey">
+                <font-awesome-icon class="icon" v-show="item.activated === 'false'" icon="play"
+                  v-on:click="item.activated = 'true'; webSocket.send(client.name + '.' + ikey + '.activated:true');" />
+                <font-awesome-icon class="icon" v-show="switchShow(item.activated === 'true', key + ikey, item.activateCooldown, item.deactivateCooldown)"
+                  icon="pause" v-on:click="item.activated = 'false'; webSocket.send(client.name + '.' + ikey + '.activated:false');" />
               </div>
-              <div v-else-if="item.type === 'PROGRAM_BLOCK'" class="icon-div" :id="key+ikey">
-                <font-awesome-icon
-                  title="Play"
-                  class="icon"
-                  v-show="item.state === 'Stopped'"
-                  icon="play"
-                  v-on:click="webSocket.send(client.name + '.' + ikey + '.state:start');"
-                />
+              <div v-else-if="item.type === 'PROGRAM_BLOCK'" class="icon-div" :id="key + ikey">
+                <font-awesome-icon title="Play" class="icon" v-show="item.state === 'Stopped'" icon="play"
+                  v-on:click="webSocket.send(client.name + '.' + ikey + '.state:start');" />
                 <div v-show="item.state === 'Running'" style="width:100%;height:100%">
-                  <font-awesome-icon
-                    title="Stop"
-                    class="half-icon"
-                    icon="stop"
-                    v-on:click="webSocket.send(client.name + '.' + ikey + '.state:stop');"
-                  />
-                  <font-awesome-icon
-                    title="Pause"
-                    class="half-icon"
-                    icon="pause"
-                    v-on:click="webSocket.send(client.name + '.' + ikey + '.state:pause');"
-                  />
+                  <font-awesome-icon title="Stop" class="half-icon" icon="stop" v-on:click="webSocket.send(client.name + '.' + ikey + '.state:stop');" />
+                  <font-awesome-icon title="Pause" class="half-icon" icon="pause" v-on:click="webSocket.send(client.name + '.' + ikey + '.state:pause');" />
                 </div>
                 <div v-show="item.state === 'Paused'" style="width:100%;height:100%">
-                  <font-awesome-icon
-                    title="Restart"
-                    class="half-icon"
-                    icon="redo"
-                    v-on:click="webSocket.send(client.name + '.' + ikey + '.state:restart');"
-                  />
-                  <font-awesome-icon
-                    title="Resume"
-                    class="half-icon"
-                    icon="step-forward"
-                    v-on:click="webSocket.send(client.name + '.' + ikey + '.state:resume');"
-                  />
+                  <font-awesome-icon title="Restart" class="half-icon" icon="redo" v-on:click="webSocket.send(client.name + '.' + ikey + '.state:restart');" />
+                  <font-awesome-icon title="Resume" class="half-icon" icon="step-forward"
+                    v-on:click="webSocket.send(client.name + '.' + ikey + '.state:resume');" />
                 </div>
               </div>
             </div>
@@ -270,15 +201,21 @@ export default {
       };
       requestAnimationFrame(callback);
     },
-    initialize() {
+    initWebSocket() {
+      this.webSocket = new WebSocket(
+        http.defaults.baseWsURL + "/controlPaneMaster"
+      );
       this.webSocket.onopen = () => {
         this.connected = true;
       };
-      this.webSocket.onerror = function(event) {
+      this.webSocket.onerror = function (event) {
         console.error("WebSocket error observed:", event);
       };
       this.webSocket.onclose = () => {
         this.connected = false;
+        setTimeout(() => {
+          this.initWebSocket();
+        }, 2000);
       };
       this.webSocket.onmessage = event => {
         // https://vuejs.org/v2/guide/list.html#Object-Change-Detection-Caveats
@@ -341,16 +278,15 @@ export default {
     /* eslint-enable no-console */
   },
   created() {
-    this.webSocket = new WebSocket(
-      http.defaults.baseWsURL + "/controlPaneMaster"
-    );
-    this.initialize();
+    this.initWebSocket();
     this.isTouch = "ontouchstart" in window;
     window.onresize = () => (this.mobilePositions = window.innerWidth < 500);
     this.mobilePositions = window.innerWidth < 500;
   },
   beforeDestroy() {
-    this.webSocket.close();
+    if (this.webSocket) {
+      this.webSocket.close();
+    }
   }
 };
 </script>
@@ -360,6 +296,7 @@ export default {
   position: relative;
   height: 500px;
 }
+
 .item {
   user-select: none;
   position: absolute;
@@ -368,6 +305,7 @@ export default {
   border-width: 2px;
   border-radius: 4px;
 }
+
 .vertical-name {
   left: 70px;
   height: 100%;
@@ -375,24 +313,30 @@ export default {
   line-height: 65px;
   position: absolute;
 }
+
 .icon-div {
   width: 33%;
   height: 100%;
 }
+
 .icon {
-  width: 100% !important  ;
+  width: 100% !important;
   height: 100%;
   padding: 7px;
 }
+
 .half-icon {
   width: 50% !important;
   height: 100%;
   padding: 4px;
 }
+
 /*from https://stackoverflow.com/questions/15935837/how-to-display-a-range-input-slider-vertically */
 input[type="range"][orient="vertical"] {
-  writing-mode: bt-lr; /* IE */
-  -webkit-appearance: slider-vertical; /* WebKit */
+  writing-mode: bt-lr;
+  /* IE */
+  -webkit-appearance: slider-vertical;
+  /* WebKit */
   width: 100%;
   height: 80%;
 }
