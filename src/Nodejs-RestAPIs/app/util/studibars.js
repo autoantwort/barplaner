@@ -11,8 +11,6 @@ let axios = Axios.create({
     baseURL: "https://studibars-ac.de/api",
 });
 
-let lastUpdated = new Date(0);
-
 const eventToBar = event => {
     return {
         name: event.name,
@@ -26,11 +24,9 @@ const eventToBar = event => {
 };
 
 exports.syncStudibarsEvents = async () => {
-    const previousLastUpdated = lastUpdated;
-    lastUpdated = new Date();
     let in4Weeks = new Date();
     in4Weeks.setDate(in4Weeks.getDate() + 28);
-    const response = await axios.get("/events?bar__name__iexact=symposion&updated_at__gt=" + previousLastUpdated.toISOString() + "&start_date__lte=" + in4Weeks.toISOString());
+    const response = await axios.get("/events?bar__name__iexact=symposion&start_date__lte=" + in4Weeks.toISOString());
     const events = response.data;
     let numberPersonsClean = null;
     for (const event of events) {
@@ -54,6 +50,39 @@ exports.syncStudibarsEvents = async () => {
     }
 };
 
-const everyMinute = new CronJob('0,15,30,45 * * * * *', function () {
+const wssUrl = 'wss://studibars.de/api/bar/1/events/subscribe';
+
+const WebSocket = require('ws');
+
+let ws;
+let reconnectInterval = 1000; // Start with a 1-second interval
+
+// Import changes after they happened
+function connectWebSocket() {
+    ws = new WebSocket(wssUrl);
+
+    ws.on('open', function open() {
+        reconnectInterval = 1000; // Reset the reconnect interval on successful connection
+    });
+
+    ws.on('message', function incoming(data) {
+        exports.syncStudibarsEvents().catch(console.error);
+    });
+
+    ws.on('close', attemptReconnect);
+    ws.on('error', attemptReconnect);
+}
+
+// Function to handle reconnection attempts
+function attemptReconnect() {
+    setTimeout(() => {
+        reconnectInterval = Math.min(reconnectInterval * 2, 30000); // Exponential backoff, max 30 seconds
+        connectWebSocket();
+    }, reconnectInterval);
+}
+
+connectWebSocket();
+
+const everyMinute = new CronJob('0 0 0 * * *', function () { // Every day at midnight
     exports.syncStudibarsEvents().catch(console.error);
 }, null, true);
