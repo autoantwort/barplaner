@@ -17,8 +17,11 @@
         </div>
         <div class="form-group row">
           <label class="col-3">Recent Usage</label>
-          <label class="col-9" v-if="usage">{{ usage.threeMonths }} <small>in three months</small>, {{ usage.sixMonths }} <small>in six month</small>, {{
-        usage.oneYear }} in one year</label>
+          <label class="col-9" v-if="usage">
+            {{ usage.threeMonths }} <small>in three months</small>,
+            {{ usage.sixMonths }} <small>in six months</small>,
+            {{ usage.oneYear }} <small>in one year</small>
+          </label>
         </div>
         <div class="form-group row">
           <label class="col-3">In Stock</label>
