@@ -4,47 +4,24 @@
       <div v-if="realItemGroup" class="col-12 col-md-8 offset-md-2 was-validated">
         <div class="form-group row">
           <label class="col-3">Name</label>
-          <generic-input-component
-            :object="realItemGroup"
-            property="name"
-            endpoint="/itemGroup/:id"
-            required
-            :minLength="4"
-          />
+          <generic-input-component :object="realItemGroup" property="name" endpoint="/itemGroup/:id" required :minLength="4" />
         </div>
         <div class="form-group row">
           <label class="col-3">Minimum Count</label>
-          <generic-input-component
-            :object="realItemGroup"
-            property="minimumCount"
-            type="number"
-            :min="0"
-            :max="realItemGroup.idealCount"
-            :required="realItemGroup.idealCount !== null"
-            endpoint="/itemGroup/:id"
-          />
+          <generic-input-component :object="realItemGroup" property="minimumCount" type="number" :min="0" :max="realItemGroup.idealCount"
+            :required="realItemGroup.idealCount !== null" endpoint="/itemGroup/:id" />
         </div>
         <div class="form-group row">
           <label class="col-3">Ideal Count</label>
-          <generic-input-component
-            :object="realItemGroup"
-            property="idealCount"
-            type="number"
-            :min="realItemGroup.minimumCount"
-            endpoint="/itemGroup/:id"
-          />
+          <generic-input-component :object="realItemGroup" property="idealCount" type="number" :min="realItemGroup.minimumCount" endpoint="/itemGroup/:id" />
         </div>
         <div class="form-group row">
           <label class="col-3">In Stock</label>
           <label class="col-9">
             {{ inStock }}
-            <span
-              v-if="inStock && inStock < realItemGroup.idealCount"
-              class="badge ml-2 vert"
-              style="vertical-align: text-top"
-              v-bind:class="[inStock < realItemGroup.minimumCount ? 'badge-danger' : 'badge-warning']"
-              >Buy {{ realItemGroup.idealCount - inStock }} item{{ realItemGroup.idealCount - inStock > 1 ? "s" : "" }}</span
-            >
+            <span v-if="inStock && inStock < realItemGroup.idealCount" class="badge ml-2 vert" style="vertical-align: text-top"
+              v-bind:class="[inStock < realItemGroup.minimumCount ? 'badge-danger' : 'badge-warning']">Buy {{ realItemGroup.idealCount - inStock }} item{{
+        realItemGroup.idealCount - inStock > 1 ? "s" : "" }}</span>
           </label>
         </div>
         <div class="form-group row">
@@ -69,10 +46,25 @@
                   <router-link :to="{ name: 'item', params: { itemId: item.id } }">{{ item.name }}</router-link>
                 </td>
                 <td><a v-if="item.website" :href="item.website">{{ item.seller }}</a><template v-else>{{ item.seller }}</template></td>
-                <td>{{ item.amount }} {{ item.unit }}</td>
+                <td>{{ item.amount }} {{ item.unit }}
+                  <template v-if="item.showAvg">
+                    <br>
+                    <small>1000 {{ item.unit }}</small>
+                  </template>
+                </td>
                 <td>{{ item.inStock }}</td>
-                <td>{{ item.minBrottoPrice }}</td>
-                <td>{{ item.avgBrottoPrice }}</td>
+                <td>{{ item.minBrottoPrice }}
+                  <template v-if="item.showAvg">
+                    <br>
+                    <small>{{ item.minBrottoPriceNorm }}</small>
+                  </template>
+                </td>
+                <td>{{ item.avgBrottoPrice }}
+                  <template v-if="item.showAvg">
+                    <br>
+                    <small>{{ item.avgBrottoPriceNorm }}</small>
+                  </template>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -90,6 +82,11 @@ import http from "../../http-common";
 import GenericInputComponent from "./components/GenericInputComponent";
 import EditPositionComponent from "./components/EditPositionComponent";
 import StockChangesList from "./StockChangesList";
+
+const formatter = new Intl.NumberFormat('de-DE', {
+  style: 'currency',
+  currency: 'EUR',
+});
 
 export default {
   name: "itemGroup",
@@ -145,6 +142,13 @@ export default {
           let inStock = 0;
           for (let i of this.itemStock) {
             inStock += i.inStock;
+            i.showAvg = (i.amount && i.amount !== 1000 && i.minBrottoPrice);
+            if (i.showAvg) {
+              i.minBrottoPriceNorm = formatter.format(i.minBrottoPrice / i.amount * 1000);
+              i.avgBrottoPriceNorm = formatter.format(i.avgBrottoPrice / i.amount * 1000);
+            }
+            i.minBrottoPrice = i.minBrottoPrice ? formatter.format(i.minBrottoPrice) : null;
+            i.avgBrottoPrice = i.avgBrottoPrice ? formatter.format(i.avgBrottoPrice) : null;
           }
           this.inStock = inStock;
         })
@@ -176,5 +180,4 @@ export default {
 };
 </script>
 
-<style>
-</style>
+<style></style>
