@@ -216,8 +216,8 @@ const parseGermanDate = s => {
 
 const exportForMetro = (invoice, text) => {
     return new Promise(async (resolve, reject) => {
-        const literRegex = /^([0-9]+,[0-9]+)l?/;
-        const liter2Regex = /^([0-9]+(,[0-9]+)?)l/;
+        const literRegex = /^([0-9]+,[0-9]+)[lL]?/;
+        const liter2Regex = /^([0-9]+(,[0-9]+)?)[lL]/;
         const kgRegex = /([0-9]+(,[0-9]+)?)kg/i;
         const mlRegex = /([0-9]+)ml/;
         const grammRegex = /([0-9]+)g/;
