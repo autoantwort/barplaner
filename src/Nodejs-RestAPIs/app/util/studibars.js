@@ -50,7 +50,7 @@ exports.syncStudibarsEvents = async () => {
     }
 };
 
-const wssUrl = 'wss://studibars.de/api/bar/1/events/subscribe';
+const wssUrl = 'wss://studibars-ac.de/api/bar/1/events/subscribe';
 
 const WebSocket = require('ws');
 
@@ -59,7 +59,7 @@ let reconnectInterval = 1000; // Start with a 1-second interval
 
 // Import changes after they happened
 function connectWebSocket() {
-    ws = new WebSocket(wssUrl);
+    ws = new WebSocket(wssUrl, { followRedirects: true });
 
     ws.on('open', function open() {
         reconnectInterval = 1000; // Reset the reconnect interval on successful connection
@@ -70,7 +70,7 @@ function connectWebSocket() {
     });
 
     ws.on('close', attemptReconnect);
-    ws.on('error', attemptReconnect);
+    ws.on('error', (error) => console.error('studibars.de WebSocket error:', error));
 }
 
 // Function to handle reconnection attempts
