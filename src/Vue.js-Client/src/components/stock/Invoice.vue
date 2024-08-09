@@ -620,11 +620,13 @@ export default {
         alert("Fehler: " + err);
         console.error(err);
       };
-      const result = await this.$refs.itemGroupCard.saveItemGroup();
-      if (typeof result === "number" || result === null) {
-        data["itemGroupId"] = result;
-      } else {
-        onError(result);
+      if (this.$refs.itemGroupCard) {
+        const result = await this.$refs.itemGroupCard.saveItemGroup();
+        if (typeof result === "number" || result === null) {
+          data["itemGroupId"] = result;
+        } else {
+          onError(result);
+        }
       }
       if (this.currentItem) {
         http
