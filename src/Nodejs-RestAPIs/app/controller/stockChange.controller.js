@@ -209,6 +209,7 @@ exports.getStockChangesForItemGroup = (req, res) => {
             model: InvoiceEntry,
             attributes: ['invoiceId'],
         }],
+        order: [['date', 'DESC']],
     }).then(changes => {
         res.send(changes);
     }).catch(err => {
