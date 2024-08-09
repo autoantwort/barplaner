@@ -62,6 +62,8 @@ const scanner = require("./app/util/scanner");
 scanner.registerClients(app);
 const shoppingListState = require("./app/util/shoppingListState");
 shoppingListState.registerWebSocketListener(app);
+const shoppingListText = require("./app/util/shoppingListText");
+shoppingListText.registerWebSocketListener(app);
 
 const ical = require("./app/util/icalCalendar");
 app.get(env.ical.urlPath, (req, res) => ical.serve(res));

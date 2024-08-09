@@ -5,7 +5,9 @@
         <div class="form-group mb-1">
           <input type="text" class="mt-3 form-control" placeholder="Search" v-on:input="filter" />
         </div>
-
+        <div class="form-group mb-1">
+          <SharedTextArea class="mt-3 form-control" />
+        </div>
         <input class="m-1 align-middle" type="checkbox" id="onlyUnchecked" v-model="onlyUnchecked">
         <label class="pt-2 align-middle" for="onlyUnchecked">Only show unchecked entries</label>
         <button class="ml-3 py-0 btn btn-primary btn-sm align-middle" @click="clearSelection">Clear Selection</button>
@@ -51,9 +53,13 @@
 <script>
 import http from "../../http-common";
 import phoneticsFilter from "../../phoneticsFilter";
+import SharedTextArea from "./components/SharedTextArea.vue";
 
 export default {
   name: "itemGroupStock",
+  components: {
+    SharedTextArea,
+  },
   data() {
     return {
       itemGroups: [],
