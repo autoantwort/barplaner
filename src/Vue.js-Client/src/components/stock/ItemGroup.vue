@@ -16,6 +16,11 @@
           <generic-input-component :object="realItemGroup" property="idealCount" type="number" :min="realItemGroup.minimumCount" endpoint="/itemGroup/:id" />
         </div>
         <div class="form-group row">
+          <label class="col-3">Recent Usage</label>
+          <label class="col-9" v-if="usage">{{ usage.threeMonths }} <small>in three months</small>, {{ usage.sixMonths }} <small>in six month</small>, {{
+        usage.oneYear }} in one year</label>
+        </div>
+        <div class="form-group row">
           <label class="col-3">In Stock</label>
           <label class="col-9">
             {{ inStock }}
@@ -81,7 +86,8 @@
 import http from "../../http-common";
 import GenericInputComponent from "./components/GenericInputComponent";
 import EditPositionComponent from "./components/EditPositionComponent";
-import StockChangesList from "./StockChangesList";
+import StockChangesList from "./StockChangesList.vue";
+import { REASON } from "common/stockChangeReasons.js";
 
 const formatter = new Intl.NumberFormat('de-DE', {
   style: 'currency',
@@ -108,6 +114,7 @@ export default {
       itemStock: [],
       stockChanges: [],
       inStock: null,
+      usage: null,
     };
   },
   methods: {
@@ -159,6 +166,31 @@ export default {
       http
         .get("/itemGroup/" + itemGroupId + "/stockChanges")
         .then((response) => {
+          const now = new Date();
+          const oneDay = 1000 * 60 * 60 * 24;
+          const threeMonthsAgo = new Date(now - oneDay * 30 * 3);
+          const sixMonthsAgo = new Date(now - oneDay * 30 * 6);
+          const oneYearAgo = new Date(now - oneDay * 365);
+          let usageThreeMonths = 0;
+          let usageSixMonths = 0;
+          let usageOneYear = 0;
+          for (let change of response.data) {
+            change.date = new Date(change.date);
+            if (change.reason === REASON.CONSUMED_DURING_BAR || change.reason === REASON.CORRECTED_CONSUMPTION_DURING_BAR) {
+              if (change.date > threeMonthsAgo) {
+                usageThreeMonths += change.amount;
+              } else if (change.date > sixMonthsAgo) {
+                usageSixMonths += change.amount;
+              } else if (change.date > oneYearAgo) {
+                usageOneYear += change.amount;
+              }
+            }
+          }
+          this.usage = {
+            threeMonths: -(usageThreeMonths),
+            sixMonths: -(usageSixMonths + usageThreeMonths),
+            oneYear: -(usageOneYear + usageSixMonths + usageThreeMonths),
+          };
           this.stockChanges = response.data;
         })
         .catch(console.error);
