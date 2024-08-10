@@ -66,7 +66,7 @@ export default {
       filteredItemGroups: [],
       selectedPosition: null,
       onlyUnchecked: false,
-      connected: false,
+      connected: 2,
     };
   },
   computed: {
@@ -113,6 +113,11 @@ export default {
           this.itemGroups = itemGroups;
           this.filteredItemGroups = this.itemGroups;
           this.initWebSocket();
+          setTimeout(() => {
+            if (this.connected === 2) {
+              this.connected = false;
+            }
+          }, 2000);
         })
         .catch((e) => {
           console.log(e);
