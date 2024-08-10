@@ -32,7 +32,7 @@ export default {
             };
             this.webSocket.onmessage = event => {
                 clearInterval(this.interval);
-                if (this.text !== "Connecting...") {
+                if (this.interval) {
                     this.disabled = true;
                     this.interval = setTimeout(() => {
                         this.disabled = false;
@@ -41,10 +41,13 @@ export default {
                     this.rows = event.data.split("\n").length
                 }
                 this.text = event.data;
+                window.localStorage.setItem("shoppingListText", event.data);
             };
         }
     },
     created() {
+        this.text = window.localStorage.getItem("shoppingListText") || this.text;
+        this.rows = this.text.split("\n").length
         this.initWebSocket();
     },
     beforeDestroy() {
