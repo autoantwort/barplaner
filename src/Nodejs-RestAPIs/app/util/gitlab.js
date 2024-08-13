@@ -16,59 +16,65 @@ let axios = Axios.create({
     }
 });
 
-const issueCronJob = new CronJob('00 00 12 1,15 * *', function() {
+const issueCronJob = new CronJob('00 00 12 1,15 * *', function () {
     exports.sendNotificationsForIssus().then(() => console.log("Git Nachrichten erfolgreich versendet.")).catch(e => console.error("Fehler beim Senden der Issues: ", e));
 }, null, true);
 
-exports.getUser = (userObject) => {
-    return new Promise((resolve, reject) => {
-        if (userObject.id === undefined || userObject.username === undefined || userObject.name === undefined) {
-            reject("The given user object " + JSON.stringify(userObject) + " is not a user object. It must have the parameters id, username, name.");
-        }
-        User.findOne({
-            where: {
-                gitLabID: userObject.id
-            },
-        }).then(user => {
-            if (user !== null) {
-                resolve(user);
-                return;
-            }
-            User.findAll({
-                where: {
-                    email:  {
-                        [Op.like]: '%' + userObject.username + '%'
-                    }
-                }
-            }).then(users => {
-                if (users.length === 1) {
-                    resolve(users[0]);
-                } else if (users.length === 0) {
-                    const subNameContains = userObject.name.split(' ').concat(userObject.username.split('.')).map(s => ({
-                        name: {
-                            [Op.like]: '%' + s + '%'
-                        }
-                    }));
-                    User.findAll({
-                        where: {
-                            [Op.and]: [{
-                                active: true
-                            }, {
-                                [Op.or]: subNameContains
-                            }]
-                        }
-                    }).then(users => {
-                        if (users.length === 1) {
-                            resolve(users[0]);
-                        } else {
-                            resolve(null);
-                        }
-                    }).catch(reject);
-                }
-            }).catch(reject);
-        }).catch(reject);
+exports.getUser = async (userObject) => {
+    if (userObject.id === undefined || userObject.username === undefined || userObject.name === undefined) {
+        throw new Error(`The given user object ${JSON.stringify(userObject)} is not a user object. It must have the parameters id, username, name.`);
+    }
+
+    // Try to find the user by gitLabID
+    let user = await User.findOne({
+        where: {
+            gitLabID: userObject.id
+        },
     });
+
+    if (user !== null) {
+        return user;
+    }
+
+    // Try to find users by email pattern
+    const users = await User.findAll({
+        where: {
+            email: {
+                [Op.like]: '%' + userObject.username + '%'
+            }
+        }
+    });
+
+    if (users.length === 1) {
+        return users[0];
+    }
+
+    // Create a list of conditions based on the name and username
+    const subNameContains = userObject.name.split(' ')
+        .concat(userObject.username.split('.'))
+        .map(s => ({
+            name: {
+                [Op.like]: '%' + s + '%'
+            }
+        }));
+
+    // Find users where active is true and name contains parts of subNameContains
+    const filteredUsers = await User.findAll({
+        where: {
+            [Op.and]: [
+                { active: true },
+                { [Op.or]: subNameContains }
+            ]
+        }
+    });
+
+    if (filteredUsers.length === 1) {
+        return filteredUsers[0];
+    } else {
+        return null;
+    }
 };
+
 
 let screenShotFileID = null;
 
@@ -76,11 +82,11 @@ exports.sendNotificationsForIssus = async () => {
     const projectsResponse = await axios.get("/projects?membership=true&per_page=100");
     const projects = {};
     const issues = [];
-    
+
     const userMessages = {};
     const messageParticipants = {};
     const lastUserProject = {};
-    
+
     for (const project of projectsResponse.data) {
         projects[project.id] = project;
     }
@@ -148,9 +154,9 @@ exports.sendNotificationsForIssus = async () => {
                     userMessage += "\n";
                     userMessages[participant.id] = userMessage;
                 }
-    
-                
-            }            
+
+
+            }
         }
     }
 
@@ -161,7 +167,7 @@ exports.sendNotificationsForIssus = async () => {
             user.gitLabID = participantId;
             user.save();
         }
-        
+
         let finalMessage;
 
         if (message !== undefined) {
@@ -188,7 +194,7 @@ exports.sendNotificationsForIssus = async () => {
         const file = screenShotFileID === null ? fs.createReadStream(path.join(__dirname, "..", "images", "screenshot_user_settings.png")) : screenShotFileID;
         try {
             Telegram.bot.sendPhoto(user.telegramID, file, { caption: "Deinem Barplaner Account konnte kein GitLab Account automatisch zugeordnet werden. Du musst diese Zuordnung leider selber durchführen. Gehe dafür bitte auf git.rwth-aachen.de/profile, kopiere die User ID, trage sie unter orga.symposion.hilton.rwth-aachen.de/#/account ein und klicke auf 'Update information'." }).then(response => console.log(response.body)).catch(console.error); // Besuche dafür die Seite: orga.symposion.hilton.rwth-aachen.de/#/account");
-        } catch(e) {
+        } catch (e) {
             console.warn("Couldn't send telegram message.");
         }
     }
