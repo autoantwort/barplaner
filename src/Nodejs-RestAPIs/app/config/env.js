@@ -21,6 +21,7 @@ const env = {
     frontendURL: "http://localhost:4200",
     staticVue: false,
     gitLabAccessToken: '', // Insert your access token (Create access token here: https://git.rwth-aachen.de/-/profile/personal_access_tokens)
+    gitLabSymposionGroupId: 15812,
     gitLabBrowser: {
         host: "git.rwth-aachen.de",
         projectId: "31804",

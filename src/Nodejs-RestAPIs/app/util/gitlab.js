@@ -75,6 +75,14 @@ exports.getUser = async (userObject) => {
     }
 };
 
+function inviteViaEmail(email) {
+    return axios.post(`/groups/${env.gitLabSymposionGroupId}/invitations`, {
+        email: email,
+        access_level: 30,
+        invite_source: "Barplaner",
+    });
+}
+
 
 let screenShotFileID = null;
 
@@ -194,6 +202,7 @@ exports.sendNotificationsForIssus = async () => {
         const file = screenShotFileID === null ? fs.createReadStream(path.join(__dirname, "..", "images", "screenshot_user_settings.png")) : screenShotFileID;
         try {
             Telegram.bot.sendPhoto(user.telegramID, file, { caption: "Deinem Barplaner Account konnte kein GitLab Account automatisch zugeordnet werden. Du musst diese Zuordnung leider selber durchführen. Gehe dafür bitte auf git.rwth-aachen.de/profile, kopiere die User ID, trage sie unter orga.symposion.hilton.rwth-aachen.de/#/account ein und klicke auf 'Update information'." }).then(response => console.log(response.body)).catch(console.error); // Besuche dafür die Seite: orga.symposion.hilton.rwth-aachen.de/#/account");
+            inviteViaEmail(user.email);
         } catch (e) {
             console.warn("Couldn't send telegram message.");
         }
