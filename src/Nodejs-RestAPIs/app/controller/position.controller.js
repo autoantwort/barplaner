@@ -29,9 +29,9 @@ exports.create = (req, res) => {
             const file = req.files[keys[0]];
             File.coreCreateImage(req.body.titel, file.name, file.data, file.mimetype).then(image => {
                 Position.create({
-                        ...req.body,
-                        imageId: image.id,
-                    })
+                    ...req.body,
+                    imageId: image.id,
+                })
                     .then(o => res.status(201).send(o))
                     .catch(errorHandler);
             }).catch(errorHandler);
@@ -39,7 +39,7 @@ exports.create = (req, res) => {
     }
 };
 
-exports.update = async(req, res) => {
+exports.update = async (req, res) => {
     try {
         if (req.files && Object.keys(req.files).length > 0) {
             const keys = Object.keys(req.files);
@@ -61,9 +61,13 @@ exports.update = async(req, res) => {
     }
 };
 
+const order = [['room', 'ASC'], ['name', 'ASC']];
+
 // get all Positions
 exports.findAll = (req, res) => {
-    Position.findAll().then(positions => {
+    Position.findAll({
+        order,
+    }).then(positions => {
         res.send(positions);
     }).catch(err => {
         res.status(500).send("Error -> " + err);
@@ -76,10 +80,7 @@ exports.getAllWithImages = (req, res) => {
         include: [{
             model: Image,
         }],
-        order: [
-            ['room', 'ASC'],
-            ['name', 'ASC'],
-        ],
+        order,
     }).then(positions => {
         res.send(positions);
     }).catch(err => {
@@ -95,6 +96,7 @@ exports.getAllForSelect = (req, res) => {
             ['name', 'text'],
             "nameColognePhonetics",
         ],
+        order,
     }).then(positions => {
         res.send(positions);
     }).catch(err => {
@@ -110,6 +112,7 @@ exports.getAllUsedImages = (req, res) => {
         include: [{
             model: Position,
             required: true,
+            order,
         }],
     }).then(images => {
         res.send(images);
@@ -161,7 +164,7 @@ exports.update = (req, res) => {
 // Find a Position by Id
 exports.findById = (req, res) => {
     Position.findByPk(req.params.id, {
-        include:  [{ model: Image }]
+        include: [{ model: Image }]
     }).then(position => {
         res.send(position);
     }).catch(err => {
