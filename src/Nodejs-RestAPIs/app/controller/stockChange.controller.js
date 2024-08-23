@@ -106,7 +106,8 @@ exports.getItemStock = (req, res) => {
             model: ItemGroup,
             attributes: ["id", "name"],
         }],
-        group: "itemId",
+        group: ["itemId", "itemGroup.id"],
+        order: [['name', 'ASC']],
     }).then(stock => {
         res.send(stock);
     }).catch(err => {

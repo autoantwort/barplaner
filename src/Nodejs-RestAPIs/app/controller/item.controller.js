@@ -103,7 +103,8 @@ exports.getAllWithGroupsAndPositions = (req, res) => {
             include: [{ model: Position }]
         }, {
             model: Position
-        }]
+        }],
+        order: [['name', 'ASC']],
     }).then(items => {
         res.send(items);
     }).catch(err => {
