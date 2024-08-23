@@ -3,6 +3,7 @@ const StockChange = db.stock.Change;
 const Item = db.stock.Item;
 const ItemGroup = db.stock.ItemGroup;
 const InvoiceEntry = db.stock.InvoiceEntry;
+const Position = db.stock.Position;
 const User = db.User;
 const sequelize = db.sequelize;
 const Op = db.Sequelize.Op;
@@ -90,21 +91,22 @@ exports.getStockChanges = (req, res) => {
 // get current Stock
 exports.getItemStock = (req, res) => {
     Item.findAll({
-        attributes: [
-            "id",
-            "name",
-            "nameColognePhonetics",
-            [sequelize.fn('COALESCE', sequelize.fn('SUM', sequelize.col('stockChanges.amount')), 0), "inStock"],
-            [sequelize.fn('ROUND', sequelize.fn('MIN', sequelize.col('brottoPrice')), 2), "minBrottoPrice"],
-            [sequelize.fn('ROUND', sequelize.fn('MAX', sequelize.col('brottoPrice')), 2), "maxBrottoPrice"],
-            [sequelize.fn('ROUND', sequelize.fn('AVG', sequelize.col('brottoPrice')), 2), "avgBrottoPrice"],
-        ],
+        attributes: {
+            include: [
+                [sequelize.fn('COALESCE', sequelize.fn('SUM', sequelize.col('stockChanges.amount')), 0), "inStock"],
+                [sequelize.fn('ROUND', sequelize.fn('MIN', sequelize.col('brottoPrice')), 2), "minBrottoPrice"],
+                [sequelize.fn('ROUND', sequelize.fn('MAX', sequelize.col('brottoPrice')), 2), "maxBrottoPrice"],
+                [sequelize.fn('ROUND', sequelize.fn('AVG', sequelize.col('brottoPrice')), 2), "avgBrottoPrice"],
+            ],
+        },
         include: [{
+            model: ItemGroup,
+            include: [{ model: Position }]
+        }, {
+            model: Position,
+        }, {
             model: StockChange,
             attributes: [],
-        }, {
-            model: ItemGroup,
-            attributes: ["id", "name"],
         }],
         group: ["itemId", "itemGroup.id"],
         order: [['name', 'ASC']],
@@ -129,7 +131,7 @@ exports.getStockForItem = (req, res) => {
         }],
         group: "itemId",
     }).then(stock => {
-        res.send(stock[0].stockChanges[0] ?? {inStock: 0});
+        res.send(stock[0].stockChanges[0] ?? { inStock: 0 });
     }).catch(err => {
         res.status(500).send("Error -> " + err);
     });

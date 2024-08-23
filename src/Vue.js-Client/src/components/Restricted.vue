@@ -49,11 +49,10 @@
             <b-dropdown-item to="/addItemGroup">Add ItemGroup</b-dropdown-item>
             <b-dropdown-item to="/addStockChange">Add Change</b-dropdown-item>
             <div class="dropdown-divider"></div>
-            <b-dropdown-item to="/items">Items</b-dropdown-item>
+            <b-dropdown-item to="/itemStock">Items</b-dropdown-item>
             <b-dropdown-item to="/positions">Positions</b-dropdown-item>
             <b-dropdown-item to="/itemGroups">Item groups</b-dropdown-item>
             <div class="dropdown-divider"></div>
-            <b-dropdown-item to="/itemStock">Item stock</b-dropdown-item>
             <b-dropdown-item to="/itemGroupStock">Shopping list</b-dropdown-item>
             <b-dropdown-item to="/stockChanges">Stock changes</b-dropdown-item>
             <div class="dropdown-divider"></div>

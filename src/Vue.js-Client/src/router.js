@@ -17,7 +17,6 @@ import AddPosition from "./components/stock/AddPosition.vue";
 import PositionList from "./components/stock/PositionList.vue";
 import Position from "./components/stock/Position.vue";
 import ItemGroup from "./components/stock/ItemGroup.vue";
-import ItemList from "./components/stock/ItemList.vue";
 import ItemGroupList from "./components/stock/ItemGroupList.vue";
 import AddItem from "./components/stock/AddItem.vue";
 import Item from "./components/stock/Item.vue";
@@ -144,10 +143,6 @@ export default new Router({
                 name: "item",
                 component: Item,
                 props: true
-            }, {
-                path: "/items",
-                name: "items-list",
-                component: ItemList,
             }, {
                 path: "/itemGroups",
                 name: "itemGroups-list",
