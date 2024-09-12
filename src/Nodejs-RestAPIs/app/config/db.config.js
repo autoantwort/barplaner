@@ -49,6 +49,7 @@ db.Setting = require('../model/setting.model.js')(sequelize, Sequelize, db.Role)
 db.ShouldDelete = require('../model/shouldDelete.model.js')(sequelize, Sequelize);
 db.TelegramNewsletter = require('../model/telegramNewsletter.model')(sequelize, Sequelize);
 db.WebPushSubscription = require('../model/webPushSubscription.model')(sequelize, Sequelize);
+db.TelegramMetroPromoSubscription = require('../model/telegramMetroPromoSubscription.model.js')(sequelize, Sequelize);
 
 db.Survey = require('../model/survey.model.js')(sequelize, Sequelize, db.User);
 db.Question = require('../model/question.model.js')(sequelize, Sequelize, db.Survey);
