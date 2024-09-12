@@ -159,7 +159,7 @@ Telegram.bot.onText(/\/metro/, msg => {
     getCurrentPromotions().then(async p => {
         if (p.length > 0) {
             let message = formatPromotions(p);
-            message += '\n\n Send /subscribeMetro to subscribe to Metro promotions.';
+            message += '\n\n Send /subscribeMetro to subscribe to Metro promotions\\.';
             Telegram.bot.editMessageText(message, { chat_id: msg.chat.id, message_id: (await waitMsg).message_id, parse_mode: 'MarkdownV2', disable_web_page_preview: true }).catch(console.error);
         }
     }).catch(console.error);
