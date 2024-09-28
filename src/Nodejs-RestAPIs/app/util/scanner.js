@@ -49,7 +49,10 @@ const sendMQTTClear = () => {
 const sendMQTTChangeAmount = (amount) => client.publish('barplaner/changeAmount', `${amount}`, retain);
 const sendMQTTItemAmount = (amount) => client.publish('barplaner/itemAmount', `${amount}`, retain);
 const sendMQTTGroupAmount = (amount) => client.publish('barplaner/groupAmount', `${amount}`, retain);
-const sendMQTTItemName = (name) => client.publish('barplaner/itemName', name, retain);
+const sendMQTTItemName = (name, object) => {
+    client.publish('barplaner/itemName', name, retain);
+    client.publish('barplaner/item', JSON.stringify(object), retain);
+};
 const sendMQTTReason = (sign, reason) => {
     client.publish('barplaner/reasonName', reason.germanName, retain);
     if (reason == reasons.inventoryReason) {
@@ -73,7 +76,7 @@ const setChangeToNull = () => {
     sendMQTTGroupAmount(0);
     sendMQTTItemAmount(0);
     sendMQTTChangeAmount(0);
-    sendMQTTItemName("");
+    sendMQTTItemName("", null);
 }
 
 const haveWebsiteConsumer = () => controllers.length > 0;
@@ -209,7 +212,7 @@ const onBarcode = async (barcode) => {
         group: "itemId",
     });
     if (items.length !== 1) {
-        sendMQTTItemName("No Item found");
+        sendMQTTItemName("No Item found", null);
         return sendMQTTBeep();
     }
     resetItemTimeout();
@@ -221,7 +224,7 @@ const onBarcode = async (barcode) => {
         state.change.save();
         return;
     }
-    sendMQTTItemName(item.name);
+    sendMQTTItemName(item.name, item);
     sendMQTTItemAmount(item.stockChanges[0]?.dataValues.inStock || 0)
     if (item.itemGroupId) {
         const items = await Item.findAll({
