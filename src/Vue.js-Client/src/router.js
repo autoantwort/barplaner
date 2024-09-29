@@ -24,6 +24,7 @@ import StockChanges from "./components/stock/StockChangesView.vue";
 import ItemGroupStockList from "./components/stock/ItemGroupStockList.vue";
 import ItemStockList from "./components/stock/ItemStockList.vue";
 import AddStockChange from "./components/stock/AddStockChange.vue";
+import ScannedItemPage from "./components/stock/ScannedItemPage.vue";
 import Invoice from "./components/stock/Invoice.vue";
 import InvoiceList from "./components/stock/InvoiceList.vue";
 import Account from "./components/Account.vue";
@@ -169,6 +170,10 @@ export default new Router({
                 name: "addStockChange",
                 component: AddStockChange,
                 props: true,
+            }, {
+                path: "/scannedItem",
+                name: "scannedItem",
+                component: ScannedItemPage,
             }, {
                 path: "/invoice/:invoiceId",
                 name: "invoice",

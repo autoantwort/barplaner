@@ -1,25 +1,11 @@
 <template>
-  <div
-    v-if="realPosition !== null && realPosition.image && realPosition.image !== null"
-    style="position: relative; width: 100%"
-    v-bind:style="{ 'max-height': maxHeight + 'px' }"
-  >
-    <div
-      ref="horizontal"
-      style="height: 1px; width: 100%; background: red; position: absolute"
-      v-bind:style="{ top: relativeYPosition }"
-    ></div>
-    <div
-      ref="vertical"
-      style="width: 1px; height: 100%; background: red; position: absolute"
-      v-bind:style="{ left: relativeXPosition }"
-    ></div>
-    <img
-      ref="img"
-      style="width: 100%; object-fit: contain; max-height: 500px"
-      :src="baseURL + realPosition.image.original"
-      v-on:load="updateRelativePosition"
-    />
+  <div style="width: 100%" :style="{ 'max-height': maxHeight + 'px' }">
+    <div v-if="realPosition !== null && realPosition.image && realPosition.image !== null" style="position: relative;">
+      <div ref="horizontal" style="height: 2px; width: 100%; background: red; position: absolute" :style="{ top: relativeYPosition }"></div>
+      <div ref="vertical" style="width: 2px; height: 100%; background: red; position: absolute" :style="{ left: relativeXPosition }"></div>
+      <img ref="img" style="width: 100%; object-fit: contain;" :style="{ 'max-height': maxHeight + 'px' }" :src="baseURL + realPosition.image.original"
+        :load="updateRelativePosition" />
+    </div>
   </div>
 </template>
 
@@ -42,6 +28,9 @@ export default {
     /* eslint-disable no-console */
     position: function (/*newPosition, oldPosition*/) {
       this.updateRealPosition();
+    },
+    realPosition: function () {
+      this.$emit('PositionNameChanged', this.realPosition.name);
     },
   },
   data() {
@@ -68,24 +57,7 @@ export default {
     updateRelativePosition() {
       const image = this.$refs.img;
       if (this.realPosition !== null && image !== undefined) {
-        // when the image is resized because it is too high and have an margin left and right
-        // when original hight is > 500, but not when already resized because the image is to wide
-        if (image.naturalHeight > 500 && !(image.naturalWidth > image.width && image.height < 500)) {
-          // compute left offset:
-
-          const realImageWidth = Math.round((image.naturalWidth / image.naturalHeight) * 500);
-          const margin = (image.width - realImageWidth) / 2;
-          this.$refs.horizontal.style.marginLeft = margin + "px";
-          this.$refs.horizontal.style.marginRight = margin + "px";
-          this.$refs.horizontal.style.width = image.width - margin * 2 + "px";
-
-          const offset = (1 - realImageWidth / image.width) / 2;
-          // real 0.0 is offset and 1.0 is 1.0 - offset
-          this.relativeXPosition =
-            (this.realPosition.xPositionOnImage * (realImageWidth / image.width) + offset) * 100 + "%";
-        } else {
-          this.relativeXPosition = this.realPosition.xPositionOnImage * 100 + "%";
-        }
+        this.relativeXPosition = this.realPosition.xPositionOnImage * 100 + "%";
         this.relativeYPosition = this.realPosition.yPositionOnImage * 100 + "%";
       }
     },
@@ -122,5 +94,4 @@ export default {
 };
 </script>
 
-<style>
-</style>
+<style></style>
