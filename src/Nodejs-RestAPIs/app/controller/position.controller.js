@@ -145,15 +145,19 @@ exports.getAllNotUsedImages = (req, res) => {
 exports.update = (req, res) => {
     if (req.params.name !== undefined) {
         res.status(400).send("You can not update the name of a position");
-    } else if (req.params.id !== undefined) {
+    } else if (req.params.id === undefined) {
         res.status(400).send("The request does not contains a id parameter");
     } else {
         Position.update(req.body, {
             where: {
                 id: req.params.id,
             }
-        }).spread((affectedCount, affectedRows) => {
-            res.status(200).send(JSON.stringify(affectedCount));
+        }).then((affected) => {
+            if (affected[0] === 0) {
+                res.status(404).send("Position with id " + req.params.id + " does not exist");
+            } else {
+                res.status(200).send(affected[1][0]);
+            }
         }).catch(err => {
             res.status(500).send("Error -> " + err);
         });

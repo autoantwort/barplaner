@@ -4,7 +4,7 @@
       <div v-if="realPosition" class="col-12 col-md-8 offset-md-2">
         <div class="form-group row">
           <label class="col-3">Name</label>
-          <label class="col-9">{{ realPosition.name }}</label>
+          <generic-input-component :object="realPosition" property="name" endpoint="/position/:id" required :minLength="4" />
         </div>
         <div class="form-group row">
           <label class="col-3">Description</label>
@@ -17,12 +17,8 @@
         <div class="form-group row">
           <label class="col-3">Item Groups</label>
           <label class="col-9">
-            <router-link
-              v-for="group in itemGroups"
-              :key="group.id"
-              :to="{ name: 'itemGroup', params: { itemGroupId: group.id, itemGroup: group } }"
-              >{{ group.name }}</router-link
-            >
+            <router-link v-for="group in itemGroups" :key="group.id" :to="{ name: 'itemGroup', params: { itemGroupId: group.id, itemGroup: group } }">{{
+              group.name }}</router-link>
             {{ itemGroups.length === 0 ? "None" : "" }}
           </label>
         </div>
@@ -47,11 +43,8 @@
                   <router-link :to="{ name: 'item', params: { itemId: item.id } }">{{ item.name }}</router-link>
                 </td>
                 <td>
-                  <router-link
-                    v-if="item.itemGroupId !== null"
-                    :to="{ name: 'itemGroup', params: { itemGroupId: item.itemGroupId } }"
-                    >{{ item.itemGroupName }}</router-link
-                  >
+                  <router-link v-if="item.itemGroupId !== null" :to="{ name: 'itemGroup', params: { itemGroupId: item.itemGroupId } }">{{ item.itemGroupName
+                    }}</router-link>
                 </td>
                 <td>{{ item.itemPos ? "From Item" : "From Item Group" }}</td>
                 <td>{{ item.amount }} {{ item.unit }}</td>
@@ -70,7 +63,9 @@
 
 <script>
 import http from "../../http-common";
-import PositionImage from "./PositionImage";
+import PositionImage from "./PositionImage.vue";
+import GenericInputComponent from "./components/GenericInputComponent.vue";
+
 
 export default {
   name: "position",
@@ -80,7 +75,10 @@ export default {
       default: null,
     },
   },
-  components: { PositionImage },
+  components: {
+    PositionImage,
+    GenericInputComponent
+  },
   data() {
     return {
       items: "",
@@ -132,5 +130,4 @@ export default {
 };
 </script>
 
-<style>
-</style>
+<style></style>

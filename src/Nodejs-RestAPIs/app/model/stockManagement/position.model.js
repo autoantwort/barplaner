@@ -31,8 +31,8 @@ module.exports = (sequelize, Sequelize, Image) => {
     }, {
         validate: {
             imagePosition() {
-                if (!(this.xPositionOnImage === null && this.yPositionOnImage === null && this.imageId === null ||
-                        this.xPositionOnImage !== null && this.yPositionOnImage !== null && this.imageId !== null)) {
+                if (!(this.xPositionOnImage === null && this.yPositionOnImage === null ||
+                        this.xPositionOnImage !== null && this.yPositionOnImage !== null)) {
                     throw new Error('xPositionOnImage, yPositionOnImageA and imageId must be "null" or "not null"');
                 }
             }
