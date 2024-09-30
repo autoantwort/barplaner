@@ -25,9 +25,9 @@
         <div class="col-4"></div>
         <label class="col-8">Scan Item</label>
       </div>
-      <div class="row row-other" v-if="otherAmount && itemGroup">
+      <div class="row row-other" v-if="otherAmount && item?.itemGroup">
         <label class="col-12 pl-5 text-center text-nowrap text-truncate">
-          {{ otherAmount }} {{ otherAmount === 1 ? "anderer" : "andere" }} {{ itemGroup?.name }}
+          {{ otherAmount }} {{ otherAmount === 1 ? "anderer" : "andere" }} {{ item?.itemGroup?.name }}
         </label>
       </div>
     </div>
@@ -36,8 +36,8 @@
         <img v-if="fileURL" style="width: 100%; height: 65dvh; object-fit: contain;" :src="fileURL" />
       </div>
       <div class="col-6" v-show="position">
-        <div style="font-size: 50px;">{{ positionName }}</div>
-        <positionImage @PositionNameChanged="onPositionNameChanged" :max-height="2000" style="height: 65dvh;" :position="position"> </positionImage>
+        <div style="font-size: 50px;">{{ position?.name }}</div>
+        <positionImage :max-height="2000" style="height: 65dvh;" :position="position"> </positionImage>
       </div>
     </div>
   </div>
@@ -63,18 +63,14 @@ export default {
       changeAmount: null,
       item: null,
       imageFileURL: null,
-      itemGroup: null,
       changeType: '=',
       reasonColor: 'black',
       fileURL: null,
-      positionName: null,
+      position: null,
     };
   },
   methods: {
     /* eslint-disable no-console */
-    onPositionNameChanged(data) {
-      this.positionName = data;
-    },
     retrieveStockChanges() {
       const itemId = this.item === null ? this.$route.params.itemId : this.item.id;
       http
@@ -85,29 +81,7 @@ export default {
         .catch(console.error);
     },
   },
-  watch: {
-    async item() {
-      this.itemGroup = null;
-      this.fileURL = null;
-      if (this.item !== null && this.item.imageId !== null) {
-        try {
-          const response = await http.get("/image/" + this.item.imageId);
-          const fileId = response.data.original;
-          this.fileURL = await http.getFile(fileId);
-          if (this.item.itemGroupId !== null) {
-            this.itemGroup = (await http.get("/itemGroup/" + this.item.itemGroupId)).data;
-          }
-        } catch (e) {
-          console.log(e);
-          this.fileURL = null;
-        }
-      }
-    },
-  },
   computed: {
-    position() {
-      return this.item?.stockPositionId ?? this.itemGroup?.stockPositionId;
-    },
     otherAmount() {
       return Math.max(0, this.groupAmount - Math.max(0, this.itemAmount));
     },
@@ -145,6 +119,10 @@ export default {
         this.groupAmount = Number(message.toString());
       } else if (topic === "barplaner/item") {
         this.item = JSON.parse(message.toString());
+        const fileId = this.item?.image?.original;
+        this.fileURL = fileId ? http.getFile(fileId) : null;
+      } else if (topic === "barplaner/position") {
+        this.position = JSON.parse(message.toString());
       } else if (topic === "barplaner/reasonIndex") {
         const index = Number(message.toString());
         if (index >= 100 || index === 0) {
@@ -158,7 +136,6 @@ export default {
           this.reasonColor = "green";
         }
       }
-
     });
   },
   beforeDestroy() {
