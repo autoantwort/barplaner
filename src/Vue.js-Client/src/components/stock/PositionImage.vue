@@ -57,8 +57,24 @@ export default {
     updateRelativePosition() {
       const image = this.$refs.img;
       if (this.realPosition !== null && image !== undefined) {
-        this.relativeXPosition = this.realPosition.xPositionOnImage * 100 + "%";
         this.relativeYPosition = this.realPosition.yPositionOnImage * 100 + "%";
+        // when the image is resized because it is too high and have an margin left and right
+        // we have to adjust the relative x position
+        const imgAspectRatio = image.naturalWidth / image.naturalHeight;
+        const containerAspectRatio = image.width / image.height;
+        if (imgAspectRatio < containerAspectRatio) {
+          // wir haben link und rechts einen weißen Rand
+          const realImageWidth = image.height * imgAspectRatio;
+          const margin = (image.width - realImageWidth) / 2;
+          this.$refs.horizontal.style.marginLeft = margin + "px";
+          this.$refs.horizontal.style.marginRight = margin + "px";
+          this.$refs.horizontal.style.width = image.width - margin * 2 + "px";
+
+          const absolutePosition = margin + this.realPosition.xPositionOnImage * realImageWidth;
+          this.relativeXPosition = absolutePosition / image.width * 100 + "%";
+        } else {
+          this.relativeXPosition = this.realPosition.xPositionOnImage * 100 + "%";
+        }
       }
     },
     retrievePosition() {
