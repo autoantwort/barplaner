@@ -89,7 +89,7 @@ export default {
   created() {
     this.baseURL = http.defaults.baseURL + "/file/";
     console.log("Connecting to MQTT started");
-    this.client = mqtt.connect("ws://mqtt.hilton.rwth-aachen.de:8080"); // create a client
+    this.client = mqtt.connect("wss://mqtt-ws.hilton.rwth-aachen.de"); // create a client
     this.client.on("error", (err) => {
       console.log("Error: ", err);
     });
