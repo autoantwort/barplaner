@@ -1,8 +1,22 @@
 <template>
   <div class="container">
-    <div class="row">
+    <div ref="print" class="print-only">
+      <div class="d-block">
+        <template v-for="arrow in ['↑', '↓']">
+          <div class="d-flex align-items-center" v-for="position in positions">
+            <template v-for="i in [1, 2]">
+              <div>{{ arrow }} {{ position.name }}</div>
+              <barcode :value="'pos' + position.id" :width="2" :height="20" :displayValue="false"></barcode>
+              <div class="mr-3">{{ arrow }}</div>
+            </template>
+          </div>
+        </template>
+      </div>
+    </div>
+    <div class="row d-print-none">
       <div class="col-12 offset-md-1 col-md-10">
         <div class="d-flex justify-content-end">
+          <button class="btn btn-primary mt-3 mr-3" v-on:click="print">Print Barcodes</button>
           <router-link class="btn btn-success mt-3 mr-3" to="/addPosition">Add Position</router-link>
         </div>
         <div class="form-group">
@@ -40,6 +54,7 @@
 <script>
 import http from "../../http-common";
 import phoneticsFilter from "../../phoneticsFilter";
+import VueBarcode from 'vue-barcode';
 
 export default {
   name: "position-list",
@@ -48,6 +63,9 @@ export default {
       positions: [],
       filteredPositions: [],
     };
+  },
+  components: {
+    'barcode': VueBarcode
   },
   methods: {
     /* eslint-disable no-console */
@@ -64,6 +82,9 @@ export default {
           console.log(e);
         });
     },
+    print() {
+      window.print();
+    },
     /* eslint-enable no-console */
   },
   mounted() {
@@ -73,4 +94,13 @@ export default {
 </script>
 
 <style>
+.print-only {
+  display: none !important;
+}
+
+@media print {
+  .print-only {
+    display: flex !important;
+  }
+}
 </style>

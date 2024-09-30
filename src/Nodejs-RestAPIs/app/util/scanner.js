@@ -4,7 +4,10 @@ const reasons = require('../../../common/stockChangeReasons.js');
 const db = require('../config/db.config.js');
 const User = db.User;
 const Item = db.stock.Item;
+const ItemGroup = db.stock.ItemGroup;
 const StockChange = db.stock.Change;
+const Position = db.stock.Position;
+const Image = db.Image;
 const Sequelize = db.Sequelize;
 const Op = Sequelize.Op;
 
@@ -49,9 +52,16 @@ const sendMQTTClear = () => {
 const sendMQTTChangeAmount = (amount) => client.publish('barplaner/changeAmount', `${amount}`, retain);
 const sendMQTTItemAmount = (amount) => client.publish('barplaner/itemAmount', `${amount}`, retain);
 const sendMQTTGroupAmount = (amount) => client.publish('barplaner/groupAmount', `${amount}`, retain);
-const sendMQTTItemName = (name, object) => {
+const sendMQTTItemNameAndPosition = (name, item) => {
     client.publish('barplaner/itemName', name, retain);
-    client.publish('barplaner/item', JSON.stringify(object), retain);
+    client.publish('barplaner/item', JSON.stringify(item), retain);
+    client.publish('barplaner/itemGroupName', item?.itemGroup?.name ?? "", retain);
+    sendMQTTPosition(item?.stockPosition ?? item?.itemGroup?.stockPosition ?? null);
+};
+const sendMQTTPosition = (position) => {
+    client.publish('barplaner/positionName', position?.name ?? null, retain);
+    console.log('barplaner/position', JSON.stringify(position));
+    client.publish('barplaner/position', JSON.stringify(position), retain);
 };
 const sendMQTTReason = (sign, reason) => {
     client.publish('barplaner/reasonName', reason.germanName, retain);
@@ -69,14 +79,16 @@ const state = {
     reason: null,
     change: null,
     sign: null,
+    item: null,
 }
 
 const setChangeToNull = () => {
     state.change = null;
+    state.item = null;
     sendMQTTGroupAmount(0);
     sendMQTTItemAmount(0);
     sendMQTTChangeAmount(0);
-    sendMQTTItemName("", null);
+    sendMQTTItemNameAndPosition("", null);
 }
 
 const haveWebsiteConsumer = () => controllers.length > 0;
@@ -173,6 +185,7 @@ const onBarcode = async (barcode) => {
             return setChangeToNull();
         }
     }
+    barcode = barcode.toString();
     if (barcode.length === 4 && (barcode[0] === '+' || barcode[0] === '-' || barcode[0] === 'i')) {
         state.sign = barcode[0];
         const id = Number(barcode.substring(1)) - 100;
@@ -187,6 +200,27 @@ const onBarcode = async (barcode) => {
             sendMQTTReason(state.sign, state.reason);
         }
         resetIdleTimeout();
+        return;
+    }
+    if (barcode.length > 3 && barcode.startsWith("pos") && barcode.substring(3).match(/^\d+$/)) {
+        resetIdleTimeout();
+        const position = await Position.findByPk(Number(barcode.substring(3)));
+        if (!position) {
+            return sendMQTTBeep();
+        }
+        sendMQTTPosition(position);
+        if (state.item) {
+            if (state.item.stockPositionId) {
+                state.item.stockPositionId = position.id;
+                state.item.save();
+            } else if (state.item.itemGroup) {
+                state.item.itemGroup.stockPositionId = position.id;
+                state.item.itemGroup.save();
+            } else {
+                state.item.stockPositionId = position.id;
+                state.item.save();
+            }
+        }
         return;
     }
     if (state.reason === null) {
@@ -208,11 +242,18 @@ const onBarcode = async (barcode) => {
             attributes: [
                 [Sequelize.fn('COALESCE', Sequelize.fn('SUM', Sequelize.col('stockChanges.amount')), 0), "inStock"]
             ],
+        }, {
+            model: ItemGroup,
+            include: [{ model: Position }]
+        }, {
+            model: Position,
+        }, {
+            model: Image,
         }],
         group: "itemId",
     });
     if (items.length !== 1) {
-        sendMQTTItemName("No Item found", null);
+        sendMQTTItemNameAndPosition("No Item found", null);
         return sendMQTTBeep();
     }
     resetItemTimeout();
@@ -224,7 +265,8 @@ const onBarcode = async (barcode) => {
         state.change.save();
         return;
     }
-    sendMQTTItemName(item.name, item);
+    state.item = item;
+    sendMQTTItemNameAndPosition(item.name, item);
     sendMQTTItemAmount(item.stockChanges[0]?.dataValues.inStock || 0)
     if (item.itemGroupId) {
         const items = await Item.findAll({
