@@ -57,7 +57,7 @@
                 <a
                   target="_blank"
                   rel="noopener noreferrer"
-                  href="https://git.rwth-aachen.de/-/profile"
+                  href="https://git.rwth-aachen.de/-/user_settings/profile#user_name"
                   class="btn btn-outline-link"
                 >My GitLab User ID</a>
               </div>
