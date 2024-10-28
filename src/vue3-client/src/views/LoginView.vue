@@ -24,8 +24,8 @@
 </template>
 
 <script>
-import http from '../http-common';
-import Roles from '../roles';
+import http from '@/http-common';
+import Roles from '@/roles';
 
 export default {
   data() {
