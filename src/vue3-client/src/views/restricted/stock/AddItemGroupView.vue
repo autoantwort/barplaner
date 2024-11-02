@@ -47,7 +47,7 @@
 
           <div class="mt-2 mb-2 text-danger" v-if="errorString.length !== 0">{{ errorString }}</div>
           <button type="button" class="btn btn-success my-4" v-on:click="addItemGroup">Add ItemGroup and add another</button>
-          <button type="button" class="btn btn-success my-4 ml-2" v-on:click="addItemGroup('itemGroups')">Add ItemGroup and view list</button>
+          <button type="button" class="btn btn-success my-4 ms-2" v-on:click="addItemGroup('itemGroups')">Add ItemGroup and view list</button>
         </form>
       </div>
     </div>

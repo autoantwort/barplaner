@@ -1,5 +1,5 @@
 <template>
-  <button v-if="item.imageId !== null" class="ml-2 btn btn-sm btn-sm-flat btn-secondary" type="button" v-on:click="openImage()">
+  <button v-if="item.imageId !== null" class="ms-2 btn btn-sm btn-sm-flat btn-secondary" type="button" v-on:click="openImage()">
     <i-fa-image />
 
     <b-modal ref="image" hide-footer no-fade centered :title="item.name">

@@ -16,7 +16,7 @@
             <label for="barcode">Barcode of the Bottle (Scan with the barcode scanner)</label>
             <barcode-input v-model="item.barcode" />
             <div class="d-flex align-items-center p-1" v-if="analyzing">
-              <div class="spinner-border mr-2" role="status">
+              <div class="spinner-border me-2" role="status">
                 <span class="sr-only">Analyzing...</span>
               </div>
               <span>Analyzing...</span>
@@ -64,9 +64,9 @@
           </div>
           <div class="my-2 text-danger" v-if="errorString.length !== 0">{{ errorString }}</div>
           <div class="my-3">
-            <button type="button" class="btn btn-success mr-2 mb-2" v-on:click="addPosition">Add and add another</button>
-            <button type="button" class="btn btn-success mr-2 mb-2" v-on:click="addPosition('items')">Add and view item list</button>
-            <button type="button" class="btn btn-success mr-2" v-on:click="addPosition('addStockChange')">Add and add change</button>
+            <button type="button" class="btn btn-success me-2 mb-2" v-on:click="addPosition">Add and add another</button>
+            <button type="button" class="btn btn-success me-2 mb-2" v-on:click="addPosition('items')">Add and view item list</button>
+            <button type="button" class="btn btn-success me-2" v-on:click="addPosition('addStockChange')">Add and add change</button>
           </div>
         </form>
       </div>

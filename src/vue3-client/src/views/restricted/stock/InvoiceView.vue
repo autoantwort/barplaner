@@ -60,19 +60,19 @@
 
                       <button
                         style="display: inline-block"
-                        class="ml-2 btn btn-sm btn-sm-flat btn-primary"
+                        class="ms-2 btn btn-sm btn-sm-flat btn-primary"
                         type="button"
                         title="Update existing Item"
                         v-on:click="editItem(entry)"
                       >
                         <i-fa-pen-to-square />
                       </button>
-                      <button class="ml-2 btn btn-sm btn-sm-flat btn-danger" type="button" title="Unlink entry from Item" v-on:click="unlinkItem(entry)">
+                      <button class="ms-2 btn btn-sm btn-sm-flat btn-danger" type="button" title="Unlink entry from Item" v-on:click="unlinkItem(entry)">
                         <i-fa-link-slash />
                       </button>
                     </div>
                     <div v-else>
-                      <button class="btn btn-sm btn-sm-flat btn-success px-1 mr-1" title="Create Item from this Invoice Entry" v-on:click="newItem(entry)">
+                      <button class="btn btn-sm btn-sm-flat btn-success px-1 me-1" title="Create Item from this Invoice Entry" v-on:click="newItem(entry)">
                         <i-fa-square-plus />
                       </button>
                       <button class="btn btn-sm btn-sm-flat btn-primary px-1" title="Link this Invoice Entry to existing Item" v-on:click="linkItem(entry)">
@@ -84,7 +84,7 @@
                     <!--<router-link v-if="entry.item" :to="{ name: 'item',params:{ itemId: entry.item.id } }">{{entry.item.name}}</router-link>-->
                     <span v-if="entry.stockChange">#{{ entry.stockChange.id }}</span>
                     <div v-else-if="entry.stockItemId">
-                      <button class="btn btn-sm btn-success px-1 py-0 mr-1" title="Create Change from this Invoice Entry" v-on:click="newChange(entry)">
+                      <button class="btn btn-sm btn-success px-1 py-0 me-1" title="Create Change from this Invoice Entry" v-on:click="newChange(entry)">
                         <i-fa-square-plus />
                       </button>
                     </div>
@@ -103,7 +103,7 @@
         </div>
         <div v-if="analysing" class="col-12 justify-content-center" style="display: flex">
           <span class="mt-1">Analysing invoice...</span>
-          <b-spinner class="center ml-3"></b-spinner>
+          <b-spinner class="center ms-3"></b-spinner>
         </div>
         <div v-if="!pdfURL" class="col-12 justify-content-center mb-4" style="display: flex">
           <button class="btn btn-primary" v-on:click="showPDF">Show PDF</button>
@@ -256,7 +256,7 @@
           <button
             v-for="(url, index) in currentEntry.images"
             :key="index"
-            class="ml-2 btn btn-sm btn-sm-flat btn-secondary"
+            class="ms-2 btn btn-sm btn-sm-flat btn-secondary"
             type="button"
             v-on:click="openImageModalFromUrl(url)"
           >
@@ -287,7 +287,7 @@
             >
               <td>
                 <router-link :to="{ name: 'item', params: { itemId: item.id, item: item } }">{{ item.name }}</router-link>
-                <button v-if="item.image !== null" class="ml-2 btn btn-sm btn-sm-flat btn-secondary" type="button" v-on:click="openImageModal(item)">
+                <button v-if="item.image !== null" class="ms-2 btn btn-sm btn-sm-flat btn-secondary" type="button" v-on:click="openImageModal(item)">
                   <i-fa-image />
                 </button>
               </td>
@@ -295,7 +295,7 @@
               <td>{{ item.amount }} {{ item.unit === 'unknown' ? '' : item.unit }}</td>
               <td>{{ item.articleNumber }}</td>
               <td class="px-0">
-                <button class="ml-2 btn btn-sm py-0 btn-primary" type="button" v-on:click="linkItemClicked(item)">
+                <button class="ms-2 btn btn-sm py-0 btn-primary" type="button" v-on:click="linkItemClicked(item)">
                   Link
                   <i-fa-link class="icon-btn" />
                 </button>

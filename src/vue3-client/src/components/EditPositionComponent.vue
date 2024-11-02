@@ -6,7 +6,7 @@
       }}</router-link>
       <button
         v-if="object.stockPosition.imageId !== null"
-        class="ml-2 btn btn-sm btn-sm-flat btn-secondary"
+        class="ms-2 btn btn-sm btn-sm-flat btn-secondary"
         type="button"
         v-on:click="openModal(object.stockPosition)"
       >
@@ -23,7 +23,7 @@
       >
       <button
         v-if="object.itemGroup.stockPosition.imageId !== null"
-        class="ml-2 btn btn-sm btn-sm-flat btn-secondary"
+        class="ms-2 btn btn-sm btn-sm-flat btn-secondary"
         type="button"
         v-on:click="openModal(object.itemGroup.stockPosition)"
       >

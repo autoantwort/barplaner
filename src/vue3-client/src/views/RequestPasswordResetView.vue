@@ -12,7 +12,7 @@
             <div style="display: flex; align-items: center">
               <button type="submit" :disabled="state !== 'form'" class="btn btn-primary" v-on:click="login">Request password reset link</button>
               <b-spinner v-if="state === 'loading'" class="center m-1" variant="primary" label="Loading..."></b-spinner>
-              <span class="ml-2">{{ result }}</span>
+              <span class="ms-2">{{ result }}</span>
             </div>
           </form>
           <!--<div class="card-footer">Footer</div> -->

@@ -1,6 +1,6 @@
 <template>
   <div class="">
-    <div class="ml-3 large-text font-weight-bold">
+    <div class="ms-3 large-text font-weight-bold">
       <div class="row mt-3 align-items-baseline">
         <div class="col-4 text-nowrap text-truncate" style="font-size: smaller">{{ user ?? 'Scan Name' }}</div>
         <div class="col-8 text-nowrap text-truncate" :style="{ color: reasonColor }">{{ reason ?? 'Scan Reason' }}</div>
@@ -26,7 +26,7 @@
         <label class="col-8">Scan Item</label>
       </div>
       <div class="row row-other" v-if="otherAmount && item?.itemGroup">
-        <label class="col-12 pl-5 text-center text-nowrap text-truncate">
+        <label class="col-12 ps-5 text-center text-nowrap text-truncate">
           {{ otherAmount }} {{ otherAmount === 1 ? 'anderer' : 'andere' }} {{ item?.itemGroup?.name }}
         </label>
       </div>

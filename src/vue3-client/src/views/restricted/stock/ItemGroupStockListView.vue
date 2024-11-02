@@ -10,7 +10,7 @@
         </div>
         <input class="m-1 align-middle" type="checkbox" id="onlyUnchecked" v-model="onlyUnchecked" />
         <label class="pt-2 align-middle" for="onlyUnchecked">Only show unchecked entries</label>
-        <button class="ml-3 py-0 btn btn-primary btn-sm align-middle" @click="clearSelection">Clear Selection</button>
+        <button class="ms-3 py-0 btn btn-primary btn-sm align-middle" @click="clearSelection">Clear Selection</button>
 
         <div v-if="!connected" class="alert alert-danger" role="alert"><strong>Connection lost!</strong> Trying to reconnect...</div>
         <div class="mt-1 mb-3">

@@ -54,7 +54,7 @@
             <label for="itemGroupName">Lagerstandsänderung</label>
             <br />
             <div class="d-flex justify-content-between">
-              <span class="ml-5">Aktueller Lagerstand:</span>
+              <span class="ms-5">Aktueller Lagerstand:</span>
               <span style="padding-right: 48px">{{ currentItemStock }}</span>
             </div>
             <div class="input-group">
@@ -288,7 +288,7 @@
           </div>
           <div class="mt-2 text-danger" v-if="errorString.length !== 0">{{ errorString }}</div>
           <button v-if="change !== null" type="button" class="btn btn-success my-3" v-on:click="addChange('another')">Add Change and add similar</button>
-          <button v-if="change !== null" type="button" class="btn btn-success ml-own" v-on:click="addChange('list')">Add Change and view list</button>
+          <button v-if="change !== null" type="button" class="btn btn-success ms-own" v-on:click="addChange('list')">Add Change and view list</button>
         </div>
       </div>
     </div>
@@ -596,7 +596,7 @@ export default {
       if (item === undefined) {
         const h = this.$createElement;
         const vNodesMsg = h('p', [
-          h('span', { class: ['mr-2'] }, `No Item found for barcode "${barcode}"`),
+          h('span', { class: ['me-2'] }, `No Item found for barcode "${barcode}"`),
           h(
             'router-link',
             {
@@ -664,7 +664,7 @@ export default {
 }
 
 @media (min-width: 475px) {
-  .ml-own {
+  .ms-own {
     margin-left: 0.5rem !important;
   }
 }

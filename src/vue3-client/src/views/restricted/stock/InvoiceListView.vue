@@ -3,7 +3,7 @@
     <div class="row">
       <div class="col-12 offset-md-1 col-md-10">
         <div class="d-flex justify-content-end">
-          <button class="btn btn-success mt-3 mr-3" v-on:click="openAddInvoice">Add Invoice</button>
+          <button class="btn btn-success mt-3 me-3" v-on:click="openAddInvoice">Add Invoice</button>
         </div>
         <div class="mt-3 mb-3">
           <div v-if="invoices.length !== 0" class="table-responsive">

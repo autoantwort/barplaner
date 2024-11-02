@@ -3,7 +3,7 @@
     <div class="row mt-3">
       <div v-if="realItem" class="col-12 col-md-8 offset-md-2 was-validated">
         <div class="d-flex justify-content-end">
-          <router-link class="btn btn-sm btn-success mb-3 mr-3" :to="{ name: 'addStockChange', params: { itemId: realItem.id } }">Add Change</router-link>
+          <router-link class="btn btn-sm btn-success mb-3 me-3" :to="{ name: 'addStockChange', params: { itemId: realItem.id } }">Add Change</router-link>
         </div>
         <div class="form-group row">
           <label class="col-3">Name</label>
@@ -40,7 +40,7 @@
         <div class="form-group row">
           <label class="col-3">Image</label>
           <label class="col-9">
-            <button v-if="realItem.imageId !== null" class="ml-2 btn btn-sm btn-sm-flat btn-secondary" type="button" v-on:click="openImage">
+            <button v-if="realItem.imageId !== null" class="ms-2 btn btn-sm btn-sm-flat btn-secondary" type="button" v-on:click="openImage">
               <i-fa-image />
             </button>
             <template v-else>None</template>

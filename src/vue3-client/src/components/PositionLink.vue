@@ -3,7 +3,7 @@
     <router-link :to="{ name: 'position', params: { positionId: position.id, position } }">
       {{ position.name }}
     </router-link>
-    <button v-if="position.imageId !== null" class="ml-2 btn btn-sm btn-sm-flat btn-secondary" type="button" v-on:click="openModal()">
+    <button v-if="position.imageId !== null" class="ms-2 btn btn-sm btn-sm-flat btn-secondary" type="button" v-on:click="openModal()">
       <i-fa-image />
     </button>
     <b-modal ref="modal" hide-footer no-fade centered :title="position.name">

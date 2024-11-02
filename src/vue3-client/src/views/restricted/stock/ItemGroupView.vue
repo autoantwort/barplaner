@@ -35,7 +35,7 @@
             {{ inStock }}
             <span
               v-if="inStock && inStock < realItemGroup.idealCount"
-              class="badge ml-2 vert"
+              class="badge ms-2 vert"
               style="vertical-align: text-top"
               v-bind:class="[inStock < realItemGroup.minimumCount ? 'badge-danger' : 'badge-warning']"
               >Buy {{ realItemGroup.idealCount - inStock }} item{{ realItemGroup.idealCount - inStock > 1 ? 's' : '' }}</span

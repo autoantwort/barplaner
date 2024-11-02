@@ -70,11 +70,11 @@
 
           <div class="form-group" v-if="user.telegramID.indexOf('login') === 0">
             <label>Dein Telegram Login Pin: {{ user.telegramID.substr(11) }}</label>
-            <a href="https://t.me/symposion_bot" class="btn btn-success ml-4">Start Bot</a>
+            <a href="https://t.me/symposion_bot" class="btn btn-success ms-4">Start Bot</a>
           </div>
           <div class="mt-2 mb-2 text-danger" v-if="errorString.length !== 0">{{ errorString }}</div>
           <button type="button" v-on:click="updateUser" class="btn btn-success">Update information</button>
-          <span class="ml-4 text-success" v-if="success">Success</span>
+          <span class="ms-4 text-success" v-if="success">Success</span>
         </form>
       </div>
     </div>

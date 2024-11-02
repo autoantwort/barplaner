@@ -3,7 +3,7 @@
     <div class="row">
       <div class="col-12 offset-md-1 col-md-10">
         <div class="d-flex justify-content-end">
-          <router-link class="btn btn-success mt-3 mr-3" to="/addItemGroup">Add ItemGroup</router-link>
+          <router-link class="btn btn-success mt-3 me-3" to="/addItemGroup">Add ItemGroup</router-link>
         </div>
         <div class="form-group">
           <input type="text" class="mt-3 form-control" placeholder="Search" v-on:input="filter" />
@@ -35,7 +35,7 @@
                     >
                     <button
                       v-if="itemGroup.stockPosition && itemGroup.stockPosition.imageId !== null"
-                      class="ml-2 btn btn-sm btn-sm-flat btn-secondary"
+                      class="ms-2 btn btn-sm btn-sm-flat btn-secondary"
                       type="button"
                       v-on:click="openModal(itemGroup.stockPosition)"
                     >

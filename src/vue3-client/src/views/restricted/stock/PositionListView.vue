@@ -7,7 +7,7 @@
             <template v-for="i in [1, 2]">
               <div>{{ arrow }} {{ position.name }}</div>
               <barcode :value="'pos' + position.id" :width="2" :height="20" :displayValue="false"></barcode>
-              <div class="mr-3">{{ arrow }}</div>
+              <div class="me-3">{{ arrow }}</div>
             </template>
           </div>
         </template>
@@ -16,8 +16,8 @@
     <div class="row d-print-none">
       <div class="col-12 offset-md-1 col-md-10">
         <div class="d-flex justify-content-end">
-          <button class="btn btn-primary mt-3 mr-3" v-on:click="print">Print Barcodes</button>
-          <router-link class="btn btn-success mt-3 mr-3" to="/addPosition">Add Position</router-link>
+          <button class="btn btn-primary mt-3 me-3" v-on:click="print">Print Barcodes</button>
+          <router-link class="btn btn-success mt-3 me-3" to="/addPosition">Add Position</router-link>
         </div>
         <div class="form-group">
           <input type="text" class="mt-3 form-control" placeholder="Search" v-on:input="filter" />

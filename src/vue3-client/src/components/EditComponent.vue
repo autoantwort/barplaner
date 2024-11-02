@@ -9,7 +9,7 @@
         <button v-if="editMode" class="btn btn-light" v-on:click="cancelClicked">
           <i-fa-xmark />
         </button>
-        <button class="ml-2 btn btn-light" v-on:click="editSaveClicked">
+        <button class="ms-2 btn btn-light" v-on:click="editSaveClicked">
           <i-fa-floppy-disk v-if="editMode" />
           <i-fa-pen-to-square v-else />
         </button>
