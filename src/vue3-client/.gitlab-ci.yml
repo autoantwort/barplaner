@@ -9,8 +9,9 @@ pages:
     - npm ci
     - npm run build
     # GitLab Pages requires the static files to be in 'public' directory
+    - cd -
     - rm -rf public
-    - mv dist public
+    - mv src/vue3-client/dist public
   artifacts:
     paths:
       - public
