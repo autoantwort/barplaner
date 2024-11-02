@@ -1,6 +1,6 @@
 <template>
   <edit-component ref="edit" :onSave="save" :onEdit="edit">
-    <label>{{ object[property] }} %</label>
+    <label v-if="Number.isFinite(object[property])">{{ object[property] }} %</label>
     <template v-slot:edit>
       <percent-input ref="input" v-model="value" v-on:enter="$refs.edit.save" />
     </template>
