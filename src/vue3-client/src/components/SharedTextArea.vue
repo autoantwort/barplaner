@@ -1,5 +1,5 @@
 <template>
-  <textarea v-bind="$attrs" style="border: none" :rows="rows" v-model="text" v-on:input.self="onInput" :disabled="disabled" value="" />
+  <textarea v-bind="$attrs" style="border: none" :rows="rows" v-model="text" v-on:input.self="onInput" :disabled="disabled" />
 </template>
 
 <script>
@@ -48,7 +48,7 @@ export default {
     this.rows = this.text.split('\n').length;
     this.initWebSocket();
   },
-  beforeDestroy() {
+  beforeUnmount() {
     this.webSocket.close();
   },
 };
