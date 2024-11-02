@@ -3,9 +3,7 @@
     <barcode-scanner ref="scanner" :callback="onBarcodeInput" />
     <div class="input-group">
       <input v-bind="$attrs" type="text" class="form-control" ref="barcode" v-on:input="onInput" v-on:keyup.enter="$emit('enter')" :placeholder="placeholder" />
-      <div class="input-group-append">
-        <button class="btn btn-success" type="button" v-on:click="$refs.scanner.loadDevicesAndPlay()">Scan</button>
-      </div>
+      <button class="btn btn-success" type="button" v-on:click="$refs.scanner.loadDevicesAndPlay()">Scan</button>
     </div>
   </div>
 </template>

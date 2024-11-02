@@ -52,9 +52,9 @@
                 locale="de"
                 placeholder="Jump to date"
               ></b-form-datepicker>
-              <div class="input-group-append">
-                <span class="input-group-text" id="basic-addon2">Include:</span>
-              </div>
+
+              <span class="input-group-text" id="basic-addon2">Include:</span>
+
               <div class="input-group-append">
                 <b-dropdown v-bind:text="include" v-model="include" style="min-width: 124px">
                   <b-dropdown-item v-on:click="include = 'Date only'">Date only</b-dropdown-item>

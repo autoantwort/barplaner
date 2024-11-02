@@ -58,9 +58,8 @@
               <span style="padding-right: 48px">{{ currentItemStock }}</span>
             </div>
             <div class="input-group">
-              <div class="input-group-prepend">
-                <div class="input-group-text" style="min-width: 36px">{{ this.sign }}</div>
-              </div>
+              <div class="input-group-text" style="min-width: 36px">{{ this.sign }}</div>
+
               <input
                 id="change"
                 type="number"
@@ -75,9 +74,8 @@
               />
             </div>
             <div class="input-group mt-2">
-              <div class="input-group-prepend">
-                <div class="input-group-text">=</div>
-              </div>
+              <div class="input-group-text">=</div>
+
               <input
                 type="number"
                 class="form-control text-right"
@@ -172,12 +170,8 @@
           <div class="form-group was-validated" v-show="showBrotto">
             <label for>Preis (Netto: ohne Steuern, Brotto: mit Steuern)</label>
             <div class="input-group" v-show="showNetto">
-              <div class="input-group-prepend">
-                <div class="input-group-text" style="min-width: 71px">Netto</div>
-              </div>
-              <div class="input-group-prepend">
-                <div class="input-group-text">{{ Math.abs(change) }} ×</div>
-              </div>
+              <div class="input-group-text" style="min-width: 71px">Netto</div>
+              <div class="input-group-text">{{ Math.abs(change) }} ×</div>
               <input
                 type="number"
                 class="form-control text-right"
@@ -190,9 +184,9 @@
                 v-on:keypress="onlyNumbers"
                 :required="showNetto"
               />
-              <div class="input-group-append">
-                <div class="input-group-text">=</div>
-              </div>
+
+              <div class="input-group-text">=</div>
+
               <input
                 type="number"
                 class="form-control text-right"
@@ -205,29 +199,26 @@
                 v-on:keypress="onlyNumbers"
                 :required="showNetto"
               />
-              <div class="input-group-append">
-                <div class="input-group-text">€</div>
-              </div>
+
+              <div class="input-group-text">€</div>
             </div>
 
             <div class="input-group my-2" v-show="showNetto">
-              <div class="input-group-prepend">
-                <div class="input-group-text px-sm">Steuersatz:</div>
-                <div class="input-group-text px-sm">
-                  <input type="radio" id="0%" value="0" name="tax" v-model="tax" :disabled="change === null" />
-                  <label style="margin-bottom: 0px; padding-left: 4px" for="0%">0%</label>
-                </div>
-                <div class="input-group-text px-sm">
-                  <input type="radio" id="7%" value="7" name="tax" v-model="tax" :disabled="change === null" />
-                  <label style="margin-bottom: 0px; padding-left: 4px" for="7%">7%</label>
-                </div>
-                <div class="input-group-text px-sm">
-                  <input type="radio" id="19%" value="19" name="tax" v-model="tax" :disabled="change === null" />
-                  <label style="margin-bottom: 0px; padding-left: 4px" for="19%">19%</label>
-                </div>
-                <div class="input-group-text px-sm">
-                  <input type="radio" id="own" value="own" name="tax" v-model="tax" :disabled="change === null" />
-                </div>
+              <div class="input-group-text px-sm">Steuersatz:</div>
+              <div class="input-group-text px-sm">
+                <input type="radio" id="0%" value="0" name="tax" v-model="tax" :disabled="change === null" />
+                <label style="margin-bottom: 0px; padding-left: 4px" for="0%">0%</label>
+              </div>
+              <div class="input-group-text px-sm">
+                <input type="radio" id="7%" value="7" name="tax" v-model="tax" :disabled="change === null" />
+                <label style="margin-bottom: 0px; padding-left: 4px" for="7%">7%</label>
+              </div>
+              <div class="input-group-text px-sm">
+                <input type="radio" id="19%" value="19" name="tax" v-model="tax" :disabled="change === null" />
+                <label style="margin-bottom: 0px; padding-left: 4px" for="19%">19%</label>
+              </div>
+              <div class="input-group-text px-sm">
+                <input type="radio" id="own" value="own" name="tax" v-model="tax" :disabled="change === null" />
               </div>
               <input
                 type="text"
@@ -242,18 +233,13 @@
                 :placeholder="taxPlaceholder"
                 :disabled="change === null"
               />
-              <div class="input-group-append">
-                <div class="input-group-text px-sm">%</div>
-              </div>
+
+              <div class="input-group-text px-sm">%</div>
             </div>
 
             <div class="input-group">
-              <div class="input-group-prepend">
-                <div class="input-group-text">Brotto</div>
-              </div>
-              <div class="input-group-prepend">
-                <div class="input-group-text">{{ Math.abs(change) }} ×</div>
-              </div>
+              <div class="input-group-text">Brotto</div>
+              <div class="input-group-text">{{ Math.abs(change) }} ×</div>
               <input
                 type="number"
                 class="form-control text-right"
@@ -266,9 +252,7 @@
                 v-on:keypress="onlyNumbers"
                 :required="showBrotto"
               />
-              <div class="input-group-append">
-                <div class="input-group-text">=</div>
-              </div>
+              <div class="input-group-text">=</div>
               <input
                 type="number"
                 class="form-control text-right"
@@ -281,9 +265,7 @@
                 v-on:keypress="onlyNumbers"
                 :required="showBrotto"
               />
-              <div class="input-group-append">
-                <div class="input-group-text">€</div>
-              </div>
+              <div class="input-group-text">€</div>
             </div>
           </div>
           <div class="mt-2 text-danger" v-if="errorString.length !== 0">{{ errorString }}</div>

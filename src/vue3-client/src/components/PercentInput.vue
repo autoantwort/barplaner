@@ -1,9 +1,8 @@
 <template>
   <div class="input-group">
     <input ref="input" type="number" min="0" max="100" step="0.1" class="form-control" :value="value" v-on:input="onInput" v-on:keyup.enter="onEnter" />
-    <div class="input-group-append">
-      <span class="input-group-text">%</span>
-    </div>
+
+    <span class="input-group-text">%</span>
   </div>
 </template>
 

@@ -9,10 +9,9 @@
         aria-label="Paste image or url of image"
         onkeypress="return false;"
       />
-      <div class="input-group-append">
-        <input type="file" accept="image/*" id="uploadImage" v-on:change="loadImageFromFile" style="display: none" />
-        <label class="btn btn-outline-secondary" for="uploadImage" style="cursor: pointer" role="button">Upload Image</label>
-      </div>
+
+      <input type="file" accept="image/*" id="uploadImage" v-on:change="loadImageFromFile" style="display: none" />
+      <label class="btn btn-outline-secondary" for="uploadImage" style="cursor: pointer" role="button">Upload Image</label>
     </div>
     <b-alert :show="imageError" v-on:dismissed="imageError = false" dismissible fade variant="danger">The pasted URL does not point to an image!</b-alert>
     <div v-if="imageURL !== null" class="col mb-4 text-center">

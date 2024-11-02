@@ -31,11 +31,10 @@
           <div class="form-group">
             <label for="gitLabId">GitLab User ID</label>
             <div class="input-group mb-3">
-              <div class="input-group-prepend">
-                <a target="_blank" rel="noopener noreferrer" href="https://git.rwth-aachen.de/-/user_settings/profile#user_name" class="btn btn-outline-link"
-                  >My GitLab User ID</a
-                >
-              </div>
+              <a target="_blank" rel="noopener noreferrer" href="https://git.rwth-aachen.de/-/user_settings/profile#user_name" class="btn btn-outline-link"
+                >My GitLab User ID</a
+              >
+
               <input
                 type="text"
                 autocomplete="off"
