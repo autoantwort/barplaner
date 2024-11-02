@@ -6,7 +6,7 @@
     <button v-if="position.imageId !== null" class="ms-2 btn btn-sm btn-sm-flat btn-secondary" type="button" v-on:click="openModal()">
       <i-fa-image />
     </button>
-    <b-modal ref="modal" hide-footer no-fade centered :title="position.name">
+    <b-modal ref="modal" hide-footer no-fade centered :title="position.name" lazy>
       <positionImage :position="position"></positionImage>
     </b-modal>
   </div>
