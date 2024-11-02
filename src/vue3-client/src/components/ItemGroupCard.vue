@@ -20,19 +20,19 @@
       <b-tab title="New" lazy>
         <b-card-text>
           <form ref="form">
-            <div class="form-group">
-              <label for="name">Name</label>
+            <div class="mb-3">
+              <label for="name" class="form-label">Name</label>
               <input type="text" class="form-control" id="name" v-model="itemGroup.name" required />
             </div>
-            <div class="form-group">
-              <label for="min">Minimum Number in Stock</label>
+            <div class="mb-3">
+              <label for="min" class="form-label">Minimum Number in Stock</label>
               <input type="number" class="form-control" id="min" min="0" :max="itemGroup.idealCount" v-model="itemGroup.minimumCount" required />
             </div>
-            <div class="form-group">
-              <label for="ideal">Ideal Number in Stock</label>
+            <div class="mb-3">
+              <label for="ideal" class="form-label">Ideal Number in Stock</label>
               <input type="number" class="form-control" id="ideal" :min="itemGroup.minimumCount" v-model="itemGroup.idealCount" />
             </div>
-            <div class="form-group">
+            <div class="mb-3">
               <position-card ref="position" :usedForItem="false" />
             </div>
           </form>

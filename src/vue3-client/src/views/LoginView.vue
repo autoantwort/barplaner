@@ -5,12 +5,12 @@
         <div class="card">
           <div class="card-header">Login</div>
           <form class="card-body" action="javascript:void(0);">
-            <div class="form-group">
-              <label for="usr">Name:</label>
+            <div class="mb-3">
+              <label for="usr" class="form-label">Name:</label>
               <input type="text" class="form-control" v-bind:class="{ 'is-invalid': wrongData }" id="usr" required v-model="name" name="username" />
             </div>
-            <div class="form-group">
-              <label for="pwd">Password:</label>
+            <div class="mb-3">
+              <label for="pwd" class="form-label">Password:</label>
               <input type="password" class="form-control" v-bind:class="{ 'is-invalid': wrongData }" id="pwd" required v-model="password" name="password" />
             </div>
             <button type="submit" class="btn btn-primary" v-on:click="login">Login</button>

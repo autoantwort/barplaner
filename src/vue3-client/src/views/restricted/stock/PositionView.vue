@@ -2,20 +2,20 @@
   <div class="container">
     <div class="row mt-3">
       <div v-if="realPosition" class="col-12 col-md-8 offset-md-2">
-        <div class="form-group row">
-          <label class="col-3">Name</label>
+        <div class="mb-3 row">
+          <label class="col-3 form-label">Name</label>
           <generic-input-component :object="realPosition" property="name" endpoint="/position/:id" required :minLength="4" />
         </div>
-        <div class="form-group row">
-          <label class="col-3">Description</label>
+        <div class="mb-3 row">
+          <label class="col-3 form-label">Description</label>
           <label class="col-9">{{ realPosition.description }}</label>
         </div>
-        <div class="form-group row">
-          <label class="col-3">Room</label>
+        <div class="mb-3 row">
+          <label class="col-3 form-label">Room</label>
           <label class="col-9">{{ realPosition.room }}</label>
         </div>
-        <div class="form-group row">
-          <label class="col-3">Item Groups</label>
+        <div class="mb-3 row">
+          <label class="col-3 form-label">Item Groups</label>
           <label class="col-9">
             <router-link v-for="group in itemGroups" :key="group.id" :to="{ name: 'itemGroup', params: { itemGroupId: group.id, itemGroup: group } }">{{
               group.name

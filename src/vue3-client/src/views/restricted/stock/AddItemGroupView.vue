@@ -3,19 +3,19 @@
     <div class="row mt-2">
       <div class="col-12 col-md-8 offset-md-2 col-lg-6 offset-lg-3">
         <form class="was-validated" ref="form">
-          <div class="form-group">
-            <label for="itemGroupName">Name</label>
+          <div class="mb-3">
+            <label for="itemGroupName" class="form-label">Name</label>
             <input type="text" class="form-control" id="itemGroupName" v-model="itemGroup.name" required />
           </div>
-          <div class="form-group">
-            <label for="itemGroupMinCount">Minimum Number in Stock</label>
+          <div class="mb-3">
+            <label for="itemGroupMinCount" class="form-label">Minimum Number in Stock</label>
             <input type="number" class="form-control" id="itemGroupMinCount" v-model="itemGroup.minimumCount" required />
           </div>
-          <div class="form-group">
-            <label for="itemGroupIdealCount">Ideal Number in Stock</label>
+          <div class="mb-3">
+            <label for="itemGroupIdealCount" class="form-label">Ideal Number in Stock</label>
             <input type="number" class="form-control" id="itemGroupIdealCount" v-model="itemGroup.idealCount" />
           </div>
-          <div class="form-group">
+          <div class="mb-3">
             <b-card no-body class="border-info">
               <b-tabs card v-model="itemGroup.positionTabIndex">
                 <b-tab title="Position:" title-link-class="text-dark" disabled></b-tab>

@@ -5,8 +5,8 @@
         <div class="card">
           <div class="card-header">Reset Password</div>
           <form class="card-body" action="javascript:void(0);">
-            <div class="form-group">
-              <label for="mail">EMail:</label>
+            <div class="mb-3">
+              <label for="mail" class="form-label">EMail:</label>
               <input type="email" class="form-control" v-bind:class="{ 'is-invalid': wrongData }" id="mail" required v-model="email" />
             </div>
             <div style="display: flex; align-items: center">

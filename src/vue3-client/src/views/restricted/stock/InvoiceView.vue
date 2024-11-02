@@ -3,34 +3,34 @@
     <div class="row mt-3">
       <template v-if="realInvoice">
         <form ref="form" class="was-validated col-12 col-lg-8 offset-lg-2 col-md-10 offset-md-1">
-          <div class="form-group row mb-2">
-            <label class="col-3 col-form-label">From</label>
+          <div class="row mb-2">
+            <label class="col-3 form-label">From</label>
             <div class="col-9">
               <input v-if="realInvoice.seller" readonly class="form-control-plaintext" :value="realInvoice.seller" />
               <input v-else type="text" class="form-control" v-model="seller" required />
             </div>
           </div>
-          <div class="form-group row mb-2">
-            <label class="col-3 col-form-label">Invoice Date</label>
+          <div class="row mb-2">
+            <label class="col-3 form-label">Invoice Date</label>
             <div class="col-9">
               <input v-if="realInvoice.invoiceDate" readonly class="form-control-plaintext" :value="$filters.asDayDateTime(realInvoice.invoiceDate)" />
               <input v-else class="form-control" required pattern="[0-3]\d\.[0-1]\d\.\d\d [0-2]\d:[0-5]\d" title="dd.mm.yy hh:mm" v-model="invoiceDate" />
               <div class="invalid-feedback">Required. Format: dd.mm.yy hh:mm</div>
             </div>
           </div>
-          <div class="form-group row mb-2">
-            <label class="col-3 col-form-label">Delivery Date</label>
+          <div class="row mb-2">
+            <label class="col-3 form-label">Delivery Date</label>
             <div class="col-9">
               <input v-if="realInvoice.deliveryDate" readonly class="form-control-plaintext" :value="$filters.asDayDateTime(realInvoice.deliveryDate)" />
               <input v-else class="form-control" pattern="[0-3]\d\.[0-1]\d\.\d\d [0-2]\d:[0-5]\d" title="dd.mm.yy hh:mm" v-model="deliveryDate" />
               <div class="invalid-feedback">Format: dd.mm.yy hh:mm</div>
             </div>
           </div>
-          <div class="form-group row" v-if="realInvoice.extraCostsDescription">
-            <label class="col-4">Extra Costs</label>
+          <div class="mb-3 row" v-if="realInvoice.extraCostsDescription">
+            <label class="col-4 form-label">Extra Costs</label>
             <label class="col-8">{{ realInvoice.extraCostsAmount }} für {{ realInvoice.extraCostsDescription }}</label>
           </div>
-          <div class="form-group row" v-if="canSave">
+          <div class="mb-3 row" v-if="canSave">
             <div class="col-5 offset-3">
               <button v-on:click="save" class="col-12 btn btn-success">Save</button>
             </div>
@@ -133,8 +133,8 @@
           <div class="col text-center text-underline">Updated Value</div>
           <div class="col text-center text-underline">Item</div>
         </div>
-        <div class="form-group">
-          <label for="name">Name</label>
+        <div class="mb-3">
+          <label for="name" class="form-label">Name</label>
           <div class="row">
             <div class="col" v-if="currentEntry">
               <button class="btn btn-light" v-on:click="updatedItem.name = currentEntry.itemDescription">
@@ -155,13 +155,13 @@
             </div>
           </div>
         </div>
-        <div class="form-group was-validated" v-if="!currentEntry?.gtin">
-          <label for="name">Barcode of Bottle</label>
+        <div class="mb-3 was-validated" v-if="!currentEntry?.gtin">
+          <label for="name" class="form-label">Barcode of Bottle</label>
           <barcode-input v-model="updatedItem.barcode" required />
           <div class="invalid-feedback" :style="{ display: updatedItem.barcode ? 'none' : 'block' }">Required</div>
         </div>
-        <div class="form-group">
-          <label for="name">Content</label>
+        <div class="mb-3">
+          <label for="name" class="form-label">Content</label>
           <div class="row">
             <div class="col" v-if="currentEntry">
               <button
@@ -192,8 +192,8 @@
             </div>
           </div>
         </div>
-        <div class="form-group">
-          <label for="name">Alcohol by volume</label>
+        <div class="mb-3">
+          <label for="name" class="form-label">Alcohol by volume</label>
           <div class="row">
             <div class="col" v-if="currentEntry">
               <button v-if="currentEntry.alcoholByVolume" class="btn btn-light" v-on:click="updatedItem.alcoholByVolume = currentEntry.alcoholByVolume">
@@ -233,7 +233,7 @@
             </div>
           </div>
         </div>
-        <div class="form-group" v-if="currentItem === null">
+        <div class="mb-3" v-if="currentItem === null">
           <item-group-card ref="itemGroupCard" />
         </div>
         <div
@@ -263,7 +263,7 @@
             <i-fa-image />
           </button>
         </p>
-        <div class="form-group mx-2">
+        <div class="mb-3 mx-2">
           <input type="text" class="mt-3 form-control" placeholder="Search" v-on:input="filter" />
         </div>
         <table class="table table-hover">

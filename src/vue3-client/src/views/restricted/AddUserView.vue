@@ -3,27 +3,27 @@
     <div class="row mt-2">
       <div class="col-12 col-md-8 offset-md-2 col-lg-6 offset-lg-3">
         <form class="was-validated" id="form">
-          <div class="form-group">
-            <label for="name">Name</label>
+          <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
             <input type="text" class="form-control" id="name" required v-model="user.name" name="name" />
             <div class="invalid-feedback">Required</div>
           </div>
-          <div class="form-group">
-            <label for="password">Password</label>
+          <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
             <input type="password" class="form-control" id="password" required v-model="user.password" pattern=".{8,}" />
             <div class="invalid-feedback">Required. Minimum eight characters.</div>
           </div>
-          <div class="form-group">
-            <label for="email">Email</label>
+          <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
             <input type="email" class="form-control" id="email" required v-model="user.email" />
             <div class="invalid-feedback">Required.</div>
           </div>
-          <div class="form-group">
-            <label for="phone">Telefonummer</label>
+          <div class="mb-3">
+            <label for="phone" class="form-label">Telefonummer</label>
             <input type="text" class="form-control" id="phone" v-model="user.phone" />
           </div>
-          <div class="form-group">
-            <label for="birthday">Geburtstag</label>
+          <div class="mb-3">
+            <label for="birthday" class="form-label">Geburtstag</label>
             <input type="text" class="form-control" id="birthday" v-model="user.birthday" pattern="[0-3]\d\.[0-1]\d\.[1-2]\d\d\d" title="dd.mm.yyyy" />
             <div class="invalid-feedback">Format: dd.mm.yyyy</div>
           </div>

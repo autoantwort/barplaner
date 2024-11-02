@@ -69,7 +69,7 @@
 
           <br />
 
-          <div class="form-group" v-if="user.telegramID.indexOf('login') === 0">
+          <div class="mb-3" v-if="user.telegramID.indexOf('login') === 0">
             <label>Dein Telegram Login Pin: {{ user.telegramID.substr(11) }}</label>
             <a href="https://t.me/symposion_bot" class="btn btn-success ms-4">Start Bot</a>
           </div>

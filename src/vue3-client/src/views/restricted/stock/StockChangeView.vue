@@ -2,40 +2,40 @@
   <div class="container">
     <div class="row mt-3">
       <div v-if="realChange" class="col-12 col-md-8 offset-md-2">
-        <div class="form-group row">
-          <label class="col-3">Id</label>
+        <div class="mb-3 row">
+          <label class="col-3 form-label">Id</label>
           <label class="col-9">{{ realChange.id }}</label>
         </div>
-        <div class="form-group row">
-          <label class="col-3">Item</label>
+        <div class="mb-3 row">
+          <label class="col-3 form-label">Item</label>
           <router-link class="col-9" :to="{ name: 'item', params: { itemId: realChange.itemId } }">{{ realChange.stockItem.name }}</router-link>
         </div>
-        <div class="form-group row">
-          <label class="col-3">Date</label>
+        <div class="mb-3 row">
+          <label class="col-3 form-label">Date</label>
           <label class="col-9">{{ $filters.asDayDateTime(realChange.date) }}</label>
         </div>
-        <div class="form-group row">
-          <label class="col-3">Brotto Price</label>
+        <div class="mb-3 row">
+          <label class="col-3 form-label">Brotto Price</label>
           <label class="col-9">{{ realChange.brottoPrice.toFixed(2) }} €</label>
         </div>
-        <div class="form-group row">
-          <label class="col-3">Price Accuracy</label>
+        <div class="mb-3 row">
+          <label class="col-3 form-label">Price Accuracy</label>
           <label class="col-9">{{ getGermanPriceAccuracy(realChange.priceAccuracy) }}</label>
         </div>
-        <div class="form-group row">
-          <label class="col-3">Reason</label>
+        <div class="mb-3 row">
+          <label class="col-3 form-label">Reason</label>
           <label class="col-9">{{ getGermanReason(realChange.reason) }}</label>
         </div>
-        <div class="form-group row">
-          <label class="col-3">Amount</label>
+        <div class="mb-3 row">
+          <label class="col-3 form-label">Amount</label>
           <label class="col-9">{{ realChange.amount }}</label>
         </div>
-        <div class="form-group row">
-          <label class="col-3">Added by User</label>
+        <div class="mb-3 row">
+          <label class="col-3 form-label">Added by User</label>
           <label class="col-9">{{ realChange.user ? realChange.user.name : '' }}</label>
         </div>
-        <div class="form-group row">
-          <label class="col-3">From Bill</label>
+        <div class="mb-3 row">
+          <label class="col-3 form-label">From Bill</label>
           <label v-if="realChange.invoiceEntryId === null" class="col-9">{{ realChange.invoiceEntryId }}</label>
           <router-link v-else class="col-9" :to="{ name: 'invoice', params: { invoiceId: realChange.invoiceEntry.invoiceId } }"
             >{{ realChange.invoiceEntry.invoice.seller }}, {{ $filters.asDayDateTime(realChange.invoiceEntry.invoice.invoiceDate) }}</router-link

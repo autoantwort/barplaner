@@ -1,7 +1,6 @@
 <template>
   <div>
-    <label>Optional: Select an image and a position on the image</label>
-    <br />
+    <label class="mb-2">Optional: Select an image and a position on the image</label>
     <div class="row row-cols-1 row-cols-md-2">
       <div v-for="image in existingImages" :key="image.id" class="col mb-4">
         <div class="card" :imageId="image.id">
@@ -41,9 +40,9 @@
       </div>
     </div>
     <form class="was-validated" ref="form">
-      <div ref="positionDiv" v-show="selectedCard !== null" class="form-group">
+      <div ref="positionDiv" v-show="selectedCard !== null" class="mb-3">
         <div class="row">
-          <label ref="scrollTo" class="col-4">Position auf dem Bild</label>
+          <label ref="scrollTo" class="col-4 form-label">Position auf dem Bild</label>
           <div class="col-8 text-end text-danger" style="text-decoration: underline; cursor: pointer" v-on:click="unselectCard">
             Keine Position auf dem Bild festlegen
             <i-fa-trash-can />
@@ -79,18 +78,20 @@
           <img ref="output" style="width: 100%" ondragstart="event.preventDefault()" />
         </div>
       </div>
-      <div class="form-group">
-        <label>Position name</label>
+      <div class="mb-3">
+        <label class="form-label">Position name</label>
         <input type="text" class="form-control" required v-model.trim="position.name" name="positionName" v-on:input="validateName" />
         <div class="invalid-feedback" ref="nameFeedback">Required</div>
       </div>
-      <div class="form-group">
-        <label for="description">Description</label>
+
+      <div class="mb-3">
+        <label for="description" class="form-label">Description</label>
         <input type="text" class="form-control" id="description" v-model="position.description" name="description" />
       </div>
-      <div class="form-group">
-        <label for="room">Room</label>
-        <select class="form-control" v-model="position.room" required>
+
+      <div class="mb-3">
+        <label for="room" class="form-label">Room</label>
+        <select class="form-select" v-model="position.room" required>
           <option>K14</option>
           <option>K6</option>
           <option>K2</option>

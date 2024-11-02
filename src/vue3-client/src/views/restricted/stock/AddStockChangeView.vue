@@ -50,8 +50,8 @@
               </li>
             </ul>
           </div>
-          <div class="form-group was-validated" v-if="change !== null">
-            <label for="itemGroupName">Lagerstandsänderung</label>
+          <div class="mb-3 was-validated" v-if="change !== null">
+            <label for="itemGroupName" class="form-label">Lagerstandsänderung</label>
             <br />
             <div class="d-flex justify-content-between">
               <span class="ms-5">Aktueller Lagerstand:</span>
@@ -97,8 +97,8 @@
               einzutragen. Am besten in die Gruppe schreiben und Bescheid geben.
             </div>
           </div>
-          <div class="form-group" v-if="change !== null">
-            <label for="itemGroupMinCount">Reason</label>
+          <div class="mb-3" v-if="change !== null">
+            <label for="itemGroupMinCount" class="form-label">Reason</label>
             <div v-for="r in displayedReasons" class="form-check mb-2" :key="r.id">
               <input class="form-check-input" type="radio" v-model="reason" name="reason" :id="r.name" :value="r.name" />
               <label class="form-check-label" :for="r.name">
@@ -131,12 +131,12 @@
               </table>
             </div>
           </div>
-          <div class="form-group was-validated" v-if="change !== null">
-            <label for="itemGroupName">Notiz</label>
+          <div class="mb-3 was-validated" v-if="change !== null">
+            <label for="itemGroupName" class="form-label">Notiz</label>
             <textarea type="text" class="form-control" rows="4" name="reason" :required="noteRequired ? 'true' : null" v-model.trim="note" />
           </div>
-          <div class="form-group" v-if="reason === 'bought'">
-            <label>Preisgenauigkeit</label>
+          <div class="mb-3" v-if="reason === 'bought'">
+            <label class="form-label">Preisgenauigkeit</label>
             <div class="form-check mb-2">
               <input class="form-check-input" type="radio" v-model="priceAccuracy" name="pA" id="unknown" value="unknown" required />
               <label class="form-check-label" for="unknown">
@@ -167,8 +167,8 @@
             </div>
             <div v-if="priceAccuracy === null" class="invalid-feedback" style="display: block">Please select an price accuracy.</div>
           </div>
-          <div class="form-group was-validated" v-show="showBrotto">
-            <label for>Preis (Netto: ohne Steuern, Brotto: mit Steuern)</label>
+          <div class="mb-3 was-validated" v-show="showBrotto">
+            <label for class="form-label">Preis (Netto: ohne Steuern, Brotto: mit Steuern)</label>
             <div class="input-group" v-show="showNetto">
               <div class="input-group-text" style="min-width: 71px">Netto</div>
               <div class="input-group-text">{{ Math.abs(change) }} ×</div>

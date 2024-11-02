@@ -5,7 +5,7 @@
         <div class="d-flex justify-content-end">
           <router-link class="btn btn-success m-3" to="/addItem">Add Item</router-link>
         </div>
-        <div class="form-group">
+        <div class="mb-3">
           <barcode-input placeholder="Search" v-on:input="filter" />
         </div>
         <div class="mt-3 mb-3">

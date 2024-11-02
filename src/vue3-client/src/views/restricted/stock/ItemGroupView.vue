@@ -2,12 +2,12 @@
   <div class="container">
     <div class="row mt-3">
       <div v-if="realItemGroup" class="col-12 col-md-8 offset-md-2 was-validated">
-        <div class="form-group row">
-          <label class="col-3">Name</label>
+        <div class="mb-3 row">
+          <label class="col-3 form-label">Name</label>
           <generic-input-component :object="realItemGroup" property="name" endpoint="/itemGroup/:id" required :minLength="4" />
         </div>
-        <div class="form-group row">
-          <label class="col-3">Minimum Count</label>
+        <div class="mb-3 row">
+          <label class="col-3 form-label">Minimum Count</label>
           <generic-input-component
             :object="realItemGroup"
             property="minimumCount"
@@ -18,19 +18,19 @@
             endpoint="/itemGroup/:id"
           />
         </div>
-        <div class="form-group row">
-          <label class="col-3">Ideal Count</label>
+        <div class="mb-3 row">
+          <label class="col-3 form-label">Ideal Count</label>
           <generic-input-component :object="realItemGroup" property="idealCount" type="number" :min="realItemGroup.minimumCount" endpoint="/itemGroup/:id" />
         </div>
-        <div class="form-group row">
-          <label class="col-3">Recent Usage</label>
+        <div class="mb-3 row">
+          <label class="col-3 form-label">Recent Usage</label>
           <label class="col-9" v-if="usage">
             {{ usage.threeMonths }} <small>in three months</small>, {{ usage.sixMonths }} <small>in six months</small>, {{ usage.oneYear }}
             <small>in one year</small>
           </label>
         </div>
-        <div class="form-group row">
-          <label class="col-3">In Stock</label>
+        <div class="mb-3 row">
+          <label class="col-3 form-label">In Stock</label>
           <label class="col-9">
             {{ inStock }}
             <span
@@ -42,8 +42,8 @@
             >
           </label>
         </div>
-        <div class="form-group row">
-          <label class="col-3">Position</label>
+        <div class="mb-3 row">
+          <label class="col-3 form-label">Position</label>
           <edit-position-component :object="realItemGroup" endpoint="/itemGroup/:id" :usedForItem="false" />
         </div>
         <div class="row" v-if="itemStock && itemStock.length > 0">

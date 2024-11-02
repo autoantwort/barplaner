@@ -5,40 +5,40 @@
         <div class="d-flex justify-content-end">
           <router-link class="btn btn-sm btn-success mb-3 me-3" :to="{ name: 'addStockChange', params: { itemId: realItem.id } }">Add Change</router-link>
         </div>
-        <div class="form-group row">
-          <label class="col-3">Name</label>
+        <div class="mb-3 row">
+          <label class="col-3 form-label">Name</label>
           <generic-input-component :object="realItem" property="name" endpoint="/item/:id" required :minLength="4" />
         </div>
-        <div class="form-group row">
-          <label class="col-3">Barcode</label>
+        <div class="mb-3 row">
+          <label class="col-3 form-label">Barcode</label>
           <edit-barcode-component :object="realItem" property="barcode" />
         </div>
-        <div class="form-group row">
-          <label class="col-3">Barcode of Carton</label>
+        <div class="mb-3 row">
+          <label class="col-3 form-label">Barcode of Carton</label>
           <edit-barcode-component :object="realItem" property="barcodePack" />
         </div>
-        <div class="form-group row">
-          <label class="col-3">Article Number</label>
+        <div class="mb-3 row">
+          <label class="col-3 form-label">Article Number</label>
           <generic-input-component :object="realItem" property="articleNumber" endpoint="/item/:id" />
         </div>
-        <div class="form-group row">
-          <label class="col-3">Seller</label>
+        <div class="mb-3 row">
+          <label class="col-3 form-label">Seller</label>
           <label class="col-9">{{ realItem.seller }}</label>
         </div>
-        <div class="form-group row">
-          <label class="col-3">Content</label>
+        <div class="mb-3 row">
+          <label class="col-3 form-label">Content</label>
           <edit-content-component :object="realItem" />
         </div>
-        <div class="form-group row">
-          <label class="col-3">Alcohol by volume</label>
+        <div class="mb-3 row">
+          <label class="col-3 form-label">Alcohol by volume</label>
           <edit-percent-component :object="realItem" property="alcoholByVolume" endpoint="/item/:id" />
         </div>
-        <div class="form-group row">
-          <label class="col-3">ItemGroup</label>
+        <div class="mb-3 row">
+          <label class="col-3 form-label">ItemGroup</label>
           <edit-item-group-component :object="realItem" />
         </div>
-        <div class="form-group row">
-          <label class="col-3">Image</label>
+        <div class="mb-3 row">
+          <label class="col-3 form-label">Image</label>
           <label class="col-9">
             <button v-if="realItem.imageId !== null" class="ms-2 btn btn-sm btn-sm-flat btn-secondary" type="button" v-on:click="openImage">
               <i-fa-image />
@@ -46,20 +46,20 @@
             <template v-else>None</template>
           </label>
         </div>
-        <div class="form-group row">
-          <label class="col-3">Position</label>
+        <div class="mb-3 row">
+          <label class="col-3 form-label">Position</label>
           <edit-position-component :object="realItem" endpoint="/item/:id" :usedForItem="true" />
         </div>
-        <div class="form-group row">
-          <label class="col-3">In Stock</label>
+        <div class="mb-3 row">
+          <label class="col-3 form-label">In Stock</label>
           <label class="col-9">{{ stock === undefined ? 'Loading...' : stock ? stock.inStock : '0' }}</label>
         </div>
-        <div class="form-group row">
-          <label class="col-3">Website</label>
+        <div class="mb-3 row">
+          <label class="col-3 form-label">Website</label>
           <edit-url-component :object="realItem" property="website" />
         </div>
-        <div class="form-group row">
-          <label class="col-3">Interal Note</label>
+        <div class="mb-3 row">
+          <label class="col-3 form-label">Interal Note</label>
           <edit-textarea-component :object="realItem" property="internalNote" endpoint="/item/:id" />
         </div>
         <div class="row" v-if="stockChanges && stockChanges.length > 0">

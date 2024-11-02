@@ -3,17 +3,17 @@
     <div class="row mt-2">
       <div class="col-12 col-md-8 offset-md-2 col-lg-6 offset-lg-3">
         <form class="was-validated" id="form">
-          <div class="form-group">
-            <label for="name">Name</label>
+          <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
             <input type="text" class="form-control" id="name" required v-model.trim="item.name" name="name" />
             <div class="invalid-feedback">Required</div>
           </div>
-          <div class="form-group">
-            <label for="image">Image</label>
+          <div class="mb-3">
+            <label for="image" class="form-label">Image</label>
             <image-input ref="imageInput" />
           </div>
-          <div class="form-group">
-            <label for="barcode">Barcode of the Bottle (Scan with the barcode scanner)</label>
+          <div class="mb-3">
+            <label for="barcode" class="form-label">Barcode of the Bottle (Scan with the barcode scanner)</label>
             <barcode-input v-model="item.barcode" />
             <div class="d-flex align-items-center p-1" v-if="analyzing">
               <div class="spinner-border me-2" role="status">
@@ -22,12 +22,12 @@
               <span>Analyzing...</span>
             </div>
           </div>
-          <div class="form-group">
-            <label for="articleNumber">Article Number (e.g. ASIN for Amazon, Art.-Nr. for Kachouri)</label>
+          <div class="mb-3">
+            <label for="articleNumber" class="form-label">Article Number (e.g. ASIN for Amazon, Art.-Nr. for Kachouri)</label>
             <input type="text" class="form-control" id="articleNumber" v-model="item.articleNumber" name="articleNumber" />
           </div>
-          <div class="form-group">
-            <label for="seller">Seller</label>
+          <div class="mb-3">
+            <label for="seller" class="form-label">Seller</label>
             <select class="form-control" id="seller" v-model="item.seller">
               <option>Amazon</option>
               <option>Metro</option>
@@ -40,26 +40,26 @@
               <option>Unknown</option>
             </select>
           </div>
-          <div class="form-group">
+          <div class="mb-3">
             <position-card ref="position" :usedForItem="true" />
           </div>
-          <div class="form-group">
-            <label for="unit">Content</label>
+          <div class="mb-3">
+            <label for="unit" class="form-label">Content</label>
             <content-input :object="item" />
           </div>
-          <div class="form-group">
-            <label>Alcohol by volume</label>
+          <div class="mb-3">
+            <label class="form-label">Alcohol by volume</label>
             <percent-input v-model="item.alcoholByVolume" />
           </div>
-          <div class="form-group">
-            <label>Website URL</label>
+          <div class="mb-3">
+            <label class="form-label">Website URL</label>
             <input class="form-control" type="url" v-model="item.website" />
           </div>
-          <div class="form-group">
-            <label>Internal Note</label>
+          <div class="mb-3">
+            <label class="form-label">Internal Note</label>
             <textarea class="form-control" rows="2" v-model="item.internalNote" />
           </div>
-          <div class="form-group">
+          <div class="mb-3">
             <item-group-card ref="itemGroup" />
           </div>
           <div class="my-2 text-danger" v-if="errorString.length !== 0">{{ errorString }}</div>

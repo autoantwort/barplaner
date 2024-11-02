@@ -29,8 +29,8 @@
     </div>
     <b-modal ref="addInvoice" centered title="Add Invoice" ok-title="Add Invoice" ok-variant="success" v-on:ok="addInvoice">
       <form ref="form">
-        <div class="form-group">
-          <label for="recipient-name" class="col-form-label">Invoice:</label>
+        <div class="mb-3">
+          <label for="recipient-name" class="col-form-label form-label">Invoice:</label>
           <b-form-file v-model="uploadedInvoicePdf" accept="application/pdf" :required="true"></b-form-file>
           <div class="invalid-feedback">Required</div>
         </div>

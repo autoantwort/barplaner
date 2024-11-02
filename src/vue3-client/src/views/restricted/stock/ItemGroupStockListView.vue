@@ -2,10 +2,10 @@
   <div class="container">
     <div class="row">
       <div class="col-12 offset-md-1 col-md-10">
-        <div class="form-group mb-1">
+        <div class="mb-1">
           <input type="text" class="mt-3 form-control" placeholder="Search" v-on:input="filter" />
         </div>
-        <div class="form-group mb-1">
+        <div class="mb-1">
           <SharedTextArea class="mt-3 form-control" />
         </div>
         <input class="m-1 align-middle" type="checkbox" id="onlyUnchecked" v-model="onlyUnchecked" />

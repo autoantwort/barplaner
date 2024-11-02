@@ -5,12 +5,12 @@
         <div v-if="validKey" class="card">
           <div class="card-header">Reset Password</div>
           <form class="card-body" action="javascript:void(0);">
-            <div class="form-group">
-              <label for="pw1">Password:</label>
+            <div class="mb-3">
+              <label for="pw1" class="form-label">Password:</label>
               <input type="password" class="form-control" id="pw1" required v-model="newPassword1" minlength="8" />
             </div>
-            <div class="form-group">
-              <label for="pw2">Repeat password:</label>
+            <div class="mb-3">
+              <label for="pw2" class="form-label">Repeat password:</label>
               <input type="password" class="form-control" v-bind:class="{ 'is-invalid': wrongData }" id="pw2" required v-model="newPassword2" />
             </div>
             <div style="display: flex; align-items: center">
