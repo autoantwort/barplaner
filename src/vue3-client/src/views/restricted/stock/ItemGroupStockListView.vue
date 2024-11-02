@@ -8,10 +8,11 @@
         <div class="mb-1">
           <SharedTextArea class="mt-3 form-control" />
         </div>
-        <input class="m-1 align-middle" type="checkbox" id="onlyUnchecked" v-model="onlyUnchecked" />
-        <label class="pt-2 align-middle" for="onlyUnchecked">Only show unchecked entries</label>
-        <button class="ms-3 py-0 btn btn-primary btn-sm align-middle" @click="clearSelection">Clear Selection</button>
-
+        <div class="d-flex mt-3">
+          <input class="m-1" type="checkbox" id="onlyUnchecked" v-model="onlyUnchecked" />
+          <label for="onlyUnchecked">Only show unchecked entries</label>
+          <button class="ms-3 py-0 btn btn-primary btn-sm" @click="clearSelection">Clear Selection</button>
+        </div>
         <div v-if="!connected" class="alert alert-danger" role="alert"><strong>Connection lost!</strong> Trying to reconnect...</div>
         <div class="mt-1 mb-3">
           <div v-if="itemGroups.length !== 0" class="table-responsive">
@@ -76,7 +77,6 @@ export default {
     },
   },
   methods: {
-    /* eslint-disable no-console */
     filter(event) {
       this.filteredItemGroups = phoneticsFilter(this.itemGroups, event.target.value);
     },
@@ -160,12 +160,11 @@ export default {
         }
       };
     },
-    /* eslint-enable no-console */
   },
   mounted() {
     this.retrieveItemGroupStock();
   },
-  beforeDestroy() {
+  beforeUnmount() {
     if (this.webSocket) {
       this.webSocket.close();
     }
