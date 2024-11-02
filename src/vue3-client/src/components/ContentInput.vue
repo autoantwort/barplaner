@@ -10,13 +10,14 @@
       v-on:keyup.enter="$emit('enter')"
       min="0"
     />
-    <div class="input-group-append">
-      <b-dropdown v-bind:text="object.unit">
-        <b-dropdown-item v-on:click="object.unit = 'Units'">Units</b-dropdown-item>
-        <b-dropdown-item v-on:click="object.unit = 'ml'">ml</b-dropdown-item>
-        <b-dropdown-item v-on:click="object.unit = 'gramm'">gramm</b-dropdown-item>
-      </b-dropdown>
-    </div>
+    <button class="btn btn-secondary dropdown-toggle" type="button" @click="isOpen = !isOpen">
+      {{ object.unit }}
+    </button>
+    <ul class="dropdown-menu dropdown-menu-end" :class="{ show: isOpen }">
+      <li><a class="dropdown-item" href="#" @click.prevent="selectUnit('Units')">Units</a></li>
+      <li><a class="dropdown-item" href="#" @click.prevent="selectUnit('ml')">ml</a></li>
+      <li><a class="dropdown-item" href="#" @click.prevent="selectUnit('gramm')">Gramm</a></li>
+    </ul>
   </div>
 </template>
 
@@ -28,11 +29,48 @@ export default {
       type: Object,
     },
   },
+  data() {
+    return {
+      isOpen: false,
+    };
+  },
   methods: {
+    handleClickOutside(event) {
+      if (!event.target.closest('.input-group')) {
+        this.isOpen = false;
+      }
+    },
+    selectUnit(unit) {
+      this.object.unit = unit;
+      this.isOpen = false;
+    },
     isValid() {
       return this.$refs.input.checkValidity();
     },
   },
+  mounted() {
+    document.addEventListener('click', this.handleClickOutside);
+  },
+
+  beforeUnmount() {
+    document.removeEventListener('click', this.handleClickOutside);
+  },
 };
 </script>
-<style></style>
+<style scoped>
+.input-group {
+  position: relative;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.125rem;
+  z-index: 1000;
+}
+
+.dropdown-menu.show {
+  display: block;
+}
+</style>
