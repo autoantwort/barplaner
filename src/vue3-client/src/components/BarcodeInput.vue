@@ -14,24 +14,25 @@ import http from '@/http-common';
 
 export default {
   name: 'barcode-input',
-  props: ['value', 'placeholder'],
+  props: ['modelValue', 'placeholder'],
+  emits: ['update:modelValue', 'enter'],
   components: {
     BarcodeScanner,
   },
   methods: {
     onBarcodeInput(value) {
-      this.$emit('input', value);
+      this.$emit('update:modelValue', value);
       this.$refs.barcode.value = value;
     },
     onInput(e) {
-      this.$emit('input', e.target.value.trim());
+      this.$emit('update:modelValue', e.target.value.trim());
     },
   },
   created() {
     this.webSocket = new WebSocket(http.defaults.baseWsURL + '/scannerConsumer');
     this.webSocket.onmessage = e => {
       this.$refs.barcode.value = e.data;
-      this.$emit('input', e.data.trim());
+      this.$emit('update:modelValue', e.data.trim());
       this.$emit('enter');
     };
   },

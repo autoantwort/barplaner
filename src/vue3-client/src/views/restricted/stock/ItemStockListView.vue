@@ -6,7 +6,7 @@
           <router-link class="btn btn-success m-3" to="/addItem">Add Item</router-link>
         </div>
         <div class="mb-3">
-          <barcode-input placeholder="Search" v-on:input="filter" />
+          <barcode-input placeholder="Search" @update:modelValue="filter" />
         </div>
         <div class="mt-3 mb-3">
           <div v-if="items.length !== 0" class="table-responsive">
@@ -79,7 +79,6 @@ export default {
     };
   },
   methods: {
-    /* eslint-disable no-console */
     filter(value) {
       this.filteredItems = phoneticsFilter(
         this.items,
@@ -104,7 +103,6 @@ export default {
   },
   mounted() {
     this.retrieveItemStock();
-    /* eslint-enable no-console */
   },
 };
 </script>

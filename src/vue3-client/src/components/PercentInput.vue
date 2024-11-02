@@ -1,6 +1,6 @@
 <template>
   <div class="input-group">
-    <input ref="input" type="number" min="0" max="100" step="0.1" class="form-control" :value="value" v-on:input="onInput" v-on:keyup.enter="onEnter" />
+    <input ref="input" type="number" min="0" max="100" step="0.1" class="form-control" :value="modelValue" v-on:input="onInput" v-on:keyup.enter="onEnter" />
 
     <span class="input-group-text">%</span>
   </div>
@@ -9,10 +9,11 @@
 <script>
 export default {
   name: 'percent-input',
-  props: ['value'],
+  props: ['modelValue'],
+  emits: ['update:modelValue', 'enter'],
   methods: {
     onInput(e) {
-      this.$emit('input', e.target.value.trim());
+      this.$emit('update:modelValue', e.target.value.trim());
     },
     onEnter() {
       if (this.$refs.input.checkValidity()) {
