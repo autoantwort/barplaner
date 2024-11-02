@@ -5,10 +5,12 @@
   height: 14px;
 }
 
-a {
-  text-decoration: none !important;
+a:not([class*='btn']) {
+  text-decoration: none;
 }
-
 a:hover {
-  text-decoration: underline !important;
+  text-decoration: underline;
+}
+.nav-item a:hover {
+  text-decoration: none;
 }
