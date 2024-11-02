@@ -4,21 +4,24 @@
       <div class="col-12 col-md-8 offset-md-2 col-lg-6 offset-lg-3">
         <div v-if="!submitted">
           <form class="was-validated" id="form">
-            <div class="form-group">
-              <label for="name">Name</label>
+            <div class="mb-3">
+              <label for="name" class="form-label">Name</label>
               <input type="text" class="form-control" id="name" required v-model="bar.name" name="name" />
               <div class="invalid-feedback">Required</div>
             </div>
-            <div class="form-group">
-              <label for="description">Description</label>
+
+            <div class="mb-3">
+              <label for="description" class="form-label">Description</label>
               <input type="text" class="form-control" id="description" v-model="bar.description" name="description" />
             </div>
-            <div class="form-group">
-              <label for="public">Public</label>
-              <input type="checkbox" class="form-control" id="public" v-model="bar.public" name="public" />
+
+            <div class="mb-3 form-check">
+              <input type="checkbox" class="form-check-input" id="public" v-model="bar.public" name="public" />
+              <label class="form-check-label" for="public">Public</label>
             </div>
-            <div class="form-group">
-              <label for="start">Start time</label>
+
+            <div class="mb-3">
+              <label for="start" class="form-label">Start time</label>
               <input
                 type="text"
                 class="form-control"
@@ -31,8 +34,9 @@
               />
               <div class="invalid-feedback">Required. Format: dd.mm.yy hh:mm</div>
             </div>
-            <div class="form-group">
-              <label for="end">End time</label>
+
+            <div class="mb-3">
+              <label for="end" class="form-label">End time</label>
               <input
                 type="text"
                 class="form-control"
@@ -44,8 +48,9 @@
               />
               <div class="invalid-feedback">Format: dd.mm.yy hh:mm</div>
             </div>
-            <div class="form-group">
-              <label for="count">Number of people to clean</label>
+
+            <div class="mb-3">
+              <label for="count" class="form-label">Number of people to clean</label>
               <input type="number" class="form-control" id="count" v-model="bar.numberOfPersonsToClean" name="end" required min="0" />
               <div class="invalid-feedback">Required.</div>
             </div>

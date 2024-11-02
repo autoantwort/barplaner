@@ -3,43 +3,45 @@
     <div class="row mt-2">
       <div class="col-12 col-md-8 offset-md-2 col-lg-6 offset-lg-3">
         <form class="was-validated" id="form">
-          <div class="form-group">
-            <label for="name">Name</label>
+          <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
             <input type="password" style="display: none" />
             <input type="text" class="form-control" id="name" v-model="user.name" name="name" required pattern=".{2,}" autocomplete="new-password" />
             <div class="invalid-feedback">Minimum two characters.</div>
           </div>
-          <div class="form-group">
-            <label for="password">Password</label>
+
+          <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
             <input type="password" class="form-control" id="password" v-model="password" pattern=".{8,}" />
             <div class="invalid-feedback">Minimum eight characters.</div>
           </div>
-          <div class="form-group">
-            <label for="email">Email</label>
+
+          <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
             <input type="email" class="form-control" id="email" v-model="user.email" />
           </div>
-          <div class="form-group">
-            <label for="phone">Telefonummer</label>
+
+          <div class="mb-3">
+            <label for="phone" class="form-label">Telefonummer</label>
             <input type="text" class="form-control" id="phone" v-model="user.phone" />
           </div>
-          <div class="form-group">
-            <label for="birthday">Geburtstag</label>
+
+          <div class="mb-3">
+            <label for="birthday" class="form-label">Geburtstag</label>
             <input type="text" class="form-control" id="birthday" v-model="user.birthday" pattern="[0-3]\d\.[0-1]\d\.[1-2]\d\d\d" title="dd.mm.yyyy" />
             <div class="invalid-feedback">Format: dd.mm.yyyy</div>
           </div>
 
-          <div class="form-group">
-            <label for="gitLabId">GitLab User ID</label>
-            <div class="input-group mb-3">
-              <a target="_blank" rel="noopener noreferrer" href="https://git.rwth-aachen.de/-/user_settings/profile#user_name" class="btn btn-outline-link"
-                >My GitLab User ID</a
-              >
-
+          <div class="mb-3">
+            <label for="gitLabId" class="form-label">GitLab User ID</label>
+            <div class="input-group">
+              <a target="_blank" rel="noopener noreferrer" href="https://git.rwth-aachen.de/-/user_settings/profile#user_name" class="btn btn-outline-link">
+                My GitLab User ID
+              </a>
               <input
                 type="text"
                 autocomplete="off"
                 placeholder="Open the left link and determine your User ID"
-                style="margin-right: 0px"
                 class="form-control"
                 id="gitLabId"
                 v-model="user.gitLabID"
@@ -161,12 +163,13 @@ export default {
 <style>
 .btn-outline-link {
   color: #007bff;
-  border-color: #28a745;
+  border-color: var(--bs-form-valid-border-color);
 }
 
 .btn-outline-link:hover {
   color: #0056b3;
   text-decoration: underline;
+  border-color: var(--bs-form-valid-border-color);
 }
 
 .text-black {

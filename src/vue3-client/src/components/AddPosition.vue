@@ -44,7 +44,7 @@
       <div ref="positionDiv" v-show="selectedCard !== null" class="form-group">
         <div class="row">
           <label ref="scrollTo" class="col-4">Position auf dem Bild</label>
-          <div class="col-8 text-right text-danger" style="text-decoration: underline; cursor: pointer" v-on:click="unselectCard">
+          <div class="col-8 text-end text-danger" style="text-decoration: underline; cursor: pointer" v-on:click="unselectCard">
             Keine Position auf dem Bild festlegen
             <i-fa-trash-can />
           </div>

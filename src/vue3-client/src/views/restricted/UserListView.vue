@@ -7,7 +7,7 @@
     </div>
     <div class="row">
       <div class="col-12 offset-md-1 col-md-10">
-        <div v-if="userAdmin" class="mt-3 text-right d-print-none">
+        <div v-if="userAdmin" class="mt-3 text-end d-print-none">
           <button class="btn btn-primary me-3" v-on:click="print">Print Barcodes</button>
           <router-link class="btn btn-success" to="/addUser">Add User</router-link>
         </div>

@@ -4,11 +4,11 @@
       <div class="col-12 col-md-8 offset-md-2 col-lg-6 offset-lg-3">
         <BarcodeScanner ref="scanner" :callback="onBarcode" />
         <div ref="form">
-          <div class="form-group">
-            <label>Item</label>
-            <div class="form-row">
-              <SearchableSelect class="border-primary col-10" :options="existingItems" :filterFunction="phoneticsFilter" v-model="item" />
-              <button class="btn btn-success btn-sm" @click="$refs.scanner.loadDevicesAndPlay()">Scan</button>
+          <div class="mb-3">
+            <label class="form-label">Item</label>
+            <div class="row g-2 align-items-center">
+              <SearchableSelect class="border-primary col" :options="existingItems" :filterFunction="phoneticsFilter" v-model="item" />
+              <button class="btn btn-success col-auto" @click="$refs.scanner.loadDevicesAndPlay()">Scan</button>
             </div>
             <div v-if="item === null" class="invalid-feedback" style="display: block">Please select an item.</div>
           </div>
@@ -16,7 +16,7 @@
             <ul class="pagination">
               <li class="page-item" :class="{ active: sign == '+' }">
                 <span
-                  class="page-link"
+                  class="page-link cursor-pointer"
                   v-on:click="
                     sign = '+';
                     paginatorClicked();
@@ -26,7 +26,7 @@
               </li>
               <li class="page-item" :class="{ active: sign == '-' }">
                 <span
-                  class="page-link"
+                  class="page-link cursor-pointer"
                   v-on:click="
                     sign = '-';
                     paginatorClicked();
@@ -40,7 +40,7 @@
             <ul class="pagination">
               <li class="page-item" v-for="i of [1, 2, 3, 4, 5, 6, 7, 8, 10, 12]" :key="i">
                 <span
-                  class="page-link"
+                  class="page-link cursor-pointer"
                   v-on:click="
                     change = i;
                     paginatorClicked();
@@ -65,7 +65,7 @@
                 type="number"
                 v-on:keypress="onlyNumbers"
                 v-on:input="onInputForChange"
-                class="form-control text-right"
+                class="form-control text-end"
                 step="any"
                 v-model.number="change"
                 :disabled="item === null"
@@ -78,7 +78,7 @@
 
               <input
                 type="number"
-                class="form-control text-right"
+                class="form-control text-end"
                 v-model.number="result"
                 v-on:keypress="onlyNumbers"
                 v-on:input="onInputForResult"
@@ -121,7 +121,7 @@
                 <tbody>
                   <tr v-for="change in filteredChanges" :key="change.id">
                     <td class="text-nowrap">{{ $filters.asDateTime(change.date) }}</td>
-                    <td class="text-right">{{ change.amount }}</td>
+                    <td class="text-end">{{ change.amount }}</td>
                     <td>{{ change.germanReason }}</td>
                     <td>{{ change.brottoPrice ? change.brottoPrice + ' €' : null }}</td>
                     <td>{{ change.user ? change.user.name : '' }}</td>
@@ -174,7 +174,7 @@
               <div class="input-group-text">{{ Math.abs(change) }} ×</div>
               <input
                 type="number"
-                class="form-control text-right"
+                class="form-control text-end"
                 step="any"
                 placeholder="Einzelpreis    "
                 v-model.number="einzelNetto"
@@ -189,7 +189,7 @@
 
               <input
                 type="number"
-                class="form-control text-right"
+                class="form-control text-end"
                 step="any"
                 placeholder="Gesamtpreis    "
                 v-model.number="gesamtNetto"
@@ -242,7 +242,7 @@
               <div class="input-group-text">{{ Math.abs(change) }} ×</div>
               <input
                 type="number"
-                class="form-control text-right"
+                class="form-control text-end"
                 step="any"
                 placeholder="Einzelpreis    "
                 v-model.number="einzelBrotto"
@@ -255,7 +255,7 @@
               <div class="input-group-text">=</div>
               <input
                 type="number"
-                class="form-control text-right"
+                class="form-control text-end"
                 step="any"
                 placeholder="Gesamtpreis    "
                 v-model.number="gesamtBrotto"
@@ -630,6 +630,10 @@ export default {
 </script>
 
 <style>
+.cursor-pointer {
+  cursor: pointer;
+}
+
 /* for very smal mobile phones  */
 @media (max-width: 400px) {
   .px-sm {

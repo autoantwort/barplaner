@@ -37,7 +37,7 @@
                     </router-link>
                   </td>
                   <td>{{ item.inStock }}</td>
-                  <td class="text-right">
+                  <td class="text-end">
                     <div class="prices" v-if="item.minBrottoPrice !== null">
                       <span class="price">{{ print(item.minBrottoPrice) }}</span> /
                       <span class="price">{{ print(item.maxBrottoPrice) }}</span>

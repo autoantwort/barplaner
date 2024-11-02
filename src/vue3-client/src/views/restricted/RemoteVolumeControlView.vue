@@ -15,7 +15,7 @@
           <tbody>
             <tr v-for="(client, index) in clients" :key="index">
               <td>{{ client.name }}</td>
-              <td class="text-right" style="padding-right: 0px">{{ client.value }}%</td>
+              <td class="text-end" style="padding-right: 0px">{{ client.value }}%</td>
               <td>
                 <input type="range" form="0" to="100" style="width: 100%" v-model="client.value" @input="updateDevice(client, $event.target.value)" />
               </td>
