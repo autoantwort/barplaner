@@ -1,0 +1,2 @@
+include:
+  - src/vue3-client/.gitlab-ci.yml
