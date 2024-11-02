@@ -110,8 +110,8 @@ const inventoryReason = {
 }
 
 const reasonNames = reasons.map(reason => reason.name);
-const addReasons = reasons.filter(r => r.sign !== '-').map(r => ({...r, sign: '+'}));
-const removeReasons = reasons.filter(r => r.sign !== '+').map(r => ({...r, sign: '-'}));
+const addReasons = reasons.filter(r => r.sign !== '-').map(r => ({ ...r, sign: '+' }));
+const removeReasons = reasons.filter(r => r.sign !== '+').map(r => ({ ...r, sign: '-' }));
 
 const commands = {
     minusOne: 20001,
@@ -122,4 +122,4 @@ const commands = {
 const findIndex = (name, reasons) => {
     return reasons.findIndex((item) => item.name === name);
 }
-module.exports = { reasons, reasonNames, addReasons, removeReasons, findIndex, inventoryReason, commands, REASON};
+export { reasons, reasonNames, addReasons, removeReasons, findIndex, inventoryReason, commands, REASON };

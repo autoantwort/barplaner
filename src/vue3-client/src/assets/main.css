@@ -1,1 +1,6 @@
 /* Global css rules */
+.icon-btn {
+  vertical-align: -0.125em;
+  width: 14px;
+  height: 14px;
+}

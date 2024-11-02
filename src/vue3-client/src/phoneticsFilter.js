@@ -1,10 +1,9 @@
-import phonetics from '../../Nodejs-RestAPIs/app/util/colognePhonetics';
+import { convert } from '../../Nodejs-RestAPIs/app/util/colognePhonetics';
 
 export default (array, searchedValue, additionalExactFilter, additionalPhoneticsFilter) => {
   const otherExactFilter = additionalExactFilter ?? (() => false);
   const otherPhoneticsFilter = additionalPhoneticsFilter ?? (() => false);
-  const v = phonetics
-    .convert(searchedValue)
+  const v = convert(searchedValue)
     .split(' ')
     .map(s => new RegExp(`(^| )${s}`));
   const r = new RegExp(searchedValue, 'i');

@@ -55,19 +55,17 @@
                 <div class="text-center" style="height: 20%; width: 100%">{{ item.value }}</div>
               </div>
               <div v-else-if="item.type === 'PROGRAMM'" class="icon-div">
-                <font-awesome-icon
+                <i-fa-play
                   class="icon"
                   v-show="item.running === 'false'"
-                  icon="play"
                   v-on:click="
                     webSocket.send(client.name + '.' + ikey + '.running:true');
                     item.running = 'true';
                   "
                 />
-                <font-awesome-icon
+                <i-fa-pause
                   class="icon"
                   v-show="item.running === 'true'"
-                  icon="pause"
                   v-on:click="
                     webSocket.send(client.name + '.' + ikey + '.running:false');
                     item.running = 'false';
@@ -75,19 +73,17 @@
                 />
               </div>
               <div v-else-if="item.type === 'SWITCH_GROUP'" class="icon-div" :id="key + ikey">
-                <font-awesome-icon
+                <i-fa-play
                   class="icon"
                   v-show="item.activated === 'false'"
-                  icon="play"
                   v-on:click="
                     item.activated = 'true';
                     webSocket.send(client.name + '.' + ikey + '.activated:true');
                   "
                 />
-                <font-awesome-icon
+                <i-fa-pause
                   class="icon"
                   v-show="switchShow(item.activated === 'true', key + ikey, item.activateCooldown, item.deactivateCooldown)"
-                  icon="pause"
                   v-on:click="
                     item.activated = 'false';
                     webSocket.send(client.name + '.' + ikey + '.activated:false');
@@ -95,25 +91,14 @@
                 />
               </div>
               <div v-else-if="item.type === 'PROGRAM_BLOCK'" class="icon-div" :id="key + ikey">
-                <font-awesome-icon
-                  title="Play"
-                  class="icon"
-                  v-show="item.state === 'Stopped'"
-                  icon="play"
-                  v-on:click="webSocket.send(client.name + '.' + ikey + '.state:start')"
-                />
+                <i-fa-play title="Play" class="icon" v-show="item.state === 'Stopped'" v-on:click="webSocket.send(client.name + '.' + ikey + '.state:start')" />
                 <div v-show="item.state === 'Running'" style="width: 100%; height: 100%">
-                  <font-awesome-icon title="Stop" class="half-icon" icon="stop" v-on:click="webSocket.send(client.name + '.' + ikey + '.state:stop')" />
-                  <font-awesome-icon title="Pause" class="half-icon" icon="pause" v-on:click="webSocket.send(client.name + '.' + ikey + '.state:pause')" />
+                  <i-fa-stop title="Stop" class="half-icon" icon="stop" v-on:click="webSocket.send(client.name + '.' + ikey + '.state:stop')" />
+                  <i-fa-pause title="Pause" class="half-icon" v-on:click="webSocket.send(client.name + '.' + ikey + '.state:pause')" />
                 </div>
                 <div v-show="item.state === 'Paused'" style="width: 100%; height: 100%">
-                  <font-awesome-icon title="Restart" class="half-icon" icon="redo" v-on:click="webSocket.send(client.name + '.' + ikey + '.state:restart')" />
-                  <font-awesome-icon
-                    title="Resume"
-                    class="half-icon"
-                    icon="step-forward"
-                    v-on:click="webSocket.send(client.name + '.' + ikey + '.state:resume')"
-                  />
+                  <i-fa-arrow-rotate-right title="Restart" class="half-icon" v-on:click="webSocket.send(client.name + '.' + ikey + '.state:restart')" />
+                  <i-fa-forward-step title="Resume" class="half-icon" v-on:click="webSocket.send(client.name + '.' + ikey + '.state:resume')" />
                 </div>
               </div>
             </div>
@@ -144,7 +129,6 @@ export default {
     };
   },
   methods: {
-    /* eslint-disable no-console */
     handleMouseOver(e) {
       if (e.target.tagName === 'H5') {
         e.target.parentElement.setAttribute('draggable', 'true');
@@ -317,7 +301,6 @@ export default {
         }
       };
     },
-    /* eslint-enable no-console */
   },
   created() {
     this.initWebSocket();
@@ -325,7 +308,7 @@ export default {
     window.onresize = () => (this.mobilePositions = window.innerWidth < 500);
     this.mobilePositions = window.innerWidth < 500;
   },
-  beforeDestroy() {
+  beforeUnmount() {
     if (this.webSocket) {
       this.webSocket.close();
     }
