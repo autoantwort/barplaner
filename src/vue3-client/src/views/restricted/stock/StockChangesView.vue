@@ -42,27 +42,9 @@
         <div class="row mt-3">
           <div class="col-md-12 col-lg-6">
             <div class="input-group">
-              <b-form-datepicker
-                v-on:input="dateSelected"
-                v-model="selectedDate"
-                :disabled="datesSet === null"
-                start-weekday="1"
-                :date-format-options="{ year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'long' }"
-                :date-disabled-fn="isDateDisabled"
-                locale="de"
-                placeholder="Jump to date"
-              ></b-form-datepicker>
-
+              <MonthCalendarInput v-model="selectedDate" @update:modelValue="dateSelected" :canSelectDate="isDateDisabled" />
               <span class="input-group-text" id="basic-addon2">Include:</span>
-
-              <div class="input-group-append">
-                <b-dropdown v-bind:text="include" v-model="include" style="min-width: 124px">
-                  <b-dropdown-item v-on:click="include = 'Date only'">Date only</b-dropdown-item>
-                  <b-dropdown-item v-on:click="include = '+ 1 Day'">+ 1 Day</b-dropdown-item>
-                  <b-dropdown-item v-on:click="include = '+/- 1 Day'">+/- 1 Day</b-dropdown-item>
-                  <b-dropdown-item v-on:click="include = 'Neighbours'">Neighbours</b-dropdown-item>
-                </b-dropdown>
-              </div>
+              <DropdownSelect v-model="include" :options="['Date only', '+ 1 Day', '+/- 1 Day', 'Neighbors']" />
             </div>
           </div>
 
@@ -109,6 +91,7 @@ import http from '@/http-common';
 import StockChangesList from './StockChangesListView.vue';
 import VueBarcode from '@/components/jsbarcode.js';
 import { reasons, addReasons, removeReasons, inventoryReason, commands } from '@common/stockChangeReasons.js';
+import MonthCalendar from '@/components/MonthCalendar.vue';
 
 function zipLists(list1, list2) {
   const zipped = [];
@@ -124,6 +107,8 @@ function zipLists(list1, list2) {
 const reasonsZipped = zipLists(addReasons, removeReasons);
 
 reasonsZipped[addReasons.length + 1][0] = inventoryReason;
+
+const dateFormat = new Intl.DateTimeFormat('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit' });
 
 export default {
   name: 'stockChangesView',
@@ -148,9 +133,9 @@ export default {
     barcode: VueBarcode,
   },
   methods: {
-    isDateDisabled(dateAsString) {
+    isDateDisabled(date) {
       if (this.datesSet === null) return true;
-      return !this.datesSet.has(dateAsString);
+      return !this.datesSet.has(dateFormat.format(date));
     },
     showLatestChanges() {
       this.$router.replace({
@@ -166,7 +151,7 @@ export default {
       }
       // wo do not show new newest changes any more => reset offset
       this.offset = null;
-      const highlight = this.selectedDate ? '&highlight=' + this.selectedDate : '';
+      const highlight = this.selectedDate ? '&highlight=' + dateFormat.format(this.selectedDate) : '';
       http
         .get('/stockChanges?from=' + from + '&to=' + to + highlight)
         .then(response => {
@@ -204,8 +189,8 @@ export default {
         date.setDate(date.getDate() + 2);
         to = date.toISOString().substring(0, 10);
         moveAfter(to);
-      } else if (this.include === 'Neighbours') {
-        // search previous neighbours
+      } else if (this.include === 'Neighbors') {
+        // search previous neighbors
         const pre = new Date(date);
         pre.setDate(pre.getDate() - 1);
         while (previousIndex !== null && pre.toISOString().startsWith(this.datesList[previousIndex])) {
@@ -214,7 +199,7 @@ export default {
         }
         pre.setDate(pre.getDate() + 1);
         from = pre.toISOString().substring(0, 10);
-        // search next neighbours
+        // search next neighbors
         date.setDate(date.getDate() + 1);
         while (nextIndex !== null && date.toISOString().startsWith(this.datesList[nextIndex])) {
           date.setDate(date.getDate() + 1);
