@@ -2,7 +2,7 @@ import Axios from 'axios';
 
 let axios = Axios.create({
   //baseURL: "http://localhost:8083/api",
-  baseURL: 'https://orga.symposion.hilton.rwth-aachen.de/api',
+  baseURL: 'https://backend.orga.symposion.hilton.rwth-aachen.de/api',
   headers: {
     'Content-type': 'application/json',
   },
@@ -15,6 +15,6 @@ axios.getImage = imageId => {
 };
 axios.defaults.withCredentials = true;
 //axios.defaults.baseWsURL = 'ws://localhost:8083';
-axios.defaults.baseWsURL = 'wss://orga.symposion.hilton.rwth-aachen.de';
+axios.defaults.baseWsURL = 'wss://backend.orga.symposion.hilton.rwth-aachen.de';
 
 export default axios;
