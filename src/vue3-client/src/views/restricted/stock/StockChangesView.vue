@@ -163,7 +163,7 @@ export default {
     dateSelected() {
       // YYYY-MM-DD
       // 0123456789
-      const index = this.datesList.indexOf(this.selectedDate);
+      const index = this.datesList.indexOf(dateFormat.format(this.selectedDate));
       let date = new Date(this.selectedDate);
       let from, to;
       let previousIndex = index === 0 ? null : index - 1;
