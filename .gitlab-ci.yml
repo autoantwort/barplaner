@@ -32,10 +32,10 @@ build:
     - buildah build -t "$CI_REGISTRY_IMAGE${tag}" -f Dockerfile-vue3 src
     - buildah images
     - buildah push "$CI_REGISTRY_IMAGE${tag}"
-  rules:
-    - if: $CI_COMMIT_BRANCH
-      exists:
-        - src/Dockerfile-vue3
+  # rules:
+  #   - exists:
+  #       - src/Dockerfile-vue3
+  #     when: always
 
 deploy-production:
   image: curlimages/curl
