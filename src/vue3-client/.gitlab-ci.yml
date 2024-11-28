@@ -1,6 +1,3 @@
-stages:
-  - format
-  - pages
 
 format:
   stage: format
