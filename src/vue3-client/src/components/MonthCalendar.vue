@@ -19,7 +19,7 @@
   </div>
   <div class="cal-days">
     <button v-for="day in dates" class="btn cal-btn" :disabled="canSelectDate ? canSelectDate(day) : false" type="button" @click.prevent="selectValue(day)">
-      {{ day.getDate() }}
+      {{ day.getUTCDate() }}
     </button>
   </div>
 </template>
@@ -45,8 +45,8 @@ export default {
       const daysInMonth = new Date(this.year, this.month + 1, 0).getDate();
       const daysInMonthBefore = new Date(this.year, this.month, 0).getDate();
       return createArray(daysInMonthBefore, neededDaysBefore)
-        .map(day => new Date(this.year, this.month - 1, day))
-        .concat(Array.from({ length: daysInMonth }, (_, i) => i + 1).map(day => new Date(this.year, this.month, day)));
+        .map(day => new Date(Date.UTC(this.year, this.month - 1, day)))
+        .concat(Array.from({ length: daysInMonth }, (_, i) => i + 1).map(day => new Date(Date.UTC(this.year, this.month, day))));
     },
     monthName: function () {
       return new Date(this.year, this.month).toLocaleString('default', { month: 'long' });

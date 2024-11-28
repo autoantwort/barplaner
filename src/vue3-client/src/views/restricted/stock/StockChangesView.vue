@@ -108,7 +108,7 @@ const reasonsZipped = zipLists(addReasons, removeReasons);
 
 reasonsZipped[addReasons.length + 1][0] = inventoryReason;
 
-const dateFormat = new Intl.DateTimeFormat('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit' });
+const dateFormat = new Intl.DateTimeFormat('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit', timeZone: 'Europe/Berlin' });
 
 export default {
   name: 'stockChangesView',
