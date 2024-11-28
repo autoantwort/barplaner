@@ -1,5 +1,17 @@
 stages:
+  - format
   - pages
+
+format:
+  stage: format
+  image: node:20-alpine
+  script:
+    - cd src/vue3-client
+    - npm ci
+    - npm run format -- --check
+  cache:
+    paths:
+      - node_modules/
 
 pages:
   stage: pages
