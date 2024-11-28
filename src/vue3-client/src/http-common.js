@@ -14,7 +14,7 @@ axios.getImage = imageId => {
   return axios.getFile(imageId);
 };
 axios.defaults.withCredentials = true;
-axios.defaults.baseWsURL = 'ws://localhost:8083';
-// axios.defaults.baseWsURL = "wss://orga.symposion.hilton.rwth-aachen.de/scannerConsumer";
+//axios.defaults.baseWsURL = 'ws://localhost:8083';
+axios.defaults.baseWsURL = 'wss://orga.symposion.hilton.rwth-aachen.de';
 
 export default axios;
