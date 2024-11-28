@@ -1,0 +1,31 @@
+
+format:
+  stage: format
+  image: node:20-alpine
+  script:
+    - cd src/vue3-client
+    - npm ci
+    - npm run format -- --check
+  cache:
+    paths:
+      - node_modules/
+
+pages:
+  stage: pages
+  image: node:20-alpine
+  script:
+    - cd src/vue3-client
+    - npm ci
+    - npm run build
+    # GitLab Pages requires the static files to be in 'public' directory
+    - cd -
+    - rm -rf public
+    - mv src/vue3-client/dist public
+  artifacts:
+    paths:
+      - public
+  # rules:
+  #   - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  cache:
+    paths:
+      - node_modules/

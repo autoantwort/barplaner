@@ -1,0 +1,46 @@
+include:
+  - src/vue3-client/.gitlab-ci.yml
+
+stages:
+  - format
+  - pages
+  - build
+  - deploy-production
+
+# From https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#buildah-example
+build:
+  stage: build
+  image: quay.io/buildah/stable
+  variables:
+    # Use vfs with buildah. Docker offers overlayfs as a default, but Buildah
+    # cannot stack overlayfs on top of another overlayfs filesystem.
+    STORAGE_DRIVER: vfs
+  before_script:
+    # GitLab container registry credentials taken from the predefined CI/CD variables
+    # to authenticate to the registry.
+    - echo "$CI_REGISTRY_PASSWORD" | buildah login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
+  script:
+    - |
+      if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
+        tag=":latest"
+        echo "Running on default branch '$CI_DEFAULT_BRANCH': tag = 'latest'"
+      else
+        tag=":$CI_COMMIT_REF_SLUG"
+        echo "Running on branch '$CI_COMMIT_BRANCH': tag = $tag"
+      fi
+    - buildah images
+    - buildah build -t "$CI_REGISTRY_IMAGE${tag}" -f Dockerfile-vue3 src
+    - buildah images
+    - buildah push "$CI_REGISTRY_IMAGE${tag}"
+  # rules:
+  #   - exists:
+  #       - src/Dockerfile-vue3
+  #     when: always
+
+deploy-production:
+  image: curlimages/curl
+  stage: deploy-production
+  script:
+    # - curl -X POST --fail https://portainer.hilton.rwth-aachen.de/api/webhooks/126620c0-c6a1-4d06-b825-675adbf9f8ca
+    - echo "Kommt noch"
+

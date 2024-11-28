@@ -18,7 +18,7 @@ const convert = s => {
             case 'Ä':
             case 'Ö':
             case 'Ü':
-                //Normal
+            //Normal
             case 'A':
             case 'E':
             case 'I':
@@ -188,4 +188,4 @@ const convert = s => {
     return newCode;
 };
 
-module.exports.convert = convert;
+export { convert };
