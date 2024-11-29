@@ -9,6 +9,8 @@ import { printDate, printDateTime, printDayDateTime } from './dateFilters';
 // Add the necessary CSS
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue-next/dist/bootstrap-vue-next.css';
+import axios from './http-common';
+import roles from './roles';
 
 const app = createApp(App);
 
@@ -22,5 +24,13 @@ app.config.globalProperties.$filters = {
 
 app.use(router);
 app.use(createBootstrap());
+
+axios.interceptors.response.use(undefined, function(error) {
+  if (error.response !== undefined && error.response.status === 401) {
+      roles.setUser(null);
+      router.push({ name: 'login' }).catch(console.error);
+  }
+  return Promise.reject(error);
+});
 
 app.mount('#app');
