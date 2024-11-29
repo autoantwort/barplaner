@@ -41,6 +41,5 @@ deploy-production:
   image: curlimages/curl
   stage: deploy-production
   script:
-    # - curl -X POST --fail https://portainer.hilton.rwth-aachen.de/api/webhooks/126620c0-c6a1-4d06-b825-675adbf9f8ca
-    - echo "Kommt noch"
+    - curl -X POST --fail https://portainer.hilton.rwth-aachen.de/api/webhooks/ee27c453-3826-40ce-bde7-1ae896e2d4a3
 
