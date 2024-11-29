@@ -25,10 +25,10 @@ app.config.globalProperties.$filters = {
 app.use(router);
 app.use(createBootstrap());
 
-axios.interceptors.response.use(undefined, function(error) {
+axios.interceptors.response.use(undefined, function (error) {
   if (error.response !== undefined && error.response.status === 401) {
-      roles.setUser(null);
-      router.push({ name: 'login' }).catch(console.error);
+    roles.setUser(null);
+    router.push({ name: 'login' }).catch(console.error);
   }
   return Promise.reject(error);
 });
