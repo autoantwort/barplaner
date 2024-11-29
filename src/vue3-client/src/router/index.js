@@ -11,6 +11,13 @@ const router = createRouter({
       path: '/',
       name: 'login',
       component: LoginView,
+      beforeEnter: (to, from, next) => {
+        if (Roles.getUser() === null) {
+          next();
+        } else {
+          next({ name: 'bar-list' });
+        }
+      },
     },
     {
       path: '/requestPasswordReset',
