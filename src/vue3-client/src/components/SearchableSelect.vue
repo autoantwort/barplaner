@@ -9,10 +9,14 @@
         <input ref="search" type="text" class="form-control" placeholder="Search..." v-model="searchTerm" @input="filterOptions" />
       </div>
       <div v-if="filteredOptions.length" class="">
-        <li v-for="option in filteredOptions" :key="option[valueKey]">
-          <a href="#" class="dropdown-item text-wrap py-2" @click="selectOption($event, option)" :class="{ active: option === selectedOption }">
-            {{ option[labelKey] }}
-          </a>
+        <li
+          v-for="option in filteredOptions"
+          :key="option[valueKey]"
+          class="dropdown-item cursor-pointer text-wrap py-2"
+          @click="selectOption($event, option)"
+          :class="{ active: option === selectedOption }"
+        >
+          {{ option[labelKey] }}
         </li>
       </div>
       <div v-else class="dropdown-item text-muted text-center">No options found</div>
@@ -123,5 +127,9 @@ export default {
 
 .dropdown-menu.show {
   display: block;
+}
+
+.cursor-pointer {
+  cursor: pointer;
 }
 </style>
