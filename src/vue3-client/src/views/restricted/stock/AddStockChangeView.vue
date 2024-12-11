@@ -3,7 +3,7 @@
     <div class="row mt-2">
       <div class="col-12 col-md-8 offset-md-2 col-lg-6 offset-lg-3">
         <BarcodeScanner ref="scanner" :callback="onBarcode" />
-        <div ref="form">
+        <form ref="form">
           <div class="mb-3">
             <label class="form-label">Item</label>
             <div class="row g-2 align-items-center">
@@ -271,7 +271,7 @@
           <div class="mt-2 text-danger" v-if="errorString.length !== 0">{{ errorString }}</div>
           <button v-if="change !== null" type="button" class="btn btn-success my-3" v-on:click="addChange('another')">Add Change and add similar</button>
           <button v-if="change !== null" type="button" class="btn btn-success ms-own" v-on:click="addChange('list')">Add Change and view list</button>
-        </div>
+        </form>
       </div>
     </div>
   </div>
