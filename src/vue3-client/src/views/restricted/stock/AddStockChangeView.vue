@@ -274,6 +274,7 @@
         </form>
       </div>
     </div>
+    <BToastOrchestrator />
   </div>
 </template>
 
@@ -282,6 +283,9 @@ import http from '@/http-common';
 import phoneticsFilter from '@/phoneticsFilter';
 import { getGermanReason, getFilterFunction } from './changeUtil';
 import { reasons } from '@common/stockChangeReasons.js';
+import { h } from 'vue';
+import { useToastController } from 'bootstrap-vue-next';
+import { BToast } from 'bootstrap-vue-next';
 
 const round = v => Math.round(v * 1000) / 1000;
 
@@ -576,7 +580,6 @@ export default {
     onBarcode(barcode) {
       const item = this.existingItems.find(i => i.barcode === barcode || i.barcodePack === barcode);
       if (item === undefined) {
-        const h = this.$createElement;
         const vNodesMsg = h('p', [
           h('span', { class: ['me-2'] }, `No Item found for barcode "${barcode}"`),
           h(
@@ -593,29 +596,36 @@ export default {
             'Create Item',
           ),
         ]);
-        this.$bvToast.toast([vNodesMsg], {
-          title: 'No item selected!',
-          solid: true,
-          toaster: 'b-toaster-bottom-center',
-          variant: 'danger',
+        this.show?.({
+          component: h(BToast, null, { default: () => vNodesMsg }),
+          props: {
+            title: 'No item selected!',
+            pos: 'bottom-center',
+            variant: 'danger',
+          },
         });
       } else {
         this.item = item;
-        this.$bvToast.toast(`Item "${this.item.text}" selected`, {
-          title: 'Item selected',
-          solid: true,
-          toaster: 'b-toaster-bottom-center',
-          variant: 'info',
+        this.show?.({
+          props: {
+            title: 'Item selected',
+            body: `Item "${this.item.text}" selected`,
+            pos: 'bottom-center',
+            variant: 'info',
+          },
         });
       }
     },
+  },
+  setup() {
+    const { show } = useToastController();
+    return { show };
   },
   mounted() {
     this.retrieveItems().then(() => {
       this.$route.query.barcode && this.onBarcode(this.$route.query.barcode);
     });
   },
-
   created() {
     this.webSocket = new WebSocket(http.defaults.baseWsURL + '/scannerConsumer');
     this.webSocket.onmessage = e => {
