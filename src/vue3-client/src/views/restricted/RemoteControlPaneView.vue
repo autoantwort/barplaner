@@ -275,7 +275,7 @@ export default {
             const item = JSON.parse(event.data.substring(event.data.indexOf(':') + 1));
             this.clients[keys[0]].data[item.id] = item;
           } else if (keys[1] === 'remove') {
-            delete this.clients[keys[0]][msg[1]] ;
+            delete this.clients[keys[0]][msg[1]];
           } else if (keys[1] === 'canMoveItems') {
             if (this.clients[keys[0]].canMoveItems !== undefined) {
               if (this.clients[keys[0]].canMoveItems != msg[1]) {
