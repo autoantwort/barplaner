@@ -22,15 +22,18 @@
               <tbody>
                 <tr v-for="itemGroup in filteredItemGroups" :key="itemGroup.id">
                   <td>
-                    <router-link :to="{ name: 'itemGroup', params: { itemGroupId: itemGroup.id, itemGroup } }">{{ itemGroup.name }}</router-link>
+                    <router-link :to="{ name: 'itemGroup', params: { itemGroupId: itemGroup.id } }" @click="setNavigationData({ itemGroup })">{{
+                      itemGroup.name
+                    }}</router-link>
                   </td>
                   <td>
                     <router-link
                       v-if="itemGroup.stockPosition"
                       :to="{
                         name: 'position',
-                        params: { positionId: itemGroup.stockPosition.id, position: itemGroup.stockPosition },
+                        params: { positionId: itemGroup.stockPosition.id },
                       }"
+                      @click="setNavigationData({ position: itemGroup.stockPosition })"
                       >{{ itemGroup.stockPosition.name }}</router-link
                     >
                     <button
@@ -61,6 +64,7 @@
 import http from '@/http-common';
 import PositionImage from '@/components/PositionImage.vue';
 import phoneticsFilter from '@/phoneticsFilter';
+import NavigationDataService from '@/router/navigationDataService';
 
 export default {
   name: 'itemGroup-list',
@@ -91,6 +95,9 @@ export default {
         .catch(e => {
           console.log(e);
         });
+    },
+    setNavigationData(item) {
+      NavigationDataService.set(item);
     },
   },
   mounted() {

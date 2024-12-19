@@ -107,6 +107,7 @@ import GenericInputComponent from '@/components/GenericInputComponent.vue';
 import EditPositionComponent from '@/components/EditPositionComponent.vue';
 import StockChangesList from './StockChangesListView.vue';
 import { REASON } from '@common/stockChangeReasons.js';
+import NavigationDataService from '@/router/navigationDataService';
 
 const formatter = new Intl.NumberFormat('de-DE', {
   style: 'currency',
@@ -137,7 +138,7 @@ export default {
     };
   },
   methods: {
-    retrieveitemGroup() {
+    retrieveItemGroup() {
       http
         .get('/itemGroup/' + this.$route.params.itemGroupId)
         .then(response => {
@@ -149,16 +150,16 @@ export default {
     },
     retrievePosition() {
       http
-        .get('/position/' + this.itemGroup.stockPositionId)
+        .get('/position/' + this.realItemGroup.stockPositionId)
         .then(response => {
-          this.itemGroup.stockPosition = response.data;
+          this.realItemGroup.stockPosition = response.data;
         })
         .catch(e => {
           console.log(e);
         });
     },
     retrieveItemStock() {
-      const itemGroupId = this.itemGroup !== null ? this.itemGroup.id : this.$route.params.itemGroupId;
+      const itemGroupId = this.realItemGroup !== null ? this.realItemGroup.id : this.$route.params.itemGroupId;
       http
         .get('/itemGroup/' + itemGroupId + '/itemStock')
         .then(response => {
@@ -179,7 +180,7 @@ export default {
         .catch(console.error);
     },
     retrieveStockChanges() {
-      const itemGroupId = this.itemGroup !== null ? this.itemGroup.id : this.$route.params.itemGroupId;
+      const itemGroupId = this.$route.params.itemGroupId;
       http
         .get('/itemGroup/' + itemGroupId + '/stockChanges')
         .then(response => {
@@ -214,11 +215,12 @@ export default {
     },
   },
   mounted() {
-    if (this.itemGroup === null) {
-      this.retrieveitemGroup();
+    const navData = NavigationDataService.get();
+    if (this.itemGroup === null && !navData?.itemGroup) {
+      this.retrieveItemGroup();
     } else {
-      this.realItemGroup = this.itemGroup;
-      if (this.itemGroup.stockPositionId !== null && this.itemGroup.stockPosition === undefined) {
+      this.realItemGroup = this.itemGroup ?? navData.itemGroup;
+      if (this.realItemGroup.stockPositionId !== null && this.realItemGroup.stockPosition === undefined) {
         this.retrievePosition();
       }
     }
