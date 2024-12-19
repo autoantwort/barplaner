@@ -258,18 +258,12 @@ export default {
         // https://vuejs.org/v2/api/#vm-set
         const msg = event.data.split(':');
         if (msg[0] === 'add') {
-          this.$root.$set(this.clients, msg[1].replace(' ', '_'), {
-            name: msg[1],
-            data: {},
-          });
+          this.clients[msg[1].replace(' ', '_')] = { name: msg[1], data: {} };
         } else if (msg[0] === 'remove') {
-          // delete this.clients[msg[1].replace(' ', '_')];
-          this.$root.$delete(this.clients, msg[1].replace(' ', '_'));
+          delete this.clients[msg[1].replace(' ', '_')];
         } else if (msg[0] === 'rename') {
-          this.$root.$set(this.clients, msg[2].replace(' ', '_'), this.clients[msg[1].replace(' ', '_')]);
-          this.$root.$delete(this.clients, msg[1].replace(' ', '_'));
-          //this.clients[msg[2].replace(' ', '_')] = this.clients[msg[1].replace(' ', '_')];
-          //delete this.clients[msg[1].replace(' ', '_')];
+          this.clients[msg[2].replace(' ', '_')] = this.clients[msg[1].replace(' ', '_')];
+          delete this.clients[msg[1].replace(' ', '_')];
           this.clients[msg[2].replace(' ', '_')].name = msg[2];
         } else {
           // example message: "BarPC.add:{"id":3, ...}"
@@ -279,11 +273,9 @@ export default {
           keys[0] = keys[0].replace(' ', '_');
           if (keys[1] === 'add') {
             const item = JSON.parse(event.data.substring(event.data.indexOf(':') + 1));
-            //this.clients[keys[0]].data[item.id] = item;
-            this.$root.$set(this.clients[keys[0]].data, item.id, item);
+            this.clients[keys[0]].data[item.id] = item;
           } else if (keys[1] === 'remove') {
-            // delete this.clients[keys[0]][msg[1]] ;
-            this.$root.$delete(this.clients[keys[0]].data, msg[1]);
+            delete this.clients[keys[0]][msg[1]] ;
           } else if (keys[1] === 'canMoveItems') {
             if (this.clients[keys[0]].canMoveItems !== undefined) {
               if (this.clients[keys[0]].canMoveItems != msg[1]) {
@@ -293,10 +285,9 @@ export default {
             } else {
               if (msg[1] === 'false') this.cantMoveCount++;
             }
-            this.$root.$set(this.clients[keys[0]], 'canMoveItems', msg[1]);
+            this.clients[keys[0]].canMoveItems = msg[1];
           } else {
-            // this.clients[keys[0]].data[keys[1]][keys[2]] = msg[1];
-            this.$root.$set(this.clients[keys[0]].data[keys[1]], keys[2], msg[1]);
+            this.clients[keys[0]].data[keys[1]][keys[2]] = msg[1];
           }
         }
       };
