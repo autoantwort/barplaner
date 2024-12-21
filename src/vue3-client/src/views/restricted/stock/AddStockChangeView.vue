@@ -286,24 +286,11 @@ import { reasons } from '@common/stockChangeReasons.js';
 import { h } from 'vue';
 import { useToastController } from 'bootstrap-vue-next';
 import { BToast } from 'bootstrap-vue-next';
+import NavigationDataService from '@/router/navigationDataService';
 
 const round = v => Math.round(v * 1000) / 1000;
 
 export default {
-  props: {
-    itemId: {
-      type: Number,
-      default: null,
-    },
-    netPrice: {
-      type: Number,
-      default: null,
-    },
-    grossPrice: {
-      type: Number,
-      default: null,
-    },
-  },
   data() {
     return {
       item: null,
@@ -368,7 +355,7 @@ export default {
         this.einzelNetto = round(this.gesamtNetto / Math.abs(this.change));
         this.updateBrotto();
       }
-      if (this.reason === null && this.netPrice !== null) this.reason = 'bought'; // Wenn das erste mal nen Menge gewählt wird und wir von "Add Item" kommen
+      if (this.reason === null && this.einzelNetto !== null) this.reason = 'bought'; // Wenn das erste mal nen Menge gewählt wird und wir von "Add Item" kommen
     },
     realTax: function (tax) {
       if (tax >= 0 && this.priceFrom) {
@@ -499,21 +486,6 @@ export default {
         .get('/itemsForSelect')
         .then(response => {
           this.existingItems = response.data;
-          if (this.itemId !== null) {
-            for (let item of this.existingItems) {
-              if (item.value === this.itemId) {
-                this.item = item;
-                break;
-              }
-            }
-            this.einzelNetto = this.netPrice;
-            this.einzelBrotto = this.grossPrice;
-            if (this.grossPrice !== null) {
-              this.priceFrom = 'einzelBrotto';
-              this.tax = Math.round((this.grossPrice / this.netPrice - 1) * 100);
-              this.priceAccuracy = 'researched';
-            }
-          }
         })
         .catch(e => {
           console.log(e);
@@ -624,6 +596,25 @@ export default {
   mounted() {
     this.retrieveItems().then(() => {
       this.$route.query.barcode && this.onBarcode(this.$route.query.barcode);
+      const navData = NavigationDataService.get();
+      if (navData?.itemId) {
+        for (let item of this.existingItems) {
+          if (item.value === navData?.itemId) {
+            this.item = item;
+            break;
+          }
+        }
+        if (navData.netPrice) {
+          this.einzelNetto = navData.netPrice;
+          this.einzelBrotto = navData.grossPrice;
+
+          if (navData.grossPrice !== null) {
+            this.priceFrom = 'einzelBrotto';
+            this.tax = Math.round((navData.grossPrice / navData.netPrice - 1) * 100);
+            this.priceAccuracy = 'researched';
+          }
+        }
+      }
     });
   },
   created() {

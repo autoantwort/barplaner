@@ -16,7 +16,7 @@
               <tbody>
                 <tr v-for="invoice in invoices" :key="invoice.id">
                   <td>
-                    <router-link :to="{ name: 'invoice', params: { invoiceId: invoice.id, invoice: invoice } }"
+                    <router-link :to="{ name: 'invoice', params: { invoiceId: invoice.id } }" @click="setNavigationData({ invoice })"
                       >{{ invoice.seller }} Rechnung vom {{ $filters.asDate(invoice.invoiceDate) }}</router-link
                     >
                   </td>
@@ -41,6 +41,7 @@
 
 <script>
 import http from '@/http-common';
+import NavigationDataService from '@/router/navigationDataService';
 
 export default {
   name: 'invoice-list',
@@ -57,6 +58,9 @@ export default {
     },
   },
   methods: {
+    setNavigationData(item) {
+      NavigationDataService.set(item);
+    },
     openAddInvoice() {
       this.$refs.addInvoice.show();
     },

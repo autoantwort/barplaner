@@ -3,7 +3,9 @@
     <div class="row mt-3">
       <div v-if="realItem" class="col-12 col-md-8 offset-md-2 was-validated">
         <div class="d-flex justify-content-end">
-          <router-link class="btn btn-sm btn-success mb-3 me-3" :to="{ name: 'addStockChange', params: { itemId: realItem.id } }">Add Change</router-link>
+          <router-link class="btn btn-sm btn-success mb-3 me-3" :to="{ name: 'addStockChange' }" @click="setNavigationData({ itemId: realItem.id })"
+            >Add Change</router-link
+          >
         </div>
         <div class="mb-3 row">
           <label class="col-3 form-label">Name</label>
@@ -89,6 +91,8 @@ import EditPercentComponent from '@/components/EditPercentComponent.vue';
 
 import StockChangesList from './StockChangesListView.vue';
 
+import NavigationDataService from '@/router/navigationDataService';
+
 export default {
   props: {
     item: {
@@ -158,15 +162,19 @@ export default {
         })
         .catch(console.error);
     },
+    setNavigationData(item) {
+      NavigationDataService.set(item);
+    },
   },
   created() {
     this.baseURL = http.defaults.baseURL + '/file/';
   },
   mounted() {
-    if (this.item === null) {
+    const navData = NavigationDataService.get();
+    if (this.item === null && !navData?.item) {
       this.retrieveItem();
     } else {
-      this.realItem = this.item;
+      this.realItem = this.item ?? navData.item;
     }
     this.retrieveStock();
     this.retrieveStockChanges();

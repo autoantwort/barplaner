@@ -35,7 +35,9 @@
               <tbody>
                 <tr v-for="position in filteredPositions" :key="position.id">
                   <td>
-                    <router-link :to="{ name: 'position', params: { positionId: position.id, position } }">{{ position.name }}</router-link>
+                    <router-link :to="{ name: 'position', params: { positionId: position.id } }" @click="setNavigationData({ position })">
+                      {{ position.name }}</router-link
+                    >
                   </td>
                   <td>{{ position.room }}</td>
                   <td>{{ position.description }}</td>
@@ -53,6 +55,7 @@
 import http from '@/http-common';
 import phoneticsFilter from '@/phoneticsFilter';
 import VueBarcode from '@/components/jsbarcode.js';
+import NavigationDataService from '@/router/navigationDataService';
 
 export default {
   name: 'position-list',
@@ -81,6 +84,9 @@ export default {
     },
     print() {
       window.print();
+    },
+    setNavigationData(item) {
+      NavigationDataService.set(item);
     },
   },
   mounted() {

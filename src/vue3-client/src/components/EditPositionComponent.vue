@@ -1,9 +1,9 @@
 <template>
   <edit-component ref="edit" :onSave="save" :onEdit="edit">
     <template v-if="object.stockPosition">
-      <router-link :to="{ name: 'position', params: { positionId: object.stockPosition.id, position: object.stockPosition } }">{{
-        object.stockPosition.name
-      }}</router-link>
+      <router-link :to="{ name: 'position', params: { positionId: object.stockPosition.id } }" @click="setNavigationData({ position: object.stockPosition })">
+        {{ object.stockPosition.name }}
+      </router-link>
       <button
         v-if="object.stockPosition.imageId !== null"
         class="ms-2 btn btn-sm btn-sm-flat btn-secondary"
@@ -17,8 +17,9 @@
       <router-link
         :to="{
           name: 'position',
-          params: { positionId: object.itemGroup.stockPosition.id, position: object.itemGroup.stockPosition },
+          params: { positionId: object.itemGroup.stockPosition.id },
         }"
+        @click="setNavigationData({ position: object.itemGroup.stockPosition })"
         >{{ object.itemGroup.stockPosition.name }}</router-link
       >
       <button
@@ -45,6 +46,7 @@ import http from '@/http-common';
 import EditComponent from './EditComponent.vue';
 import PositionCard from './PositionCard.vue';
 import PositionImage from '@/components/PositionImage.vue';
+import NavigationDataService from '@/router/navigationDataService';
 
 export default {
   name: 'edit-position-component',
@@ -95,6 +97,9 @@ export default {
     },
     edit() {
       this.$refs.input.setPosition(this.object.stockPosition);
+    },
+    setNavigationData(item) {
+      NavigationDataService.set(item);
     },
   },
 };

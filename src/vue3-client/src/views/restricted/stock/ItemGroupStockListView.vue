@@ -31,7 +31,7 @@
                 <tr v-for="itemGroup in visibleItemGroups" :key="itemGroup.id" :class="itemGroup.class">
                   <td><input type="checkbox" v-model="itemGroup.checked" @click="onEntryChecked($event, itemGroup.id)" /></td>
                   <td>
-                    <router-link :to="{ name: 'itemGroup', params: { itemGroupId: itemGroup.id, itemGroup } }">
+                    <router-link :to="{ name: 'itemGroup', params: { itemGroupId: itemGroup.id } }" @click="setNavigationData({ itemGroup })">
                       {{ itemGroup.name }}
                     </router-link>
                   </td>
@@ -53,6 +53,7 @@
 import http from '@/http-common';
 import phoneticsFilter from '@/phoneticsFilter';
 import SharedTextArea from '@/components/SharedTextArea.vue';
+import NavigationDataService from '@/router/navigationDataService';
 
 export default {
   name: 'itemGroupStock',
@@ -77,6 +78,9 @@ export default {
     },
   },
   methods: {
+    setNavigationData(item) {
+      NavigationDataService.set(item);
+    },
     filter(event) {
       this.filteredItemGroups = phoneticsFilter(this.itemGroups, event.target.value);
     },

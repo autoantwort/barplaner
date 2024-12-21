@@ -1,6 +1,6 @@
 <template>
   <div style="display: contents" v-if="hasPosition">
-    <router-link :to="{ name: 'position', params: { positionId: position.id, position } }">
+    <router-link :to="{ name: 'position', params: { positionId: position.id } }" @click="setNavigationData({ position })">
       {{ position.name }}
     </router-link>
     <button v-if="position.imageId !== null" class="ms-2 btn btn-sm btn-sm-flat btn-secondary" type="button" v-on:click="openModal()">
@@ -14,6 +14,7 @@
 
 <script>
 import PositionImage from '@/components/PositionImage.vue';
+import NavigationDataService from '@/router/navigationDataService';
 
 export default {
   props: ['item'],
@@ -31,6 +32,9 @@ export default {
   methods: {
     openModal() {
       this.$refs.modal.show();
+    },
+    setNavigationData(item) {
+      NavigationDataService.set(item);
     },
   },
 };

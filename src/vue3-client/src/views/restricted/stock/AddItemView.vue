@@ -84,6 +84,8 @@ import PositionCard from '@/components/PositionCard.vue';
 import ItemGroupCard from '@/components/ItemGroupCard.vue';
 import PercentInput from '@/components/PercentInput.vue';
 
+import NavigationDataService from '@/router/navigationDataService';
+
 export default {
   components: {
     BarcodeInput,
@@ -222,9 +224,9 @@ export default {
             if (response.status === 201) {
               if (redirectAfter !== undefined) {
                 if (redirectAfter === 'addStockChange') {
+                  NavigationDataService.set({ itemId: response.data.id, grossPrice: this.grossPrice, netPrice: this.netPrice });
                   this.$router.push({
                     name: 'addStockChange',
-                    params: { itemId: response.data.id, grossPrice: this.grossPrice, netPrice: this.netPrice },
                   });
                 } else {
                   this.$router.push(redirectAfter);

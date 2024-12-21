@@ -1,8 +1,12 @@
 <template>
   <edit-component ref="edit" :onSave="save" :onEdit="edit">
-    <router-link v-if="object.itemGroup" :to="{ name: 'itemGroup', params: { itemGroupId: object.itemGroup.id, itemGroup: object.itemGroup } }">{{
-      object.itemGroup.name
-    }}</router-link>
+    <router-link
+      v-if="object.itemGroup"
+      :to="{ name: 'itemGroup', params: { itemGroupId: object.itemGroup.id } }"
+      @click="setNavigationData({ itemGroup: object.itemGroup })"
+    >
+      {{ object.itemGroup.name }}</router-link
+    >
     <template v-else>None</template>
     <template v-slot:edit>
       <item-group-card ref="input" />
@@ -14,6 +18,7 @@
 import http from '@/http-common';
 import EditComponent from './EditComponent.vue';
 import ItemGroupCard from './ItemGroupCard.vue';
+import NavigationDataService from '@/router/navigationDataService';
 
 export default {
   name: 'edit-item-group-component',
@@ -47,6 +52,9 @@ export default {
     },
     edit() {
       this.$refs.input.setItemGroup(this.object.itemGroup);
+    },
+    setNavigationData(item) {
+      NavigationDataService.set(item);
     },
   },
 };
