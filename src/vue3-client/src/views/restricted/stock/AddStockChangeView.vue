@@ -287,6 +287,7 @@ import { h } from 'vue';
 import { useToastController } from 'bootstrap-vue-next';
 import { BToast } from 'bootstrap-vue-next';
 import NavigationDataService from '@/router/navigationDataService';
+import { RouterLink } from 'vue-router';
 
 const round = v => Math.round(v * 1000) / 1000;
 
@@ -387,6 +388,7 @@ export default {
       this.reason = null;
       if (this.item !== null) this.errorString = '';
       if (this.item) {
+        //if (this.item.)
         http
           .get('/item/' + this.item.value + '/stock')
           .then(response => {
@@ -552,20 +554,20 @@ export default {
     onBarcode(barcode) {
       const item = this.existingItems.find(i => i.barcode === barcode || i.barcodePack === barcode);
       if (item === undefined) {
+        NavigationDataService.set({ initialItem: { barcode: barcode } });
         const vNodesMsg = h('p', [
-          h('span', { class: ['me-2'] }, `No Item found for barcode "${barcode}"`),
+          h('span', { class: ['me-2'] }, () => `No Item found for barcode "${barcode}"`),
           h(
-            'router-link',
+            RouterLink,
             {
               class: ['btn', 'btn-sm', 'btn-success'],
-              props: {
+
                 to: {
                   name: 'addItem',
-                  params: { initialItem: { barcode: barcode } },
                 },
-              },
+
             },
-            'Create Item',
+            () => 'Create Item',
           ),
         ]);
         this.show?.({

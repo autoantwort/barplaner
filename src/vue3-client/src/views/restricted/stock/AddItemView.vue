@@ -95,12 +95,6 @@ export default {
     ItemGroupCard,
     PercentInput,
   },
-  props: {
-    initialItem: {
-      type: Object,
-      default: null,
-    },
-  },
   data() {
     return {
       item: {
@@ -243,9 +237,10 @@ export default {
     },
   },
   mounted() {
-    if (this.initialItem !== null) {
-      for (let p in this.initialItem) {
-        this.item[p] = this.initialItem[p];
+    const navData = NavigationDataService.get();
+    if (navData?.initialItem) {
+      for (let p in navData.initialItem) {
+        this.item[p] = navData.initialItem[p];
       }
     }
   },
