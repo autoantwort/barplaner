@@ -562,10 +562,9 @@ export default {
             {
               class: ['btn', 'btn-sm', 'btn-success'],
 
-                to: {
-                  name: 'addItem',
-                },
-
+              to: {
+                name: 'addItem',
+              },
             },
             () => 'Create Item',
           ),
