@@ -321,6 +321,7 @@ import ContentInput from '@/components/ContentInput.vue';
 import PercentInput from '@/components/PercentInput.vue';
 import ItemGroupCard from '@/components/ItemGroupCard.vue';
 import BarcodeInput from '@/components/BarcodeInput.vue';
+import NavigationDataService from '@/router/navigationDataService';
 
 function parseDate(input) {
   if (input === undefined) return undefined;
@@ -338,16 +339,6 @@ export default {
     PercentInput,
     ItemGroupCard,
     BarcodeInput,
-  },
-  props: {
-    invoice: {
-      type: Object,
-      default: null,
-    },
-    isNew: {
-      type: Boolean,
-      default: false,
-    },
   },
   data() {
     return {
@@ -610,7 +601,7 @@ export default {
         });
     },
     retrieveInvoiceEntries() {
-      const invoiceId = this.invoice !== null ? this.invoice.id : this.$route.params.invoiceId;
+      const invoiceId = this.realInvoice !== null ? this.realInvoice.id : this.$route.params.invoiceId;
       http
         .get('/invoice/' + invoiceId + '/entries')
         .then(response => {
@@ -623,7 +614,7 @@ export default {
     },
     retrieveAnalysis() {
       this.analysing = true;
-      const invoiceId = this.invoice !== null ? this.invoice.id : this.$route.params.invoiceId;
+      const invoiceId = this.realInvoice !== null ? this.realInvoice.id : this.$route.params.invoiceId;
       http
         .get('/invoice/' + invoiceId + '/analyse')
         .then(response => {
@@ -650,13 +641,16 @@ export default {
     },
   },
   mounted() {
+    const navData = NavigationDataService.get();
+    const isNew = navData?.isNew ?? false;
+    const invoice = navData?.invoice ?? null;
     this.baseURL = http.defaults.baseURL;
-    if (this.invoice === null) {
+    if (invoice === null) {
       this.retrieveinvoice();
     } else {
-      this.realInvoice = this.invoice;
+      this.realInvoice = invoice;
     }
-    if (this.isNew) {
+    if (isNew) {
       this.retrieveAnalysis();
     } else {
       this.retrieveInvoiceEntries();

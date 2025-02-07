@@ -82,20 +82,19 @@ export default {
         })
         .then(response => {
           if (response.status === 409) {
+            NavigationDataService.set({ invoice: response.data.invoice });
             this.$router.push({
               name: 'invoice',
               params: {
                 invoiceId: response.data.invoice.id,
-                invoice: response.data.invoice,
               },
             });
           } else if (response.status === 201) {
+            NavigationDataService.set({ isNew: true, invoice: response.data });
             this.$router.push({
               name: 'invoice',
               params: {
                 invoiceId: response.data.id,
-                invoice: response.data,
-                isNew: true,
               },
             });
           } else {
