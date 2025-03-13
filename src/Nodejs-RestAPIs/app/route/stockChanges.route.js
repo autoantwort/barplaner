@@ -5,6 +5,7 @@ module.exports = function(app) {
 
     app.get('/api/itemStock', changes.getItemStock);
     app.get('/api/stockChanges', changes.getStockChanges);
+    app.get('/api/stockChange/:id', changes.getStockChange);
     app.get('/api/:date/stockChanges', changes.getAllChangesAtDay);
     app.get('/api/itemGroupStock', changes.getItemGroupStock);
     app.get('/api/item/:itemId/stock', changes.getStockForItem);

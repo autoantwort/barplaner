@@ -2,6 +2,7 @@ const db = require('../config/db.config.js');
 const StockChange = db.stock.Change;
 const Item = db.stock.Item;
 const ItemGroup = db.stock.ItemGroup;
+const Invoice = db.stock.Invoice;
 const InvoiceEntry = db.stock.InvoiceEntry;
 const Position = db.stock.Position;
 const User = db.User;
@@ -87,6 +88,30 @@ exports.getStockChanges = (req, res) => {
         res.status(500).send("Error -> " + err);
     });
 };
+
+exports.getStockChange = (req, res) => {
+    StockChange.findByPk(req.params.id, {
+        include: [{
+            model: User,
+            attributes: ['name'],
+        }, {
+            model: Item,
+            attributes: ['name'],
+        }, {
+            model: InvoiceEntry,
+            attributes: ['invoiceId'],
+            include: [{
+                model: Invoice,
+                attributes: ['seller', 'invoiceDate'],
+            }],
+        }],
+    }).then(change => {
+        res.send(change);
+    }).catch(err => {
+        res.status(500).send("Error -> " + err);
+    });
+};
+
 
 // get current Stock
 exports.getItemStock = (req, res) => {
