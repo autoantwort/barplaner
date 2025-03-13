@@ -14,7 +14,7 @@
       <tbody>
         <slot name="before"></slot>
         <tr v-for="change in changes" :key="change.id" :class="{ highlight: change.highlight }">
-          <td>{{ change.date | asDayDateTime }}</td>
+          <td><router-link :to="{ name: 'stockChange', params: { changeId: change.id }, }"> {{ change.date | asDayDateTime }}</router-link></td>
           <td v-if="showItem">
             <router-link :to="{ name: 'item', params: { itemId: change.itemId } }">{{ change.stockItem.name }}</router-link>
           </td>
