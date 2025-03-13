@@ -3,33 +3,30 @@
     <div class="row mt-3">
       <div v-if="realChange" class="col-12 col-md-8 offset-md-2">
         <div class="mb-3 row">
-          <label class="col-3 form-label">Id</label>
-          <label class="col-9">{{ realChange.id }}</label>
+          <label class="col-3 form-label">Date</label>
+          <label class="col-9">{{ $filters.asDayDateTime(realChange.date) }}</label>
+        </div>
+        <div class="mb-3 row">
+          <label class="col-3 form-label">Amount</label>
+          <label class="col-9">{{ realChange.amount }}</label>
         </div>
         <div class="mb-3 row">
           <label class="col-3 form-label">Item</label>
           <router-link class="col-9" :to="{ name: 'item', params: { itemId: realChange.itemId } }">{{ realChange.stockItem.name }}</router-link>
         </div>
         <div class="mb-3 row">
-          <label class="col-3 form-label">Date</label>
-          <label class="col-9">{{ $filters.asDayDateTime(realChange.date) }}</label>
+          <label class="col-3 form-label">Reason</label>
+          <label class="col-9">{{ getGermanReason(realChange.reason) }}</label>
         </div>
         <div class="mb-3 row">
-          <label class="col-3 form-label">Brotto Price</label>
-          <label class="col-9">{{ realChange.brottoPrice.toFixed(2) }} €</label>
+          <label class="col-3 form-label">Net/Brotto Price</label>
+          <label class="col-9">{{ $filters.asEuro(realChange.netPrice) }} / {{ $filters.asEuro(realChange.brottoPrice) }}</label>
         </div>
         <div class="mb-3 row">
           <label class="col-3 form-label">Price Accuracy</label>
           <label class="col-9">{{ getGermanPriceAccuracy(realChange.priceAccuracy) }}</label>
         </div>
-        <div class="mb-3 row">
-          <label class="col-3 form-label">Reason</label>
-          <label class="col-9">{{ getGermanReason(realChange.reason) }}</label>
-        </div>
-        <div class="mb-3 row">
-          <label class="col-3 form-label">Amount</label>
-          <label class="col-9">{{ realChange.amount }}</label>
-        </div>
+
         <div class="mb-3 row">
           <label class="col-3 form-label">Added by User</label>
           <label class="col-9">{{ realChange.user ? realChange.user.name : '' }}</label>
@@ -53,13 +50,7 @@ import { getGermanReason } from './changeUtil';
 const getGermanPriceAccuracy = e => e;
 
 export default {
-  name: 'change',
-  props: {
-    change: {
-      type: Object,
-      default: null,
-    },
-  },
+  name: 'stock-change',
   data() {
     return {
       realChange: null,
@@ -80,11 +71,7 @@ export default {
     },
   },
   mounted() {
-    if (this.change === null) {
-      this.retrieveChange();
-    } else {
-      this.realChange = this.change;
-    }
+    this.retrieveChange();
   },
 };
 </script>
