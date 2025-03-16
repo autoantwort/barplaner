@@ -13,6 +13,10 @@ exports.registerClients = function(app) {
             console.error("Fehler bei einem Websocket unter /volumeClient", err);
         });
         ws.on('message', msg => {
+            if (ArrayBuffer.isView(msg)) {
+                const decoder = new TextDecoder();
+                msg = decoder.decode(msg);
+            }
             if (msg.startsWith("Name:")) {
                 const newName = msg.substring(5);
                 if (name === "unnamed") {
@@ -49,6 +53,10 @@ exports.registerMasters = app => {
             ws.send("Value:" + c + ":" + clients[c].lastValue);
         }
         ws.on('message', msg => {
+            if (ArrayBuffer.isView(msg)) {
+                const decoder = new TextDecoder();
+                msg = decoder.decode(msg);
+            }
             // master setting volume, format: <name>:<value>
             const strings = msg.split(":");
             if (clients[strings[0]] !== undefined) {

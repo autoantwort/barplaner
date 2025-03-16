@@ -306,6 +306,10 @@ exports.registerClients = function (app) {
             console.error("Fehler bei einem Websocket unter /scanner", err);
         });
         ws.on('message', msg => {
+            if (ArrayBuffer.isView(msg)) {
+                const decoder = new TextDecoder();
+                msg = decoder.decode(msg);
+            }
             sendMessageToController(msg);
             onBarcode(msg);
         });

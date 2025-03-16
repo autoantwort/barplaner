@@ -10,6 +10,10 @@ exports.registerWebSocketListener = function (app) {
             console.error("Fehler bei einem Websocket unter /shoppingListState", err);
         });
         ws.on('message', msg => {
+            if (ArrayBuffer.isView(msg)) {
+                const decoder = new TextDecoder();
+                msg = decoder.decode(msg);
+            }
             if (msg.startsWith("Add:")) {
                 selectedItems.add(msg.substring(4));
             } else if (msg.startsWith("Remove:")) {

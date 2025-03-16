@@ -23,6 +23,10 @@ exports.registerWebSocketListener = function (app) {
             console.error("Fehler bei einem Websocket unter /shoppingListText", err);
         });
         ws.on('message', msg => {
+            if (ArrayBuffer.isView(msg)) {
+                const decoder = new TextDecoder();
+                msg = decoder.decode(msg);
+            }
             clients.forEach(c => {
                 if (c !== ws) {
                     c.send(msg)

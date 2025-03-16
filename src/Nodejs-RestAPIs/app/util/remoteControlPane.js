@@ -13,6 +13,10 @@ exports.registerClients = function(app) {
         let name = "unnamed";
         clients[name] = { ws, data: {} };
         ws.on('message', msg => {
+            if (ArrayBuffer.isView(msg)) {
+                const decoder = new TextDecoder();
+                msg = decoder.decode(msg);
+            }
             if (msg.startsWith("name:")) {
                 const newName = msg.substring(5);
                 if (newName === "add" || newName === "remove" || clients[newName] !== undefined) {
@@ -73,6 +77,10 @@ exports.registerMasters = app => {
             }
         }
         ws.on('message', msg => {
+            if (ArrayBuffer.isView(msg)) {
+                const decoder = new TextDecoder();
+                msg = decoder.decode(msg);
+            }
             // example message: "BarPC.34.value:55"
             const strings = msg.split(".");
             if (clients[strings[0]] !== undefined) {
