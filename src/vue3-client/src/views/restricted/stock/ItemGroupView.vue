@@ -34,7 +34,7 @@
           <label class="col-9">
             {{ inStock }}
             <span
-              v-if="inStock && inStock < realItemGroup.idealCount"
+              v-if="inStock !== null && inStock < realItemGroup.idealCount"
               class="badge ms-2 vert"
               style="vertical-align: text-top"
               v-bind:class="[inStock < realItemGroup.minimumCount ? 'text-bg-danger' : 'text-bg-warning']"
