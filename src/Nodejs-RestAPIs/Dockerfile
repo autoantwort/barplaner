@@ -1,11 +1,9 @@
-FROM node:10
-RUN mkdir -p /code
+FROM oven/bun:latest
 WORKDIR /code
-COPY package.json /code
-
-RUN npm install
+COPY package.json bun.lockb /code
+RUN bun install --production
 
 COPY . /code
 
 EXPOSE 8080
-CMD [ "npm", "start" ]
+CMD [ "bun", "run", "server.js" ]
