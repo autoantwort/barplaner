@@ -40,6 +40,8 @@ stages:
 
 build:bun-backend:
   <<: *build_template
+  variables:
+    STORAGE_DRIVER: vfs
     
 
 # build:vue-frontend:
