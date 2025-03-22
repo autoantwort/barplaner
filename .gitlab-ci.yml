@@ -5,6 +5,7 @@ stages:
   - format
   - pages
   - build
+  - test
   - deploy-production
 
 # From https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#buildah-example
@@ -51,6 +52,25 @@ build:bun-backend:
     IMAGE_NAME: /bun-backend
     DOCKERFILE_NAME: Dockerfile
     DOCKERFILE_DIR: src/Nodejs-RestAPIs
+
+test-backend:
+  stage: test
+  image: curlimages/curl
+  script:
+    - |
+      if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
+        tag=":latest"
+        echo "Running on default branch '$CI_DEFAULT_BRANCH': tag = 'latest'"
+      else
+        tag=":$CI_COMMIT_REF_SLUG"
+        echo "Running on branch '$CI_COMMIT_BRANCH': tag = $tag"
+      fi
+    - docker run -d --name backend-test $CI_REGISTRY_IMAGE/bun-backend:${tag}
+    - sleep 10 # wait for the backend to start
+    - curl --fail http://localhost:3000/health || (docker logs backend-test && exit 1)
+    - docker stop backend-test
+    - docker rm backend-test
+
 
 deploy-production:
   image: curlimages/curl
