@@ -51,6 +51,7 @@ build:bun-backend:
   <<: *build_template
   variables:
     test: tewewr
+    STORAGE_DRIVER: vfs # otherwise we override
     
 
 # build:vue-frontend:
