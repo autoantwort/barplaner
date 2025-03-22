@@ -30,7 +30,7 @@ stages:
         echo "Running on branch '$CI_COMMIT_BRANCH': tag = $tag"
       fi
     - buildah images
-    - buildah build -t "$CI_REGISTRY_IMAGE$IMAGE_NAME${tag}" -f $DOCKERFILE_NAME $DOCKERFILE_DIR
+    - buildah build -t "$CI_REGISTRY_IMAGE$IMAGE_NAME${tag}" $DOCKERFILE_DIR
     - buildah images
     - buildah push "$CI_REGISTRY_IMAGE$IMAGE_NAME${tag}"
   # rules:
@@ -38,20 +38,20 @@ stages:
   #       - src/Dockerfile-vue3
   #     when: always
 
-
-build:vue-frontend:
-  <<: *build_template
-  variables:
-    IMAGE_NAME: ""
-    DOCKERFILE_NAME: Dockerfile-vue3
-    DOCKERFILE_DIR: src
-
 build:bun-backend:
   <<: *build_template
   variables:
     IMAGE_NAME: /bun-backend
     DOCKERFILE_NAME: Dockerfile
     DOCKERFILE_DIR: src/Nodejs-RestAPIs
+
+# build:vue-frontend:
+#   <<: *build_template
+#   variables:
+#     IMAGE_NAME: ""
+#     DOCKERFILE_NAME: Dockerfile-vue3
+#     DOCKERFILE_DIR: src
+
 
 test-backend:
   stage: test
