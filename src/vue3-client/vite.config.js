@@ -31,7 +31,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
-      '@common': fileURLToPath(new URL('../common', import.meta.url)),
+      '@common': fileURLToPath(new URL('../Nodejs-RestAPIs/app/common', import.meta.url)),
     }
   }
 })

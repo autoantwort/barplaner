@@ -1,6 +1,6 @@
 const mqtt = require('mqtt');
 const config = require('../config/env');
-const reasons = require('../../../common/stockChangeReasons.js');
+const reasons = require('../common/stockChangeReasons.js');
 const db = require('../config/db.config.js');
 const User = db.User;
 const Item = db.stock.Item;

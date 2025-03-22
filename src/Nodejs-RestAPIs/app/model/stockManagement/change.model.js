@@ -1,4 +1,4 @@
-const reasons = require('../../../../common/stockChangeReasons.js').reasonNames;
+const reasons = require('../../common/stockChangeReasons.js').reasonNames;
 
 module.exports = (sequelize, Sequelize, Item, User, InvoiceEntry) => {
     const StockChange = sequelize.define('stockChange', {
