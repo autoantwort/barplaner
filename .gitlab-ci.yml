@@ -4,12 +4,26 @@ include:
 stages:
   - format
   - pages
+  - define-tag
   - build
   - test
   - deploy-production
 
-variables:
-    STORAGE_DRIVER: vfs
+define-tag:
+  stage: define-tag
+  script:
+    - |
+      if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
+        tag=":latest"
+        echo "Running on default branch '$CI_DEFAULT_BRANCH': tag = 'latest'"
+      else
+        tag=":$CI_COMMIT_REF_SLUG"
+        echo "Running on branch '$CI_COMMIT_BRANCH': tag = $tag"
+      fi
+    - echo "TAG=${tag}" >> build.env
+  artifacts:
+    reports:
+      dotenv: build.env
 
 # From https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#buildah-example
 .template: &build_template
@@ -24,18 +38,10 @@ variables:
     # to authenticate to the registry.
     - echo "$CI_REGISTRY_PASSWORD" | buildah login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
   script:
-    - |
-      if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
-        tag=":latest"
-        echo "Running on default branch '$CI_DEFAULT_BRANCH': tag = 'latest'"
-      else
-        tag=":$CI_COMMIT_REF_SLUG"
-        echo "Running on branch '$CI_COMMIT_BRANCH': tag = $tag"
-      fi
     - buildah images
-    - buildah build -t "$CI_REGISTRY_IMAGE/bun-backend${tag}" src/Nodejs-RestAPIs
+    - buildah build -t "$CI_REGISTRY_IMAGE/bun-backend${TAG}" src/Nodejs-RestAPIs
     - buildah images
-    - buildah push "$CI_REGISTRY_IMAGE/bun-backend${tag}"
+    - buildah push "$CI_REGISTRY_IMAGE/bun-backend${TAG}"
   # rules:
   #   - exists:
   #       - src/Dockerfile-vue3
@@ -57,16 +63,8 @@ build:bun-backend:
 
 test-backend:
   stage: test
-  image: curlimages/curl
+  # image: curlimages/curl
   script:
-    - |
-      if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
-        tag=":latest"
-        echo "Running on default branch '$CI_DEFAULT_BRANCH': tag = 'latest'"
-      else
-        tag=":$CI_COMMIT_REF_SLUG"
-        echo "Running on branch '$CI_COMMIT_BRANCH': tag = $tag"
-      fi
     - docker run -d --name backend-test $CI_REGISTRY_IMAGE/bun-backend:${tag}
     - sleep 10 # wait for the backend to start
     - curl --fail http://localhost:3000/health || (docker logs backend-test && exit 1)
