@@ -8,6 +8,9 @@ stages:
   - test
   - deploy-production
 
+variables:
+    STORAGE_DRIVER: vfs
+
 # From https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#buildah-example
 .template: &build_template
   stage: build
@@ -41,7 +44,7 @@ stages:
 build:bun-backend:
   <<: *build_template
   variables:
-    STORAGE_DRIVER: vfs
+    test: tewewr
     
 
 # build:vue-frontend:
