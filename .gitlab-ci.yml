@@ -37,6 +37,26 @@ build:
   #       - src/Dockerfile-vue3
   #     when: always
 
+build-backend:
+  stage: build
+  image: quay.io/buildah/stable
+  variables:
+    STORAGE_DRIVER: vfs
+  before_script:
+    - echo "$CI_REGISTRY_PASSWORD" | buildah login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
+  script:
+    - |
+      if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
+        tag=":latest"
+      else
+        tag=":$CI_COMMIT_REF_SLUG"
+      fi
+    - echo "CI_REGISTRY_IMAGE $CI_REGISTRY_IMAGE"
+    - buildah images
+    - buildah build -t "$CI_REGISTRY_IMAGE/bun-backend${tag}" src/Nodejs-RestAPIs
+    - buildah images
+    - buildah push "$CI_REGISTRY_IMAGE/bun-backend${tag}"
+
 deploy-production:
   image: curlimages/curl
   stage: deploy-production
