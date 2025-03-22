@@ -40,9 +40,6 @@ stages:
 
 build:bun-backend:
   <<: *build_template
-  variables:
-
-    DOCKERFILE_NAME: Dockerfile
     
 
 # build:vue-frontend:
