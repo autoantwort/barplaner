@@ -26,7 +26,7 @@ define-tag:
       dotenv: build.env
 
 # From https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#buildah-example
-build-vue-frontend:
+build-containers:
   stage: build
   image: quay.io/buildah/stable
   variables:
@@ -39,32 +39,23 @@ build-vue-frontend:
     - echo "$CI_REGISTRY_PASSWORD" | buildah login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
   script:
     - buildah images
+    # Build and push vue container
     - buildah build -t "$CI_REGISTRY_IMAGE${TAG}" -f Dockerfile-vue3 src
-    - buildah images
     - buildah push "$CI_REGISTRY_IMAGE${TAG}"
+    # Build and push backend container
+    - buildah build -t "$CI_REGISTRY_IMAGE/bun-backend${TAG}" src/Nodejs-RestAPIs
+    - buildah push "$CI_REGISTRY_IMAGE/bun-backend${TAG}"
   # rules:
   #   - exists:
   #       - src/Dockerfile-vue3
   #     when: always
 
-build-backend:
-  stage: build
-  image: quay.io/buildah/stable
-  variables:
-    STORAGE_DRIVER: vfs
-  before_script:
-    - echo "$CI_REGISTRY_PASSWORD" | buildah login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
-  script:
-    - buildah images
-    - buildah build -t "$CI_REGISTRY_IMAGE/bun-backend${TAG}" src/Nodejs-RestAPIs
-    - buildah images
-    - buildah push "$CI_REGISTRY_IMAGE/bun-backend${TAG}"
 
 test-backend:
   stage: test
   image: docker
   before_script:
-    - echo "$CI_REGISTRY_PASSWORD" | buildah login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
   script:
     - docker run -d --name backend-test $CI_REGISTRY_IMAGE/bun-backend${TAG}
     - sleep 10 # wait for the backend to start
