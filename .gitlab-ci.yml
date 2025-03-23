@@ -59,6 +59,8 @@ test-backend:
   script:
     - docker run -d --name backend-test $CI_REGISTRY_IMAGE/bun-backend${TAG}
     - sleep 10 # wait for the backend to start
+    - apt update
+    - apt install curl -y
     - curl --fail http://localhost:3000/health || (docker logs backend-test && exit 1)
     - docker stop backend-test
     - docker rm backend-test
