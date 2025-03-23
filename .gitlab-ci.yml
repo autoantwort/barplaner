@@ -64,7 +64,7 @@ test-backend:
   stage: test
   image: docker
   script:
-    - docker run -d --name backend-test $CI_REGISTRY_IMAGE/bun-backend:${TAG}
+    - docker run -d --name backend-test $CI_REGISTRY_IMAGE/bun-backend${TAG}
     - sleep 10 # wait for the backend to start
     - curl --fail http://localhost:3000/health || (docker logs backend-test && exit 1)
     - docker stop backend-test
