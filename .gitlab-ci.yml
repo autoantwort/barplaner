@@ -40,8 +40,8 @@ build-containers:
   script:
     - buildah images
     # Build and push vue container
-    - buildah build -t "$CI_REGISTRY_IMAGE${TAG}" -f Dockerfile-vue3 src
-    - buildah push "$CI_REGISTRY_IMAGE${TAG}"
+    # - buildah build -t "$CI_REGISTRY_IMAGE${TAG}" -f Dockerfile-vue3 src
+    # - buildah push "$CI_REGISTRY_IMAGE${TAG}"
     # Build and push backend container
     - buildah build -t "$CI_REGISTRY_IMAGE/bun-backend${TAG}" src/Nodejs-RestAPIs
     - buildah push "$CI_REGISTRY_IMAGE/bun-backend${TAG}"
