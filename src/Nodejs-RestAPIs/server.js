@@ -36,12 +36,12 @@ bcrypt.genSalt(10, function(err, salt) {
 });
 
 // force: true will drop the table if it already exists
-db.sequelize.sync({ force: env.resetDatabase }).then(() => {
-    console.log('Sync with db');
-    db.callSyncCallbacks();
-    //const Util = require('./app/util/adduser');
-    //Util.createAdmin("Test", "Test", e => console.log(e));
-});
+await db.sequelize.sync({ force: env.resetDatabase });
+console.log('Sync with db');
+db.callSyncCallbacks();
+//const Util = require('./app/util/adduser');
+//Util.createAdmin("Test", "Test", e => console.log(e));
+
 if (env.loadOldData === true)
     require("./app/old_data/loadOldData").loadOldData();
 
