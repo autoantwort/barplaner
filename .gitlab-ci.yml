@@ -46,7 +46,7 @@ build-containers:
     - buildah build -t "$CI_REGISTRY_IMAGE/bun-backend${TAG}" src/Nodejs-RestAPIs
     - buildah push "$CI_REGISTRY_IMAGE/bun-backend${TAG}"
     - buildah rm backend-test || true
-    - buildah run --name backend-test $CI_REGISTRY_IMAGE/bun-backend${TAG}
+    - buildah run $CI_REGISTRY_IMAGE/bun-backend${TAG}
   # rules:
   #   - exists:
   #       - src/Dockerfile-vue3
