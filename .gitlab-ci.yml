@@ -57,6 +57,7 @@ test-backend:
   before_script:
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
   script:
+    - docker container stop backend-test || true # it seems that the next step survives pipeline runs
     - docker container rm backend-test || true # it seems that the next step survives pipeline runs
     - docker run -d --name backend-test $CI_REGISTRY_IMAGE/bun-backend${TAG}
     - sleep 20 # wait for the backend to start
