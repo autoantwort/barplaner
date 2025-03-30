@@ -61,6 +61,7 @@ test-backend:
     - docker container rm backend-test || true # it seems that the next step survives pipeline runs
     - docker run -d --name backend-test -p 8080:8080 $CI_REGISTRY_IMAGE/bun-backend${TAG}
     - sleep 5 # wait for the backend to start
+    - docker container ls --format "table {{.ID}}\t{{.Names}}\t{{.Ports}}" -a
     - apk add --no-cache curl
     - curl http://localhost:8080/ || (docker logs backend-test && exit 1)
     - docker stop backend-test
