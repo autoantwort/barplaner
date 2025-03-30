@@ -62,7 +62,7 @@ test-backend:
     - docker run -d --name backend-test $CI_REGISTRY_IMAGE/bun-backend${TAG}
     - sleep 20 # wait for the backend to start
     - apk add --no-cache curl
-    - curl --fail http://localhost:3000/health || (docker logs backend-test && exit 1)
+    - curl --fail http://localhost:8000/ || (docker logs backend-test && exit 1)
     - docker stop backend-test
     - docker rm backend-test
 
