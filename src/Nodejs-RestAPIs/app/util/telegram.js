@@ -277,6 +277,6 @@ exports.deleteTelegramMessage = (chatID, messageID, deleteAfter, newText) => {
             clearTimeout(deleteTimeout);
         }
         nextDeleteExecution = deleteAfter;
-        deleteTimeout = setTimeout(runMessageDeletion, nextDeleteExecution - Date.now());
+        deleteTimeout = setTimeout(runMessageDeletion, Math.max(1, nextDeleteExecution - Date.now()));
     }
 }
