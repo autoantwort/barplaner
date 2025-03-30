@@ -269,7 +269,7 @@ const checkForEventsAndSend = sendDaysBefore => {
         bars = bars.filter(b => {
             const barDate = new Date(b.start);
             barDate.setHours(0, 0, 0, 0);
-            let dayDiff = (barDate - now) / 1000 / 60 / 60 / 24;
+            let dayDiff = Math.ceil((barDate - now) / 1000 / 60 / 60 / 24);
             return sendDaysBefore.some(v => v === dayDiff);
         })
         if (bars.length !== 0) {
