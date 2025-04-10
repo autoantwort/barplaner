@@ -45,7 +45,7 @@ const getLinksForAllMetroItems = async () => {
 }
 
 const getPromotionInfo = (store) => {
-    if (store.sellingPriceInfo.appliedAdjustments.indexOf("promotion") > -1) {
+    if (store.sellingPriceInfo?.appliedAdjustments.indexOf("promotion") > -1) {
         const promotion = store.sellingPriceInfo.promotionLabels.promotion;
         return {
             startDate: new Date(promotion.start),
@@ -161,6 +161,8 @@ Telegram.bot.onText(/\/metro/, msg => {
             let message = formatPromotions(p);
             message += '\n\n Send /subscribeMetro to subscribe to Metro promotions\\.';
             Telegram.bot.editMessageText(message, { chat_id: msg.chat.id, message_id: (await waitMsg).message_id, parse_mode: 'MarkdownV2', disable_web_page_preview: true }).catch(console.error);
+        } else {
+            Telegram.bot.editMessageText("No promotions found.", { chat_id: msg.chat.id, message_id: (await waitMsg).message_id }).catch(console.error);
         }
     }).catch(console.error);
 });
