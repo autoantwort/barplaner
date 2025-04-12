@@ -10,13 +10,14 @@ const CronJob = require('cron').CronJob;
 
 const storeId = "00017";
 
-const getItemsFromMetro = async (ids) => {
+const getItemsFromMetro = async (ids, cookie) => {
     const qids = ids.map(i => "ids=" + i).join("&");
     res = await Axios.get(`https://produkte.metro.de/evaluate.article.v1/betty-variants?country=DE&locale=de-DE&storeIds=${storeId}&details=true&${qids}`, {
         headers: {
             "CallTreeId": "||BTEX-E09F8846-A50C-425A-8EA5-C9CFF22EC701",
             "Host": "produkte.metro.de",
-        }
+            "Cookie": cookie,
+        },
     });
     return res.data
 }
@@ -64,7 +65,7 @@ function splitListIntoChunks(array, chunkSize) {
     return result;
 }
 
-const getCurrentPromotions = async () => {
+const getCurrentPromotions = async (cookie) => {
     const links = await getLinksForAllMetroItems();
     const seenIds = new Set();
     ids = links.map(link => link.substring(linkPrefix.length)).map(link => {
@@ -83,7 +84,7 @@ const getCurrentPromotions = async () => {
     });
     const currentPromotions = [];
     for (let chunk of splitListIntoChunks(ids, 20)) {
-        const result = await getItemsFromMetro(chunk.map(id => id.searchId));
+        const result = await getItemsFromMetro(chunk.map(id => id.searchId), cookie);
         for (let id of chunk) {
             if (!result.result[id.id]) {
                 continue;
@@ -155,8 +156,14 @@ const formatPromotions = (promotions) => {
 
 
 Telegram.bot.onText(/\/metro/, msg => {
-    let waitMsg = Telegram.bot.sendMessage(msg.chat.id, "Rufe Angebote ab...");
-    getCurrentPromotions().then(async p => {
+    cookieRegex = /-H 'Cookie: ([^']*)/;
+    const cookie = msg.text.match(cookieRegex);
+    let cookieString = "";
+    if (cookie && cookie[1]) {
+        cookieString = cookie[1];
+    }
+    let waitMsg = Telegram.bot.sendMessage(msg.chat.id, `Rufe Angebote ab (${cookieString ? "mit" : "ohne"} Cookie) ...`);
+    getCurrentPromotions(cookieString).then(async p => {
         if (p.length > 0) {
             let message = formatPromotions(p);
             message += '\n\n Send /subscribeMetro to subscribe to Metro promotions\\.';
