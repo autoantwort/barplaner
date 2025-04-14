@@ -64,6 +64,7 @@ db.stock.Item = require('../model/stockManagement/item.model')(sequelize, Sequel
 db.stock.Invoice = require('../model/stockManagement/invoice.model')(sequelize, Sequelize, db.File);
 db.stock.InvoiceEntry = require('../model/stockManagement/invoiceEntry.model')(sequelize, Sequelize, db.stock.Invoice, db.stock.Item);
 db.stock.Change = require('../model/stockManagement/change.model')(sequelize, Sequelize, db.stock.Item, db.User, db.stock.InvoiceEntry);
+db.stock.ChangeLog = require('../model/stockManagement/changeLog.model')(sequelize, Sequelize, db.User, db.stock.Change);
 
 
 let funcArray = [];

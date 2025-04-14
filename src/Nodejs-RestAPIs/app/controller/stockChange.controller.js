@@ -8,6 +8,7 @@ const Position = db.stock.Position;
 const User = db.User;
 const sequelize = db.sequelize;
 const Op = db.Sequelize.Op;
+const StockChangeLog = db.stock.ChangeLog;
 
 /**
  * Returns a date string for the next day. E.g.: 2020-01-10 for input 2020-01-09
@@ -27,6 +28,61 @@ exports.create = (req, res) => {
         .then(o => res.status(201).send(o))
         .catch(e => res.status(400).send(e));
 };
+
+exports.changeStockChange = async (req, res) => {
+    try {
+        const stockChange = await StockChange.findByPk(req.params.id);
+        if (!stockChange) {
+            res.status(404).send("StockChange not found.");
+            return;
+        }
+        const changes = {};
+        for (const key in req.body.change) {
+            if (req.body.change[key] !== stockChange[key]) {
+                changes[key] = [stockChange[key], req.body.change[key]];
+                stockChange[key] = req.body.change[key];
+            }
+        }
+        if (Object.keys(changes).length !== 0) {
+            StockChangeLog.create({
+                stockChangeId: stockChange.id,
+                userId: req.user.id,
+                changedFields: changes,
+                note: req.body.note,
+            });
+        }
+        await stockChange.save();
+        res.status(200).send(stockChange);
+    } catch (err) {
+        res.status(500).send("Error -> " + err);
+    }
+};
+
+exports.deleteStockChange = (req, res) => {
+    if (req.body.reason?.length < 6 ?? false) {
+        res.status(400).send("Reason must be at least 6 characters long.");
+        return;
+    }
+    req.body = { change: { amount: 0 }, note: req.body.reason };
+    exports.changeStockChange(req, res);
+}
+
+exports.getStockChangeLog = (req, res) => {
+    StockChangeLog.findAll({
+        where: {
+            stockChangeId: req.params.id,
+        },
+        include: [{
+            model: User,
+            attributes: ['name'],
+        }],
+        order: [['createdAt', 'DESC']],
+    }).then(logs => {
+        res.send(logs);
+    }).catch(err => {
+        res.status(500).send("Error -> " + err);
+    });
+}
 
 // get Stock Changes
 exports.getStockChanges = (req, res) => {
