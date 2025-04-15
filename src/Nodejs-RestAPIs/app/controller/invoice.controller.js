@@ -8,7 +8,8 @@ const Files = db.File;
 const Op = db.Sequelize.Op;
 const File = require("./file.controller");
 const Axios = require("axios");
-const PDFParser = require("pdf2json");
+const pdfParse = require('pdf-parse');
+const fs = require('fs');
 const analyser = require("../util/analyseBarcode");
 
 // Post a Invoice
@@ -363,9 +364,7 @@ const exportForMetro = (invoice, text) => {
                             stockItemId: entry ? entry.stockItemId : null,
                             alcoholByVolume: item.alk,
                         }).then(invoiceEntry => {
-                            console.log("invoiceEntry", invoiceEntry);
                             analyser.getItemFromMetro(item.articleNumber).then((item) => {
-                                console.log("invoiceEntry + item", invoiceEntry, item);
                                 if (item) {
                                     if (invoiceEntry.amount === null) {
                                         invoiceEntry.amount = item.amount;
@@ -407,10 +406,9 @@ exports.analyseInvoice = (req, res) => {
         if (count > 0) {
             return res.status(400).send("Analysis has already been carried out");
         }
-        let pdfParser = new PDFParser(null /* context */, true /* needRawText */);
-        pdfParser.on("pdfParser_dataError", errData => res.status(500).send("Error while parsing PDF: " + errData.parserError));
-        pdfParser.on("pdfParser_dataReady", pdfData => {
-            const content = pdfParser.getRawTextContent();
+        const dataBuffer = fs.readFileSync(File.getFilePathForId(invoice.fileId));
+        pdfParse(dataBuffer).then(data => {
+            const content = data.text.trim().replace("\n \n", "\n");
             if (content.startsWith("METRO Deutschland GmbH")) {
                 exportForMetro(invoice, content).then(() => {
                     InvoiceEntry.findAll({
@@ -432,8 +430,7 @@ exports.analyseInvoice = (req, res) => {
             } else {
                 res.status(501).send("can not parse this invoice");
             }
-        });
-        pdfParser.loadPDF(File.getFilePathForId(invoice.fileId));
+          }).catch(e => res.status(500).send("Error: " + e))
     }).catch(e => res.status(500).send("Error: " + e))
 };
 
