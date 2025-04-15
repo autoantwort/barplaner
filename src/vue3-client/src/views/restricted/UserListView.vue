@@ -2,7 +2,7 @@
   <div class="container">
     <div ref="print" class="row print-only" v-for="row in activeUsers">
       <div class="col-3 d-flex justify-content-center align-items-center mb-4" v-for="user in row">
-        <barcode :value="10000 + user.id" :width="2" :height="100" :text="user.name" fontSize="25"></barcode>
+        <barcode :value="10000 + user.id" :width="2" :height="100" :text="shortUsername(user.name)" fontSize="25"></barcode>
       </div>
     </div>
     <div class="row">
@@ -140,6 +140,14 @@ export default {
         .catch(e => {
           console.log(e);
         });
+    },
+    shortUsername(username) {
+      username = username.replace(/ v[ao]n /g, ' ');
+      const index = username.indexOf(' ');
+      if (index !== -1) {
+        return username.substring(0, index) + " " + username.substring(index + 1, index + 2) + ".";
+      }
+      return username;
     },
     print() {
       window.print();
