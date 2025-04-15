@@ -66,8 +66,10 @@ exports.getItemFromMetro = async (articleIdentifier, bundleSize = undefined) => 
                 }
                 if (bundle.stores[storeId]) {
                     const info = bundle.stores[storeId].sellingPriceInfo
-                    result.netPrice = info.netPrice;
-                    result.grossPrice = info.grossPrice;
+                    if (info) {
+                        result.netPrice = info.netPrice;
+                        result.grossPrice = info.grossPrice;
+                    }
                 }
                 result.name = variant.description;
                 result.seller = "Metro";
