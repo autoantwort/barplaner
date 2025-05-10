@@ -1,14 +1,13 @@
-const mqtt = require('mqtt');
-const config = require('../config/env');
-const reasons = require('../common/stockChangeReasons.js');
-const db = require('../config/db.config.js');
-const User = db.User;
-const Item = db.stock.Item;
-const ItemGroup = db.stock.ItemGroup;
-const StockChange = db.stock.Change;
-const Position = db.stock.Position;
-const Image = db.Image;
-const Sequelize = db.Sequelize;
+import { where } from 'sequelize';
+import { inventoryReason, addReasons, findIndex, removeReasons, reasons, commands, REASON } from '../common/stockChangeReasons.js';
+import { User, stock, Image, Sequelize } from '../config/db.config.js';
+import { client, retain } from './mqttClient.js';
+import { changeRequest, findRequest } from './itemRequestUtil.js';
+const Item = stock.Item;
+const ItemGroup = stock.ItemGroup;
+const ItemRequest = stock.ItemRequest;
+const StockChange = stock.Change;
+const Position = stock.Position;
 const Op = Sequelize.Op;
 
 const controllers = [];
@@ -16,27 +15,6 @@ const controllers = [];
 function sendMessageToController(msg) {
     controllers.filter(c => c.readyState === 1 /*WebSocket.OPEN*/).forEach(c => c.send(msg));
 }
-
-// MQTT broker credentials
-const options = {
-    username: config.mqtt.username,
-    password: config.mqtt.password,
-};
-
-const retain = { retain: true };
-
-// Create a MQTT client
-const client = mqtt.connect(config.mqtt.url, options);
-
-// Handle errors
-client.on('error', (error) => {
-    console.error('MQTT error:', error);
-});
-
-// When connected
-client.on('connect', () => {
-    console.log('Connected to MQTT broker');
-});
 
 const sendMQTTBeep = () => {
     client.publish('barplaner/beep', '1');
@@ -65,10 +43,10 @@ const sendMQTTPosition = (position) => {
 };
 const sendMQTTReason = (sign, reason) => {
     client.publish('barplaner/reasonName', reason.germanName, retain);
-    if (reason == reasons.inventoryReason) {
-        client.publish('barplaner/reasonIndex', `${1 + reasons.addReasons.length + 2 + 100}`, retain);
+    if (reason == inventoryReason) {
+        client.publish('barplaner/reasonIndex', `${1 + addReasons.length + 2 + 100}`, retain);
     } else {
-        client.publish('barplaner/reasonIndex', `${(sign === '-' ? -1 : 1) * (1 + reasons.findIndex(reason.name, sign === '-' ? reasons.removeReasons : reasons.addReasons))}`, retain);
+        client.publish('barplaner/reasonIndex', `${(sign === '-' ? -1 : 1) * (1 + findIndex(reason.name, sign === '-' ? removeReasons : addReasons))}`, retain);
     }
     setChangeToNull();
 };
@@ -112,15 +90,15 @@ const determineDefaultReason = () => {
         return day === startDay && hour >= startHour && hour < endHour;
     }
     if (inRangeAcrossDays(WEDNESDAY, 18, 8)) {
-        return reasons.reasons.find(reason => reason.name === 'consumedDuringBar');
+        return reasons.find(reason => reason.name === 'consumedDuringBar');
     }
     if (inRangeAcrossDays(FRIDAY, 15, 2) || inRangeAcrossDays(SATURDAY, 15, 2)) {
-        return reasons.reasons.find(reason => reason.name === 'rentalConsumption');
+        return reasons.find(reason => reason.name === 'rentalConsumption');
     }
     if (inRangeOneDays(SATURDAY, 9, 15) || inRangeOneDays(SUNDAY, 9, 15)) {
-        return reasons.reasons.find(reason => reason.name === 'correctedRentalConsumption');
+        return reasons.find(reason => reason.name === 'correctedRentalConsumption');
     }
-    return reasons.reasons.find(reason => reason.name === 'bought');
+    return reasons.find(reason => reason.name === 'bought');
 };
 let idleTimeout = null;
 const resetIdleTimeout = () => {
@@ -157,7 +135,7 @@ const onBarcode = async (barcode) => {
             }
             resetIdleTimeout();
             return;
-        } else if (code === reasons.commands.minusOne) {
+        } else if (code === commands.minusOne) {
             if (state.change) {
                 const amount = Number(state.change.amount);
                 if (Math.abs(amount) === 1) {
@@ -171,14 +149,14 @@ const onBarcode = async (barcode) => {
             } else {
                 return sendMQTTBeep();
             }
-        } else if (code === reasons.commands.cancel) {
+        } else if (code === commands.cancel) {
             if (state.change) {
                 state.change.destroy();
                 return setChangeToNull();
             } else {
                 return sendMQTTBeep();
             }
-        } else if (code === reasons.commands.done) {
+        } else if (code === commands.done) {
             state.user = null;
             state.reason = null;
             sendMQTTClear();
@@ -190,9 +168,9 @@ const onBarcode = async (barcode) => {
         state.sign = barcode[0];
         const id = Number(barcode.substring(1)) - 100;
         if (id === 0) {
-            state.reason = reasons.inventoryReason;
+            state.reason = inventoryReason;
         } else {
-            state.reason = reasons.reasons.find(r => r.id === id);
+            state.reason = reasons.find(r => r.id === id);
         }
         if (!state.reason) {
             sendMQTTBeep();
@@ -258,6 +236,13 @@ const onBarcode = async (barcode) => {
     }
     resetItemTimeout();
     const item = items[0];
+    if (state.reason.name === REASON.CONSUMED_DURING_BAR) {
+        const request = await findRequest(item);
+        if (request) {
+            changeRequest(request, -1);
+        }
+    }
+
     if (state.change && state.change.itemId === item.id && state.change.reason === state.reason.name) {
         const amount = Number(state.change.amount);
         state.change.amount = `${Math.sign(amount) * (Math.abs(amount) + 1)}`;
@@ -300,7 +285,7 @@ const onBarcode = async (barcode) => {
     }
 }
 
-exports.registerClients = function (app) {
+export function registerClients (app) {
     app.ws('/scanner', (ws, req) => {
         ws.on('error', err => {
             console.error("Fehler bei einem Websocket unter /scanner", err);
@@ -317,8 +302,8 @@ exports.registerClients = function (app) {
             // ignore
         });
     });
-};
-exports.registerMasters = app => {
+}
+export function registerMasters(app) {
     app.ws('/scannerConsumer', (ws, req) => {
         ws.on('error', err => {
             console.error("Fehler bei einem Websocket unter /scannerConsumer", err);
@@ -334,4 +319,4 @@ exports.registerMasters = app => {
             }
         });
     });
-};
+}

@@ -117,6 +117,8 @@ const commands = {
     minusOne: 20001,
     cancel: 20002,
     done: 20003,
+    next: 20004,
+    previous: 20005,
 }
 
 const findIndex = (name, reasons) => {

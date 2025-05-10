@@ -5,13 +5,18 @@
         <div class="col-4 text-nowrap text-truncate" style="font-size: smaller">{{ user ?? 'Scan Name' }}</div>
         <div class="col-8 text-nowrap text-truncate" :style="{ color: reasonColor }">{{ reason ?? 'Scan Reason' }}</div>
       </div>
+      <div class="row mt-3" v-if="currentRequest && !showTextBelow">
+        <div class="col-12 text-nowrap text-truncate text-center" style="font-size: 70%">
+          <span class="text-nowrap text-truncate">Angefragt: {{ currentRequest.amount }}x {{ currentRequest.stockItem.itemGroup?.name ??
+            currentRequest.stockItem.name }}</span>
+        </div>
+      </div>
       <div class="row">
         <div class="col-12 text-nowrap text-truncate text-center" style="font-size: 70%">{{ item?.name }}</div>
       </div>
       <div class="row" v-if="item !== null">
         <div class="col-12 text-center number-width">
-          <span style="font-size: 150%"
-            >{{ itemAmount }}
+          <span style="font-size: 150%">{{ itemAmount }}
             <template v-if="changeAmount !== 0">
               <span v-if="changeType === '+'" style="color: green">+ {{ changeAmount }}</span>
               <span v-if="changeType === '-'" style="color: red">- {{ Math.abs(changeAmount) }}</span>
@@ -24,6 +29,12 @@
       <div class="row mt-5" v-else-if="reason">
         <div class="col-4"></div>
         <label class="col-8">Scan Item</label>
+      </div>
+      <div class="row mt-3" v-if="currentRequest && showTextBelow">
+        <div class="col-12 text-nowrap text-truncate text-center" style="font-size: 70%">
+          <span class="text-nowrap text-truncate">Angefragt: {{ currentRequest.amount }}x {{ currentRequest.stockItem.itemGroup?.name ??
+            currentRequest.stockItem.name }}</span>
+        </div>
       </div>
       <div class="row row-other" v-if="otherAmount && item?.itemGroup">
         <label class="col-12 ps-5 text-center text-nowrap text-truncate">
@@ -49,6 +60,16 @@ import mqtt from 'mqtt';
 import http from '@/http-common';
 import PositionImage from '@/components/PositionImage.vue';
 
+function doesItemMatch(request, item) {
+  if (request.stockItem.id === item.id) {
+    return true;
+  }
+  if (item.itemGroup !== null && request.stockItem.itemGroup !== null && request.stockItem.itemGroup.id === item.itemGroup.id) {
+    return true;
+  }
+  return false;
+}
+
 export default {
   components: {
     PositionImage,
@@ -64,8 +85,10 @@ export default {
       imageFileURL: null,
       changeType: '=',
       reasonColor: 'black',
-      fileURL: null,
-      position: null,
+      itemPosition: null,
+      selectedQuereIndex: null,
+      quere: [],
+      preferRequestImages: false,
     };
   },
   methods: {
@@ -82,6 +105,29 @@ export default {
   computed: {
     otherAmount() {
       return Math.max(0, this.groupAmount - Math.max(0, this.itemAmount));
+    },
+    currentRequest() {
+      if (this.selectedQuereIndex !== null && this.quere.length > 0) {
+        return this.quere[this.selectedQuereIndex];
+      }
+      return null;
+    },
+    requestPosition() {
+      return this.currentRequest?.stockItem?.stockPosition ?? this.currentRequest?.stockItem?.itemGroup?.stockPosition;
+    },
+    position() {
+      return (this.item !== null && !this.preferRequestImages) ? this.itemPosition ?? this.requestPosition : this.requestPosition;
+    },
+    fileURL() {
+      if (this.item !== null && !this.preferRequestImages) {
+        const fileId = this.item.image?.original;
+        return fileId ? http.getFile(fileId) : null;
+      }
+      const fileId = this.currentRequest?.stockItem?.image?.original;
+      return fileId ? http.getFile(fileId) : null;
+    },
+    showTextBelow() {
+      return this.preferRequestImages || this.item === null;
     },
   },
   created() {
@@ -117,10 +163,11 @@ export default {
         this.groupAmount = Number(message.toString());
       } else if (topic === 'barplaner/item') {
         this.item = JSON.parse(message.toString());
-        const fileId = this.item?.image?.original;
-        this.fileURL = fileId ? http.getFile(fileId) : null;
+        if (this.item !== null) {
+          this.preferRequestImages = false;
+        }
       } else if (topic === 'barplaner/position') {
-        this.position = JSON.parse(message.toString());
+        this.itemPosition = JSON.parse(message.toString());
       } else if (topic === 'barplaner/reasonIndex') {
         const index = Number(message.toString());
         if (index >= 100 || index === 0) {
@@ -132,6 +179,50 @@ export default {
         } else {
           this.changeType = '+';
           this.reasonColor = 'green';
+        }
+      } else if (topic === 'barplaner/itemRequest/quere') {
+        const quere = JSON.parse(message.toString());
+        if (this.item !== null && this.selectedQuereIndex !== null) {
+          // Currently selected item was in the quere. Check if it is still in the quere and if we should show the next request
+          if (doesItemMatch(this.quere[this.selectedQuereIndex], this.item)) {
+            // Item was the current item
+            if (this.selectedQuereIndex >= quere.length || !doesItemMatch(quere[this.selectedQuereIndex], this.item)) {
+              // Item is not in the quere anymore => show next request
+              this.selectedQuereIndex = this.selectedQuereIndex % quere.length;
+              this.preferRequestImages = true;
+            }
+          }
+        }
+        this.quere = quere;
+        if (this.selectedQuereIndex === null || this.selectedQuereIndex >= this.quere.length) {
+          this.selectedQuereIndex = 0;
+        }
+        if (this.quere.length === 0) {
+          this.selectedQuereIndex = null;
+        }
+        if (this.item !== null) {
+          const newIndex = quere.findIndex(request => doesItemMatch(request, this.item));
+          if (newIndex >= 0) {
+            this.selectedQuereIndex = newIndex;
+          }
+        }
+      } else if (topic === 'barplaner/itemRequest/next') {
+        if (this.quere.length > 0) {
+          this.preferRequestImages = true;
+          if (this.selectedQuereIndex === null) {
+            this.selectedQuereIndex = 0;
+          } else {
+            this.selectedQuereIndex = (this.selectedQuereIndex + 1) % this.quere.length;
+          }
+        }
+      } else if (topic === 'barplaner/itemRequest/previous') {
+        if (this.quere.length > 0) {
+          this.preferRequestImages = true;
+          if (this.selectedQuereIndex === null) {
+            this.selectedQuereIndex = 0;
+          } else {
+            this.selectedQuereIndex = (this.selectedQuereIndex - 1 + this.quere.length) % this.quere.length;
+          }
         }
       }
     });

@@ -59,12 +59,14 @@ const remoteVolumeControl = require("./app/util/remoteVolumeControl");
 remoteVolumeControl.registerClients(app);
 const remoteControlPane = require("./app/util/remoteControlPane");
 remoteControlPane.registerClients(app);
-const scanner = require("./app/util/scanner");
+const scanner = await import("./app/util/scanner");
 scanner.registerClients(app);
 const shoppingListState = require("./app/util/shoppingListState");
 shoppingListState.registerWebSocketListener(app);
 const shoppingListText = require("./app/util/shoppingListText");
 shoppingListText.registerWebSocketListener(app);
+const { registerWebSocketListener } = await import("./app/util/itemRequestScanner");
+registerWebSocketListener(app);
 
 const ical = require("./app/util/icalCalendar");
 app.get(env.ical.urlPath, (req, res) => ical.serve(res));

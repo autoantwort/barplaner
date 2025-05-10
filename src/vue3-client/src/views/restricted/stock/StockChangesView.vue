@@ -36,6 +36,14 @@
           <p><span>Dark LED</span>: 5 items</p>
         </div>
       </div>
+      <div class="row print-only mt-5">
+        <div class="col-4">
+          <barcode :value="commands.next" :width="2" :height="100" text="Show next request"></barcode>
+        </div>
+        <div class="col-4">
+          <barcode :value="commands.previous" :width="2" :height="100" text="Show previous request"></barcode>
+        </div>
+      </div>
     </template>
     <div class="row d-print-none">
       <div class="col-12 offset-md-1 col-md-10">
