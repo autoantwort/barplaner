@@ -1,80 +1,52 @@
-const db = require('../config/db.config.js');
-const Wordpress = db.Wordpress;
-const Bar = db.Bar;
-const Role = db.Role;
-const Setting = db.Setting;
+import { Wordpress, Bar, Setting } from '../config/db.config.js';
+import { NewsletterAdminRoleName } from './rolesNames.js';
 
-let NewsletterAdminRole = null;
-let SendDaysBefore = null;
-let SendTime = null;
-let DefaultImageURL = null;
-let TemplateNewsletterId = null;
+const [SendDaysBefore, _1] = await Setting.findCreateFind({
+    where: {
+        name: "sendDaysBeforeBar",
+    },
+    defaults: {
+        name: "sendDaysBeforeBar",
+        description: "The number of days before the bar at which the newsletter is sent. Example: The bar on 15.10 and this value is 2, the newsletter will be sent on 13.10.",
+        value: "2",
+        permission: NewsletterAdminRoleName
+    }
+});
 
-db.addSyncCallback(() => {
-    Role.findCreateFind({
-        where: { name: "NewsletterAdmin" },
-        defaults: {
-            name: "NewsletterAdmin",
-            description: "You can change settings that have something to do with the newsletter.",
-        }
-    }).then(role =>  {
-        NewsletterAdminRole = role[0];
-        Setting.findCreateFind({
-            where: {
-                name: "sendDaysBeforeBar",
-            },
-            defaults: {
-                name: "sendDaysBeforeBar",
-                description: "The number of days before the bar at which the newsletter is sent. Example: The bar on 15.10 and this value is 2, the newsletter will be sent on 13.10.",
-                value: "2",
-                permission: NewsletterAdminRole.name
-            }
-        }).then(sendDaysBefore => {
-            SendDaysBefore = sendDaysBefore[0];
-        }).catch(console.error);
+const [SendTime, _2] = await Setting.findCreateFind({
+    where: {
+        name: "newsletterSendTime",
+    },
+    defaults: {
+        name: "newsletterSendTime",
+        description: "At what time should the newsletter be sent?",
+        value: "15",
+        permission: NewsletterAdminRoleName
+    }
+});
 
-        Setting.findCreateFind({
-            where: {
-                name: "newsletterSendTime",
-            },
-            defaults: {
-                name: "newsletterSendTime",
-                description: "At what time should the newsletter be sent?",
-                value: "15",
-                permission: NewsletterAdminRole.name
-            }
-        }).then(newsletterSendTime => {
-            SendTime = newsletterSendTime[0];
-        }).catch(console.error);
+const [TemplateNewsletterId, _3] = await Setting.findCreateFind({
+    where: {
+        name: "templateNewsletterId",
+    },
+    defaults: {
+        name: "templateNewsletterId",
+        description: "The id of the newsletter that should be used as template.",
+        value: "-1",
+        permission: NewsletterAdminRoleName
+    }
+});
 
-        Setting.findCreateFind({
-            where: {
-                name: "templateNewsletterId",
-            },
-            defaults: {
-                name: "templateNewsletterId",
-                description: "The id of the newsletter that should be used as template.",
-                value: "-1",
-                permission: NewsletterAdminRole.name
-            }
-        }).then(templateNewsletterId => {
-            TemplateNewsletterId = templateNewsletterId[0];
-        }).catch(console.error);
-
-        Setting.findCreateFind({
-            where: {
-                name: "DefaultImageURL",
-            },
-            defaults: {
-                name: "DefaultImageURL",
-                description: "The url to the image that should be used, if a bar has no cover image (created in the orga system and not on facebook).",
-                value: "https://www.hilton.rwth-aachen.de/wordpress/symposion/wp-content/uploads/sites/2/2019/08/67976531_2499717063420882_1963470524436709376_o.jpg",
-                permission: NewsletterAdminRole.name
-            }
-        }).then(defaultImageURL => {
-            DefaultImageURL = defaultImageURL[0];
-        }).catch(console.error);
-    }).catch(console.error);
+const [DefaultImageURL, _4] = await Setting.findCreateFind({
+    where: {
+        name: "DefaultImageURL",
+    },
+    defaults: {
+        name: "DefaultImageURL",
+        description: "The url to the image that should be used, if a bar has no cover image (created in the orga system and not on facebook).",
+        value: "https://www.hilton.rwth-aachen.de/wordpress/symposion/wp-content/uploads/sites/2/2019/08/67976531_2499717063420882_1963470524436709376_o.jpg",
+        permission: NewsletterAdminRoleName
+    }
 });
 
 /**
@@ -208,10 +180,10 @@ function sendNewsletter(barObject, newsletterId, sendTime) {
  * 
  * @param {Bar} barData the bar model object 
  */
-exports.sendEmailForBar = (barData) => {
+export function sendEmailForBar(barData) {
     TemplateNewsletterId.reload().then(id => {
         computeSendTime(barData.start).then(time => {
             sendNewsletter(barData, id.value, time);
         }).catch(console.error);
     }).catch(console.error);
-};
+}

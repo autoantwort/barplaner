@@ -1,15 +1,9 @@
-const db = require('../config/db.config.js');
-const Axios = require("axios");
-const env = require('../config/env');
+import { Bar, Setting, Sequelize } from '../config/db.config.js';
+import Axios from "axios";
+import { facebookAccessToken, symposionPageID, facebookFetchInterval } from '../config/env';
+import { FacebookAdminRole } from './roles.js';
 
-const Bar = db.Bar;
-const User = db.User;
-const UserRoles = db.UserRoles;
-const BarDuty = db.BarDuty;
-const Role = db.Role;
-const Setting = db.Setting;
-const Op = db.Sequelize.Op;
-const BarUtil = require('./addBar');
+import { changeBar, addBar } from './addBar';
 
 let axios = Axios.create({
     baseURL: "https://graph.facebook.com/v3.2",
@@ -18,71 +12,51 @@ let axios = Axios.create({
     // }
 });
 
-let AccessToken = null;
-let PageID = null;
-let CopyEvents = null;
-let FetchInterval = null;
 
-db.addSyncCallback(() => {
-    Role.findCreateFind({
-        where: { name: "FacebookAdmin" },
-        defaults: {
-            name: "FacebookAdmin",
-            description: "You can change the the settings belongs to facebook",
-        },
-    }).then(role => {
-        role = role.name;
-        Setting.findCreateFind({
-            where: { name: "access-token" },
-            defaults: {
-                name: "access-token",
-                permission: role,
-                description: "The Access token to access the facebook graph api to get the events from the symposion page.",
-                value: env.facebookAccessToken
-            }
-        }).then(s => {
-            AccessToken = s[0];
-            AccessToken.value = env.facebookAccessToken;
-            AccessToken.save().catch(console.error);
-        }).catch(console.error);
-        Setting.findCreateFind({
-            where: { name: "pageID" },
-            defaults: {
-                name: "pageID",
-                permission: role,
-                description: "The pageID of the symposion facebook page.",
-                value: env.symposionPageID,
-            }
-        }).then(s => {
-            PageID = s[0];
-        }).catch(console.error);
-        Setting.findCreateFind({
-            where: { name: "copyEvents" },
-            defaults: {
-                name: "copyEvents",
-                permission: role,
-                description: "A boolean, if true, the system copy facebook events to the barplaner, if false, nothing get copied.",
-                value: true
-            }
-        }).then(s => {
-            CopyEvents = s[0];
-        }).catch(console.error);
-        Setting.findCreateFind({
-            where: { name: "fetchInterval" },
-            defaults: {
-                name: "fetchInterval",
-                permission: role,
-                description: "The intervall, in wich the server will fetch the facebook graph api for new events.",
-                value: env.facebookFetchInterval,
-            }
-        }).then(s => {
-            FetchInterval = s[0];
-        }).catch(console.error);
-    }).catch(console.error);
+
+const role = FacebookAdminRole.name;
+const [AccessToken, _] = await Setting.findCreateFind({
+    where: { name: "access-token" },
+    defaults: {
+        name: "access-token",
+        permission: role,
+        description: "The Access token to access the facebook graph api to get the events from the symposion page.",
+        value: facebookAccessToken
+    }
+});
+AccessToken.value = facebookAccessToken;
+AccessToken.save().catch(console.error);
+
+const [PageID, _1] = await Setting.findCreateFind({
+    where: { name: "pageID" },
+    defaults: {
+        name: "pageID",
+        permission: role,
+        description: "The pageID of the symposion facebook page.",
+        value: symposionPageID,
+    }
+});
+const [CopyEvents, _2] = await Setting.findCreateFind({
+    where: { name: "copyEvents" },
+    defaults: {
+        name: "copyEvents",
+        permission: role,
+        description: "A boolean, if true, the system copy facebook events to the barplaner, if false, nothing get copied.",
+        value: true
+    }
+});
+const [FetchInterval, _3] = await Setting.findCreateFind({
+    where: { name: "fetchInterval" },
+    defaults: {
+        name: "fetchInterval",
+        permission: role,
+        description: "The intervall, in wich the server will fetch the facebook graph api for new events.",
+        value: facebookFetchInterval,
+    }
 });
 
 
-exports.getFacebookEvents = () => {
+export function getFacebookEvents() {
     return new Promise((resolve, reject) => {
         if (AccessToken === null) {
             reject("Not in sync with db");
@@ -96,16 +70,16 @@ exports.getFacebookEvents = () => {
             });
         }
     });
-};
+}
 
-exports.syncFacebookEvents = () => {
+export function syncFacebookEvents() {
     return new Promise((resolve, reject) => {
-        exports.getFacebookEvents().then(events => {
+        getFacebookEvents().then(events => {
             const now = new Date();
             Bar.findAll({
                 where: {
                     start: {
-                        [db.Sequelize.Op.gt]: now
+                        [Sequelize.Op.gt]: now
                     }
                 },
                 order: [
@@ -143,7 +117,7 @@ exports.syncFacebookEvents = () => {
                             bars[b].start.getMonth() === events[e].start.getMonth() &&
                             bars[b].start.getDate() === events[e].start.getDate()) {
                             // the BarUtil checks what should be updated (if any)
-                            BarUtil.changeBar(bars[b], getBarData(events[e]));
+                            changeBar(bars[b], getBarData(events[e]));
                             ++b;
                             ++e;
                             // bar is older then the facebook event, skip bar
@@ -167,10 +141,10 @@ exports.syncFacebookEvents = () => {
                         // use fancy recursion   
                         let index = 0;
                         let createBar = () => {
-                            BarUtil.addBar(barsToCreate[index], Number(numberSetting.value))
+                            addBar(barsToCreate[index], Number(numberSetting.value))
                                 .then(userIDs => {
                                     console.log("Es müssen putzen : ", userIDs)
-                                        ++index;
+                                    ++index;
                                     if (index < barsToCreate.length) {
                                         createBar();
                                     } else {
@@ -194,7 +168,7 @@ exports.syncFacebookEvents = () => {
 let intervalID = null;
 let time = 4;
 
-exports.runFacebookSync = () => {
+export function runFacebookSync() {
     if (intervalID === null) {
         intervalID = setInterval(() => {
             ++time;
@@ -204,7 +178,7 @@ exports.runFacebookSync = () => {
                     if (CopyEvents.value == true) {
                         FetchInterval.reload().then(() => {
                             if (time >= FetchInterval.value) {
-                                exports.syncFacebookEvents().catch(console.error);
+                                syncFacebookEvents().catch(console.error);
                                 time = 0;
                             }
                         });
@@ -215,7 +189,7 @@ exports.runFacebookSync = () => {
     }
 }
 
-exports.stopFacebookSync = () => {
+export function stopFacebookSync() {
     if (intervalID !== null) {
         clearInterval(intervalID);
         intervalID = null;

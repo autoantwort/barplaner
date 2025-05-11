@@ -30,7 +30,7 @@ app.use(cookieParser());
 
 const db = require('./app/config/db.config.js');
 const bcrypt = require('bcrypt');
-bcrypt.genSalt(10, function(err, salt) {
+bcrypt.genSalt(10, function (err, salt) {
     console.log(salt);
     console.log(JSON.stringify(salt));
 });
@@ -53,7 +53,7 @@ require("./app/util/telegram");
 require("./app/util/gitFileBrowser");
 require("./app/util/telegramNewsletter");
 require("./app/util/gitlab");
-require("./app/util/studibars");
+import "./app/util/studibars";
 require("./app/util/metro");
 const remoteVolumeControl = require("./app/util/remoteVolumeControl");
 remoteVolumeControl.registerClients(app);
@@ -90,7 +90,7 @@ app.post('/api/login', (req, res) => {
         } else {
             let func = (result) => {
                 if (result === true) {
-                    res.cookie('auth', user.sessionID, { maxAge: 1892160000000 /*60 years*/ , httpOnly: true, sameSite: false /* TODO */ , secure: req.secure });
+                    res.cookie('auth', user.sessionID, { maxAge: 1892160000000 /*60 years*/, httpOnly: true, sameSite: false /* TODO */, secure: req.secure });
                     user.getRoles().then(roles => {
                         res.send({ user: user, roles: roles });
                     }).catch(err => res.status(500).send(err));
@@ -106,7 +106,7 @@ app.post('/api/login', (req, res) => {
                 // right, but old password hash
                 let result = user.password.substr(5) === hash.digest('hex');
                 if (result) {
-                    bcrypt.hash(req.body.password, 10).then(function(hash) {
+                    bcrypt.hash(req.body.password, 10).then(function (hash) {
                         user.update({ password: hash })
                             .then(() => { console.log("password hash updated") })
                             .catch(err => console.error("Error while updating password hash : " + err));
@@ -133,7 +133,7 @@ app.post('/api/login', (req, res) => {
         }
     });
 });
-const user = require('./app/controller/user.controller.js');
+const user = await import('./app/controller/user.controller.js');
 app.post('/api/users/sendPasswordResetLink', user.sendPasswordResetLink);
 app.post('/api/users/validPasswortResetKey', user.validPasswordResetKey);
 app.post('/api/users/resetPasswort', user.resetPasswort);
@@ -154,7 +154,7 @@ app.use((req, res, next) => {
     });
 });
 app.post('/api/logout', (req, res) => {
-    res.clearCookie('auth', { httpOnly: true, sameSite: false /* TODO */ , secure: req.secure });
+    res.clearCookie('auth', { httpOnly: true, sameSite: false /* TODO */, secure: req.secure });
     req.user.update({ sessionID: null })
         .then(() => res.send("logged out"))
         .catch(err => releaseEvents.status(500).send("Error -> " + err));
@@ -163,7 +163,7 @@ remoteVolumeControl.registerMasters(app);
 remoteControlPane.registerMasters(app);
 scanner.registerMasters(app);
 require('./app/route/user.route.js')(app);
-require('./app/route/bar.route.js')(app);
+(await import('./app/route/bar.route.js')).default(app);
 require('./app/route/duty.route.js')(app);
 require('./app/route/setting.route.js')(app);
 require('./app/route/survey.route.js')(app);
@@ -188,12 +188,12 @@ app.use('/api/file/:fileId', (req, res, next) => {
     });
 });
 app.use('/api/file/', express.static(env.fileStoragePath, {
-    maxAge: 1000 * 60 * 60 * 24 * 365 * 10 /*10 years*/ ,
+    maxAge: 1000 * 60 * 60 * 24 * 365 * 10 /*10 years*/,
     index: false,
 }));
 
 // Create a Server
-var server = app.listen(8080, function() {
+var server = app.listen(8080, function () {
 
     var host = server.address().address;
     var port = server.address().port;

@@ -2,7 +2,7 @@ const db = require('../config/db.config.js');
 const env = require('../config/env');
 const cron = require('cron');
 const Telegram = require('./telegram');
-const SettingsController = require('../controller/setting.controller');
+const SettingsController = import('../controller/setting.controller');
 
 
 const Bar = db.Bar;
@@ -22,7 +22,7 @@ const updateSendAtTime = value => {
 
 db.addSyncCallback(() => {
     // after 5 seconds the BarAdmin role should be created if the role does not exists
-    setTimeout(() => {}, 5000);
+    setTimeout(() => { }, 5000);
     Role.findByPk('BarAdmin').then(role => {
         Setting.findCreateFind({
             where: { name: "telegramBarFeedbackDaysBefore" },
@@ -50,7 +50,7 @@ db.addSyncCallback(() => {
     }).catch(console.error);
 });
 
-SettingsController.addSettingChangeListener("telegramBarFeedbackSendAt", updateSendAtTime);
+SettingsController.then(controller => controller.addSettingChangeListener("telegramBarFeedbackSendAt", updateSendAtTime));
 
 const bot = Telegram.bot;
 
@@ -124,7 +124,7 @@ function sendBarInfo(bar, userID) {
                 ...userWhere,
                 barID: bar.id,
             },
-            include:  [{
+            include: [{
                 model: User
             }]
         }).then(duties => {
@@ -174,7 +174,7 @@ function sendBarInfo(bar, userID) {
                     msg.sendMessage(bar.start).catch(console.error);
                 }).catch((e) => {
                     console.error(d.user.name, JSON.stringify(e), e.response.body);
-                    if(e.response.body.error_code === 403) {
+                    if (e.response.body.error_code === 403) {
                         d.user.update({
                             telegramID: "login pin: " + (Math.random() * 1000000).toFixed(0),
                         }).catch(console.error);
@@ -289,7 +289,7 @@ const checkForEventsAndSend = sendDaysBefore => {
     });
 };
 
-const getSendDaysBefore = async() => {
+const getSendDaysBefore = async () => {
     if (SendDaysBefore === null) {
         return defaultSendDaysBefore;
     }
@@ -303,7 +303,7 @@ const getSendDaysBefore = async() => {
 }
 
 // every day at 3 pm
-const sendCronJob = new cron.CronJob('00 00 15 * * *', async() => checkForEventsAndSend(await getSendDaysBefore()), null, true, "Europe/Berlin");
+const sendCronJob = new cron.CronJob('00 00 15 * * *', async () => checkForEventsAndSend(await getSendDaysBefore()), null, true, "Europe/Berlin");
 
 exports.barAdded = (bar) => {
     const today = new Date();

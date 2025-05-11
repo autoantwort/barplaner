@@ -1,29 +1,29 @@
-module.exports = function(app) {
+import { create, distributeCleaningDuty, findAll, findById, getAllBarsWithBarduties, update, updateCleaning, updateDuty, deleteBar } from "../controller/bar.controller";
 
-    const bar = require('../controller/bar.controller.js');
 
+export default function (app) {
     // Create a new Bar
-    app.post('/api/bar', bar.create);
+    app.post('/api/bar', create);
 
     // Retrieve all Bars
-    app.get('/api/bars', bar.findAll);
+    app.get('/api/bars', findAll);
 
     // Retrieve all Bars with Barduties
-    app.get('/api/bars/duties', bar.getAllBarsWithBarduties);
+    app.get('/api/bars/duties', getAllBarsWithBarduties);
     // update cleaning
-    app.put('/api/bar/:barID/duty/:userID/cleaning', bar.updateCleaning);
+    app.put('/api/bar/:barID/duty/:userID/cleaning', updateCleaning);
     // update cleaning
-    app.put('/api/bar/:barID/duty/:userID', bar.updateDuty);
+    app.put('/api/bar/:barID/duty/:userID', updateDuty);
 
     // update duty
-    app.post('/api/bar/:barID/duty', bar.distributeCleaningDuty);
+    app.post('/api/bar/:barID/duty', distributeCleaningDuty);
 
     // Retrieve a single bar by Id
-    app.get('/api/bar/:barID', bar.findById);
+    app.get('/api/bar/:barID', findById);
 
     // Update a bar with Id
-    app.put('/api/bar/:barID', bar.update);
+    app.put('/api/bar/:barID', update);
 
     // Delete a Bar with Id
-    app.delete('/api/bar/:barID', bar.delete);
+    app.delete('/api/bar/:barID', deleteBar);
 };

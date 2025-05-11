@@ -1,40 +1,10 @@
-const db = require('../config/db.config.js');
-const Util = require('../util/cleaning');
-const BarUtil = require('../util/addBar');
-const Telegram = require('../util/telegram');
-const Bar = db.Bar;
-const User = db.User;
-const BarDuty = db.BarDuty;
-const sequelize = db.sequelize;
-const Role = db.Role;
-const UserRoles = db.UserRoles;
-
-let BarAdminRole = null;
-let CleaningAdminRole = null;
-
-db.addSyncCallback(() => {
-    Role.findCreateFind({
-        where: { name: "BarAdmin" },
-        defaults: {
-            name: "BarAdmin",
-            description: "You can add bars and change them",
-        },
-    }).then(role =>  {
-        BarAdminRole = role[0];
-    }).catch(console.error);
-    Role.findCreateFind({
-        where: { name: "CleaningAdmin" },
-        defaults: {
-            name: "CleaningAdmin",
-            description: "You can update the have_to_clean state of barduties",
-        },
-    }).then(role =>  {
-        CleaningAdminRole = role[0];
-    }).catch(console.error);
-});
-
+import { Bar, User, BarDuty, UserRoles } from '../config/db.config.js';
+import { computeCleaning } from '../util/cleaning';
+import { addBar } from '../util/addBar';
+import { BarAdminRole, CleaningAdminRole } from '../util/roles.js';
+import { changeCleaningStatus } from '../util/telegramBarFeedback.js';
 // Post a Bar
-exports.create = (req, res) => {
+export function create(req, res) {
 
     UserRoles.findOne({
         where: {
@@ -45,14 +15,14 @@ exports.create = (req, res) => {
         if (result === null) {
             res.status(403).send("You dont have this permission");
         } else {
-            BarUtil.addBar({
-                    name: req.body.name,
-                    description: req.body.description,
-                    public: req.body.public,
-                    start: req.body.start,
-                    end: req.body.end,
-                    facebookEventID: req.body.facebookEventID,
-                }, req.body.numberOfPersonsToClean)
+            addBar({
+                name: req.body.name,
+                description: req.body.description,
+                public: req.body.public,
+                start: req.body.start,
+                end: req.body.end,
+                facebookEventID: req.body.facebookEventID,
+            }, req.body.numberOfPersonsToClean)
                 .then(r => res.send(r))
                 .catch(err => {
                     console.error(err);
@@ -60,20 +30,20 @@ exports.create = (req, res) => {
                 });
         }
     }).catch(err => res.status(500).send("Error -> " + err));
-};
+}
 
 // FETCH all Bars
-exports.findAll = (req, res) => {
+export function findAll(req, res) {
     Bar.findAll().then(bar => {
         // Send all bars to Client
         res.send(bar);
     }).catch(err => {
         res.status(500).send("Error -> " + err);
     });
-};
+}
 
 // Update cleaning
-exports.updateCleaning = (req, res) => {
+export function updateCleaning(req, res) {
     let update = () => {
         BarDuty.update(req.body, {
             where: {
@@ -81,7 +51,7 @@ exports.updateCleaning = (req, res) => {
                 barID: req.params.barID,
             }
         }).spread((affectedCount, affectedRows) => {
-            Telegram.changeCleaningStatus(req.params.barID, req.params.userID, req.body.have_to_clean);
+            changeCleaningStatus(req.params.barID, req.params.userID, req.body.have_to_clean);
             // Send all bars to Client
             res.status(200).send(JSON.stringify(affectedCount));
         }).catch(err => {
@@ -112,8 +82,8 @@ exports.updateCleaning = (req, res) => {
         }
     }).catch(err => res.status(500).send("Error -> " + err));
 
-}; // Update cleaning
-exports.updateDuty = (req, res) => {
+} // Update cleaning
+export function updateDuty(req, res) {
     if (req.user.id === Number(req.params.userID)) {
         BarDuty.update(req.body, {
             where: {
@@ -130,10 +100,10 @@ exports.updateDuty = (req, res) => {
         res.status(403).send("You dont have this permission");
     }
 
-};
+}
 
 // FETCH all Bars with barduties
-exports.getAllBarsWithBarduties = (req, res) => {
+export function getAllBarsWithBarduties(req, res) {
     User.findAll({ raw: true }).then(users => {
         let userMap = {};
         for (const user of users) {
@@ -183,25 +153,25 @@ exports.getAllBarsWithBarduties = (req, res) => {
             res.status(500).send("Error -> " + err);
         });
     });
-};
+}
 
 // Find a Bar by Id
-exports.findById = (req, res) => {
+export function findById(req, res) {
     Bar.findById(req.params.barID).then(bar => {
         res.send(bar);
     }).catch(err => {
         res.status(500).send("Error -> " + err);
     });
-};
+}
 // Find a Bar by Id
-exports.distributeCleaningDuty = (req, res) => {
-    Util.computeCleaning(req.params.barID, 2);
+export function distributeCleaningDuty(req, res) {
+    computeCleaning(req.params.barID, 2);
     res.send("Wird bearbeitet");
-};
+}
 
 
 // Update a Bar
-exports.update = (req, res) => {
+export function update(req, res) {
     UserRoles.findOne({
         where: {
             userId: req.user.id,
@@ -228,10 +198,10 @@ exports.update = (req, res) => {
             });
         }
     }).catch(err => res.status(500).send("Error -> " + err));
-};
+}
 
 // Delete a Bar by Id
-exports.delete = (req, res) => {
+export function deleteBar(req, res) {
     UserRoles.findOne({
         where: {
             userId: req.user.id,

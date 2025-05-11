@@ -1,11 +1,8 @@
-const db = require('../config/db.config.js');
-const Axios = require("axios");
-const CronJob = require('cron').CronJob;
+import { Bar, Setting, Sequelize } from '../config/db.config.js';
+import Axios from "axios";
+import { CronJob } from 'cron';
 
-const Bar = db.Bar;
-const Setting = db.Setting;
-const Sequelize = db.Sequelize;
-const BarUtil = require('./addBar.js');
+import { changeBar, addBar } from './addBar.js';
 
 let axios = Axios.create({
     baseURL: "https://studibars-ac.de/api",
@@ -23,7 +20,7 @@ const eventToBar = event => {
     };
 };
 
-exports.syncStudibarsEvents = async () => {
+export async function syncStudibarsEvents() {
     let in4Weeks = new Date();
     in4Weeks.setDate(in4Weeks.getDate() + 28);
     const response = await axios.get("/events?bar__name__iexact=symposion&start_date__lte=" + in4Weeks.toISOString());
@@ -33,26 +30,26 @@ exports.syncStudibarsEvents = async () => {
         const bar = await Bar.findOne({ where: { studibarsEventId: event.id } })
         if (bar) {
             if (bar.updatedAt < new Date(event.updated_at)) {
-                await BarUtil.changeBar(bar, eventToBar(event));
+                await changeBar(bar, eventToBar(event));
             }
         } else {
             const startDate = new Date(event.start_date).toISOString().split('T')[0];
             const bars = await Bar.findAll({ where: Sequelize.where(Sequelize.fn('DATE', Sequelize.col('start')), startDate) })
             if (bars.length === 1) {
-                await BarUtil.changeBar(bars[0], eventToBar(event));
+                await changeBar(bars[0], eventToBar(event));
             } else if (bars.length === 0) {
                 numberPersonsClean = numberPersonsClean || await Setting.findByPk("defaultNumberOfPersonsToClean");
-                await BarUtil.addBar(eventToBar(event), numberPersonsClean.value);
+                await addBar(eventToBar(event), numberPersonsClean.value);
             } else {
                 console.warn("syncStudibarsEvents: Multiple bars on the same day. Can not match event to bar: " + JSON.stringify(event));
             }
         }
     }
-};
+}
 
 const wssUrl = 'wss://studibars-ac.de/api/bar/1/events/subscribe';
 
-const WebSocket = require('ws');
+import WebSocket from 'ws';
 
 let ws;
 let reconnectInterval = 1000; // Start with a 1-second interval
@@ -66,7 +63,7 @@ function connectWebSocket() {
     });
 
     ws.on('message', function incoming(data) {
-        exports.syncStudibarsEvents().catch(console.error);
+        syncStudibarsEvents().catch(console.error);
     });
 
     ws.on('close', attemptReconnect);
@@ -84,5 +81,5 @@ function attemptReconnect() {
 connectWebSocket();
 
 const everyMinute = new CronJob('0 0 0 * * *', function () { // Every day at midnight
-    exports.syncStudibarsEvents().catch(console.error);
+    syncStudibarsEvents().catch(console.error);
 }, null, true);

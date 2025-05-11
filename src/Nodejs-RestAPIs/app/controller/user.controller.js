@@ -1,43 +1,15 @@
-const nodemailer = require('nodemailer');
-const db = require('../config/db.config.js');
-const config = require('../config/env.js');
-const bcrypt = require('bcrypt');
-const crypto = require('crypto');
-const Bar = db.Bar;
-const User = db.User;
-const Role = db.Role;
-const UserRoles = db.UserRoles;
-const BarDuty = db.BarDuty;
-const Op = db.Sequelize.Op;
-const Sequelize = db.Sequelize;
+import { createTransport } from 'nodemailer';
+import { Bar, User, Role, UserRoles, BarDuty, Sequelize } from '../config/db.config.js';
+import { mailServer, frontendURL } from '../config/env.js';
+import { hash as _hash } from 'bcrypt';
+import { randomBytes } from 'crypto';
+import { UserAdminRole, CleaningAdminRole } from '../util/roles.js';
+const Op = Sequelize.Op;
 
-let transporter = nodemailer.createTransport(config.mailServer);
+let transporter = createTransport(mailServer);
 
-let UserAdminRole = null;
-let CleaningAdminRole = null;
-
-db.addSyncCallback(() => {
-    Role.findCreateFind({
-        where: { name: "UserAdmin" },
-        defaults: {
-            name: "UserAdmin",
-            description: "You can add/remove user, change properties of user, change roles of a user.",
-        }
-    }).then(role =>  {
-        UserAdminRole = role[0];
-    }).catch(console.error);
-    Role.findCreateFind({
-        where: { name: "CleaningAdmin" },
-        defaults: {
-            name: "CleaningAdmin",
-            description: "You can update the have_to_clean state of barduties",
-        }
-    }).then(role =>  {
-        CleaningAdminRole = role[0];
-    }).catch(console.error);
-});
 // Post a User
-exports.create = (req, res) => {
+export function create(req, res) {
     UserRoles.findOne({
         where: {
             userId: req.user.id,
@@ -51,14 +23,14 @@ exports.create = (req, res) => {
                 res.status(400).send("password or name was not defined" + JSON.stringify(req.body));
                 return;
             }
-            bcrypt.hash(req.body.password, 10).then(function(hash) {
+            _hash(req.body.password, 10).then(function (hash) {
                 User.create({
                     name: req.body.name,
                     password: hash,
                     email: req.body.email,
                     phone: req.body.phone,
                     active: req.body.active,
-                    sessionID: crypto.randomBytes(32).toString('hex'),
+                    sessionID: randomBytes(32).toString('hex'),
                     birthday: req.body.birthday
                 }).then(user => {
                     if (user.active) {
@@ -91,9 +63,9 @@ exports.create = (req, res) => {
             });
         }
     }).catch(err => res.status(500).send("Error -> " + err));
-};
+}
 
-exports.validPasswordResetKey = (req, res) => {
+export function validPasswordResetKey(req, res) {
     User.findOne({ where: { passwordResetKey: req.body.token } }).then(async user => {
         if (user === null) {
             return res.status(404).send("Token not found");
@@ -102,9 +74,9 @@ exports.validPasswordResetKey = (req, res) => {
     }).catch(err => {
         res.status(500).send(err);
     });
-};
+}
 
-exports.resetPasswort = (req, res) => {
+export function resetPasswort(req, res) {
     if (req.body.password === undefined || req.body.token === undefined) {
         return res.status(400).send("password or token not defined" + JSON.stringify(req.body));
     }
@@ -115,30 +87,30 @@ exports.resetPasswort = (req, res) => {
         if (user === null) {
             return res.status(404).send("Token not found");
         }
-        const hash = await bcrypt.hash(req.body.password, 10);
+        const hash = await _hash(req.body.password, 10);
         user.password = hash;
         user.save();
         res.send("Password updated");
     }).catch(err => {
         res.status(500).send(err);
     });
-};
+}
 
-exports.sendPasswordResetLink = (req, res) => {
+export function sendPasswordResetLink(req, res) {
     User.findOne({
         where: Sequelize.where(Sequelize.fn('lower', Sequelize.col('email')), Sequelize.fn('lower', req.body.mail)),
     }).then(user => {
         if (!user) {
             return res.status(404).send("Unknown mail address.")
         }
-        user.passwordResetKey = crypto.randomBytes(32).toString('hex');
+        user.passwordResetKey = randomBytes(32).toString('hex');
         user.save();
         // Setup email data
         let mailOptions = {
-            from: config.mailServer.auth.user,
+            from: mailServer.auth.user,
             to: user.email,
             subject: 'Password reset Barplaner',
-            text: 'To reset your password, please click the following link: ' + config.frontendURL + '/#/resetPassword/' + user.passwordResetKey
+            text: 'To reset your password, please click the following link: ' + frontendURL + '/#/resetPassword/' + user.passwordResetKey
         };
         // Send mail with defined transport object
         transporter.sendMail(mailOptions, (error, info) => {
@@ -153,7 +125,7 @@ exports.sendPasswordResetLink = (req, res) => {
     });
 }
 
-exports.getRoles = (req, res) => {
+export function getRoles(req, res) {
     User.findByPk(req.params.userID).then(user => {
         user.getRoles().then(roles => {
             res.send(roles)
@@ -164,7 +136,7 @@ exports.getRoles = (req, res) => {
 }
 
 // Add a role to user (POST)
-exports.addRole = (req, res) => {
+export function addRole(req, res) {
     UserRoles.findOne({
         where: {
             userId: req.user.id,
@@ -185,10 +157,10 @@ exports.addRole = (req, res) => {
             });
         }
     }).catch(err => res.status(500).send("Error -> " + err));
-};
+}
 
 // remove a role to user (DELETE)
-exports.removeRole = (req, res) => {
+export function removeRole(req, res) {
     UserRoles.findOne({
         where: {
             userId: req.user.id,
@@ -217,10 +189,10 @@ exports.removeRole = (req, res) => {
             });
         }
     }).catch(err => res.status(500).send("Error -> " + err));
-};
+}
 
 // FETCH all User
-exports.findAll = (req, res) => {
+export function findAll(req, res) {
     User.findAll({
         raw: true,
         attributes: ['active', 'birthday', 'email', 'experienced_cleaner', 'gitLabID', 'id', 'name', 'phone', 'telegramID'],
@@ -230,9 +202,9 @@ exports.findAll = (req, res) => {
     }).catch(err => {
         res.status(500).send("Error -> " + err);
     });
-};
+}
 // FETCH all Roles
-exports.findAllRoles = (req, res) => {
+export function findAllRoles(req, res) {
     User.findAll({
         raw: true,
     }).then(user => {
@@ -251,9 +223,9 @@ exports.findAllRoles = (req, res) => {
     }).catch(err => {
         res.status(500).send("Error -> " + err);
     });
-};
+}
 
-exports.userRolesTable = (req, res) => {
+export function userRolesTable(req, res) {
     User.findAll({
         raw: true,
     }).then(user => {
@@ -279,10 +251,10 @@ exports.userRolesTable = (req, res) => {
             }).catch(err => res.status(500).send(err));
         }).catch(err => res.status(500).send(err));
     }).catch(err => res.status(500).send(err));
-};
+}
 
 // Find a User by Id
-exports.findById = (req, res) => {
+export function findById(req, res) {
     User.findByPk(req.params.userID, {
         attributes: ['active', 'birthday', 'email', 'experienced_cleaner', 'gitLabID', 'id', 'name', 'phone', 'telegramID', 'only_show_gitlab_notifications_if_assigned'],
     }).then(user => {
@@ -290,14 +262,14 @@ exports.findById = (req, res) => {
     }).catch(err => {
         res.status(500).send("Error -> " + err);
     });
-};
+}
 
 
 // Update a User
-exports.update = (req, res) => {
+export function update(req, res) {
     let realFunc = (data) => {
-        let createUser = function(hash) {
-            let update = {...data, password: hash }; //{ name: req.body.name, email: req.body.email, phone: req.body.phone, telegramID: req.body.telegramID, active: req.body.active, password: hash };
+        let createUser = function (hash) {
+            let update = { ...data, password: hash }; //{ name: req.body.name, email: req.body.email, phone: req.body.phone, telegramID: req.body.telegramID, active: req.body.active, password: hash };
             //remove undefined properties, otherwise update() will set the entries in the table to null
             Object.keys(update).forEach(key => update[key] === undefined && delete update[key]);
             User.findByPk(req.params.userID, { attributes: ['active'] }).then(user => {
@@ -311,7 +283,7 @@ exports.update = (req, res) => {
                     res.status(400).send(err);
                 });
                 // check if users active status changes a bar duties should be created/deleted
-                if ((update.active == true || update.active == false ) && user.active != update.active) {
+                if ((update.active == true || update.active == false) && user.active != update.active) {
                     if (update.active) {
                         // we have to add bar duties
                         // get all new bars
@@ -329,7 +301,7 @@ exports.update = (req, res) => {
                                 BarDuty.create({
                                     barID: bar.id,
                                     userID: req.params.userID,
-                                }).catch(err => {});
+                                }).catch(err => { });
                             });
                         }).catch(console.error);
                     } else {
@@ -364,7 +336,7 @@ exports.update = (req, res) => {
                 res.status(400).send({ errors: [{ message: "password is to short, min 8 chars", value: req.body.password.length }] })
                 return;
             }
-            bcrypt.hash(req.body.password, 10).then(function(hash) {
+            _hash(req.body.password, 10).then(function (hash) {
                 createUser(hash);
             });
         }
@@ -406,10 +378,10 @@ exports.update = (req, res) => {
             }).catch(err => res.status(500).send("Error -> " + err));
         }
     }
-};
+}
 
 // Delete a User by Id
-exports.delete = (req, res) => {
+const _delete = (req, res) => {
     UserRoles.findOne({
         where: {
             userId: req.user.id,
@@ -430,3 +402,4 @@ exports.delete = (req, res) => {
         }
     }).catch(err => res.status(500).send("Error -> " + err));
 };
+export { _delete as delete };
