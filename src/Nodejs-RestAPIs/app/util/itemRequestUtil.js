@@ -85,7 +85,6 @@ async function createRequest(item) {
         amount: 1,
     });
     const id = await chatIdSetting.reload();
-    console.log("Chat ID", id.value);
     if (id.value !== null) {
         const message = await bot.sendMessage(id.value, createTelegramMessage(1, item));
         request.chatId = message.chat.id;
