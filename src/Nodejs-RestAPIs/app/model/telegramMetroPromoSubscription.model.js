@@ -1,10 +1,10 @@
-module.exports = (sequelize, Sequelize) => {
-    const TelegramMetroPromoSubscription = sequelize.define('telegramMetroPromoSubscription', {
-        chatId: {
-            type: Sequelize.INTEGER,
-            primaryKey: true,
-        },
-    });
+import { sequelize, Sequelize } from "../config/database";
 
-    return TelegramMetroPromoSubscription;
-};
+const TelegramMetroPromoSubscription = sequelize.define('telegramMetroPromoSubscription', {
+    chatId: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+    },
+});
+
+export { TelegramMetroPromoSubscription };

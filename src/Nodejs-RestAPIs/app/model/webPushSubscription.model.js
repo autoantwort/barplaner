@@ -1,13 +1,13 @@
-module.exports = (sequelize, Sequelize) => {
-    const WebPushSubscription = sequelize.define('webPushSubscription', {
-        endpoint: {
-            type: Sequelize.STRING,
-            primaryKey: true,
-        },
-        subscription: {
-            type: Sequelize.STRING,
-        },
-    });
+import { sequelize, Sequelize } from "../config/database";
 
-    return WebPushSubscription;
-};
+const WebPushSubscription = sequelize.define('webPushSubscription', {
+    endpoint: {
+        type: Sequelize.STRING,
+        primaryKey: true,
+    },
+    subscription: {
+        type: Sequelize.STRING,
+    },
+});
+
+export { WebPushSubscription };
