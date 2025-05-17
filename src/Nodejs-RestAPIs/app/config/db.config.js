@@ -17,10 +17,6 @@ db.TelegramNewsletter = require('../model/telegramNewsletter.model').TelegramNew
 db.WebPushSubscription = require('../model/webPushSubscription.model').WebPushSubscription;
 db.TelegramMetroPromoSubscription = require('../model/telegramMetroPromoSubscription.model.js').TelegramMetroPromoSubscription;
 
-db.Survey = require('../model/survey.model.js')(sequelize, Sequelize, db.User);
-db.Question = require('../model/question.model.js')(sequelize, Sequelize, db.Survey);
-db.Answer = require('../model/answer.model.js')(sequelize, Sequelize, db.User, db.Question);
-
 db.File = require('../model/file.model.js')(sequelize, Sequelize);
 db.Image = require('../model/image.model.js')(sequelize, Sequelize, db.File);
 db.stock = {};

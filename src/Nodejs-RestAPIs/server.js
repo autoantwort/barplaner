@@ -166,7 +166,6 @@ require('./app/route/user.route.js')(app);
 (await import('./app/route/bar.route.js')).default(app);
 require('./app/route/duty.route.js')(app);
 require('./app/route/setting.route.js')(app);
-require('./app/route/survey.route.js')(app);
 require('./app/route/position.route')(app);
 require('./app/route/file.route')(app);
 require('./app/route/item.route')(app);
