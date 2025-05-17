@@ -20,14 +20,14 @@ db.TelegramMetroPromoSubscription = require('../model/telegramMetroPromoSubscrip
 db.File = require('../model/file.model.js').File;
 db.Image = require('../model/image.model.js').Image;
 db.stock = {};
-db.stock.Position = require('../model/stockManagement/position.model')(sequelize, Sequelize, db.Image);
-db.stock.ItemGroup = require('../model/stockManagement/itemGroup.model')(sequelize, Sequelize, db.stock.Position);
-db.stock.Item = require('../model/stockManagement/item.model')(sequelize, Sequelize, db.Image, db.stock.ItemGroup, db.stock.Position);
-db.stock.ItemRequest = require('../model/stockManagement/itemRequest.model.js')(sequelize, Sequelize, db.stock.Item);
-db.stock.Invoice = require('../model/stockManagement/invoice.model')(sequelize, Sequelize, db.File);
-db.stock.InvoiceEntry = require('../model/stockManagement/invoiceEntry.model')(sequelize, Sequelize, db.stock.Invoice, db.stock.Item);
-db.stock.Change = require('../model/stockManagement/change.model')(sequelize, Sequelize, db.stock.Item, db.User, db.stock.InvoiceEntry);
-db.stock.ChangeLog = require('../model/stockManagement/changeLog.model')(sequelize, Sequelize, db.User, db.stock.Change);
+db.stock.Position = require('../model/stockManagement/position.model').Position;
+db.stock.ItemGroup = require('../model/stockManagement/itemGroup.model').ItemGroup;
+db.stock.Item = require('../model/stockManagement/item.model').Item;
+db.stock.ItemRequest = require('../model/stockManagement/itemRequest.model.js').ItemRequest;
+db.stock.Invoice = require('../model/stockManagement/invoice.model').Invoice;
+db.stock.InvoiceEntry = require('../model/stockManagement/invoiceEntry.model').InvoiceEntry;
+db.stock.Change = require('../model/stockManagement/change.model').StockChange;
+db.stock.ChangeLog = require('../model/stockManagement/changeLog.model').StockChangeLog;
 
 
 let funcArray = [];

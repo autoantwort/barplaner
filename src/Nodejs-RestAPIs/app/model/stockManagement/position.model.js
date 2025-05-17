@@ -1,58 +1,58 @@
-const colognePhonetics = require('./../../util/colognePhonetics');
+import { Sequelize, sequelize } from '../../config/database';
+import { Image } from '../image.model';
+import { convert } from './../../util/colognePhonetics';
 
-module.exports = (sequelize, Sequelize, Image) => {
-    const Position = sequelize.define('stockPosition', {
-        name: {
-            type: Sequelize.STRING(64),
-            unique: true,
-        },
-        nameColognePhonetics: {
-            type: Sequelize.STRING,
-        },
-        description: {
-            type: Sequelize.STRING,
-            allowNull: true,
-            defaultValue: null,
-        },
-        xPositionOnImage: {
-            type: Sequelize.FLOAT,
-            allowNull: true,
-            defaultValue: null,
-        },
-        yPositionOnImage: {
-            type: Sequelize.FLOAT,
-            allowNull: true,
-            defaultValue: null,
-        },
-        room: {
-            type: Sequelize.ENUM,
-            values: ['K14', 'K6', 'K2', 'Cocktaillager', 'Techniklager', 'Cocktailtheke', 'Biertheke', 'Anderer'],
+const Position = sequelize.define('stockPosition', {
+    name: {
+        type: Sequelize.STRING(64),
+        unique: true,
+    },
+    nameColognePhonetics: {
+        type: Sequelize.STRING,
+    },
+    description: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        defaultValue: null,
+    },
+    xPositionOnImage: {
+        type: Sequelize.FLOAT,
+        allowNull: true,
+        defaultValue: null,
+    },
+    yPositionOnImage: {
+        type: Sequelize.FLOAT,
+        allowNull: true,
+        defaultValue: null,
+    },
+    room: {
+        type: Sequelize.ENUM,
+        values: ['K14', 'K6', 'K2', 'Cocktaillager', 'Techniklager', 'Cocktailtheke', 'Biertheke', 'Anderer'],
+    }
+}, {
+    validate: {
+        imagePosition() {
+            if (!(this.xPositionOnImage === null && this.yPositionOnImage === null ||
+                this.xPositionOnImage !== null && this.yPositionOnImage !== null)) {
+                throw new Error('xPositionOnImage, yPositionOnImageA and imageId must be "null" or "not null"');
+            }
         }
-    }, {
-        validate: {
-            imagePosition() {
-                if (!(this.xPositionOnImage === null && this.yPositionOnImage === null ||
-                        this.xPositionOnImage !== null && this.yPositionOnImage !== null)) {
-                    throw new Error('xPositionOnImage, yPositionOnImageA and imageId must be "null" or "not null"');
-                }
+    },
+    hooks: {
+        beforeSave: (item, options) => {
+            if (item._changed.has("name")) {
+                item.nameColognePhonetics = convert(item.name);
             }
         },
-        hooks: {
-            beforeSave: (item, options) => {
-                if (item._changed.has("name")) {
-                    item.nameColognePhonetics = colognePhonetics.convert(item.name);
-                }
-            },
-            beforeBulkUpdate: (options) => {
-                if (options.fields.indexOf('name') !== -1)
-                    options.individualHooks = true;
-            },
+        beforeBulkUpdate: (options) => {
+            if (options.fields.indexOf('name') !== -1)
+                options.individualHooks = true;
         },
-        sequelize: sequelize,
-    });
+    },
+    sequelize: sequelize,
+});
 
-    Position.belongsTo(Image);
-    Image.hasMany(Position);
+Position.belongsTo(Image);
+Image.hasMany(Position);
 
-    return Position;
-};
+export { Position };

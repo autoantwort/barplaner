@@ -1,24 +1,25 @@
-module.exports = (sequelize, Sequelize, File) => {
-    const Invoice = sequelize.define('invoice', {
-        deliveryDate: {
-            type: Sequelize.DATE,
-        },
-        invoiceDate: {
-            type: Sequelize.DATE,
-        },
-        seller: {
-            type: Sequelize.STRING,
-        },
-        extraCostsDescription: { // something like delivery costs
-            type: Sequelize.STRING(1024),
-        },
-        extraCostsAmount: {
-            type: Sequelize.Sequelize.DECIMAL(6, 2),
-        },
-    });
+const { sequelize, Sequelize } = require("../../config/database");
+const { File } = require("../file.model");
 
-    Invoice.belongsTo(File);
-    File.hasMany(Invoice);
+const Invoice = sequelize.define('invoice', {
+    deliveryDate: {
+        type: Sequelize.DATE,
+    },
+    invoiceDate: {
+        type: Sequelize.DATE,
+    },
+    seller: {
+        type: Sequelize.STRING,
+    },
+    extraCostsDescription: { // something like delivery costs
+        type: Sequelize.STRING(1024),
+    },
+    extraCostsAmount: {
+        type: Sequelize.Sequelize.DECIMAL(6, 2),
+    },
+});
 
-    return Invoice;
-};
+Invoice.belongsTo(File);
+File.hasMany(Invoice);
+
+export { Invoice };
