@@ -1,14 +1,12 @@
-const db = require('../config/db.config.js');
-const File = require('./file.controller');
-const http = require('axios');
-const Position = db.stock.Position;
-const Item = db.stock.Item;
-const ItemGroup = db.stock.ItemGroup;
-const Image = db.Image;
-const sequelize = db.sequelize;
+import { coreCreateImageFromRequest, coreCreateImage } from './file.controller';
+import axios from 'axios';
+import { Position } from '../model/stockManagement/position.model';
+import { Item } from '../model/stockManagement/item.model';
+import { ItemGroup } from '../model/stockManagement/itemGroup.model';
+import { Image } from '../model/image.model';
 
 // Post a Item
-createOrUpdate = create => async(req, res) => {
+const createOrUpdate = create => async (req, res) => {
     let response = { created: {} };
     const errorHandler = e => res.status(e.name === "SequelizeValidationError" || e.name === "SequelizeUniqueConstraintError" ? 400 : 500).send("Error: " + e.name + ": " + e.errors[0].message);
 
@@ -18,7 +16,7 @@ createOrUpdate = create => async(req, res) => {
         imageId = req.body.itemImageId;
     } else if (req.files && req.files.itemImage !== undefined) {
         try {
-            imageId = (await File.coreCreateImageFromRequest(req, req.body.name, "itemImage")).dataValues.id;
+            imageId = (await coreCreateImageFromRequest(req, req.body.name, "itemImage")).dataValues.id;
             response.created.image = imageId;
         } catch (error) {
             response.error = "Error while creating image from request: " + error;
@@ -27,8 +25,8 @@ createOrUpdate = create => async(req, res) => {
         }
     } else if (req.body.itemImageURL !== undefined) {
         try {
-            const downloadResponse = await http.get(req.body.itemImageURL, { responseType: 'arraybuffer' });
-            imageId = (await File.coreCreateImage(req.body.name, req.body.itemImageURL, downloadResponse.data, downloadResponse.headers['content-type'])).dataValues.id;
+            const downloadResponse = await axios.get(req.body.itemImageURL, { responseType: 'arraybuffer' });
+            imageId = (await coreCreateImage(req.body.name, req.body.itemImageURL, downloadResponse.data, downloadResponse.headers['content-type'])).dataValues.id;
             response.created.image = imageId;
         } catch (error) {
             response.error = "Can't create an image from the given url: " + error;
@@ -52,7 +50,7 @@ createOrUpdate = create => async(req, res) => {
             res.status(400).send(response);
         });
     } else {
-        Item.update(values, { where: { id: req.params.id } }).then(async(affected_) => {
+        Item.update(values, { where: { id: req.params.id } }).then(async (affected_) => {
             const affected = affected_[0];
             if (affected === 0) {
                 response.error = "Item with id " + req.params.id + " does not exist";
@@ -67,20 +65,20 @@ createOrUpdate = create => async(req, res) => {
     }
 };
 
-exports.create = createOrUpdate(true);
-exports.update = createOrUpdate(false);
+export const create = createOrUpdate(true);
+export const update = createOrUpdate(false);
 
 // get all items
-exports.getAll = (req, res) => {
+export function getAll(req, res) {
     Item.findAll().then(items => {
         res.send(items);
     }).catch(err => {
         res.status(500).send("Error -> " + err);
     });
-};
+}
 
 // get all items for select
-exports.getAllForSelect = (req, res) => {
+export function getAllForSelect(req, res) {
     Item.findAll({
         attributes: [
             ['id', 'value'],
@@ -94,9 +92,9 @@ exports.getAllForSelect = (req, res) => {
     }).catch(err => {
         res.status(500).send("Error -> " + err);
     });
-};
+}
 
-exports.getAllWithGroupsAndPositions = (req, res) => {
+export function getAllWithGroupsAndPositions(req, res) {
     Item.findAll({
         include: [{
             model: ItemGroup,
@@ -110,9 +108,9 @@ exports.getAllWithGroupsAndPositions = (req, res) => {
     }).catch(err => {
         res.status(500).send("Error -> " + err);
     });
-};
+}
 
-exports.getAllWithImage = (req, res) => {
+export function getAllWithImage(req, res) {
     Item.findAll({
         include: [{
             model: Image
@@ -122,10 +120,10 @@ exports.getAllWithImage = (req, res) => {
     }).catch(err => {
         res.status(500).send("Error -> " + err);
     });
-};
+}
 
 // Find a Item by Id
-exports.findById = (req, res) => {
+export function findById(req, res) {
     Item.findByPk(req.params.id, {
         include: [{
             model: Position,
@@ -139,4 +137,4 @@ exports.findById = (req, res) => {
     }).catch(err => {
         res.status(500).send("Error -> " + err);
     });
-};
+}

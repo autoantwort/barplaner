@@ -1,26 +1,25 @@
-const db = require('../config/db.config.js');
-const ItemGroup = db.stock.ItemGroup;
-const Position = db.stock.Position;
+import { ItemGroup } from "../model/stockManagement/itemGroup.model";
+import { Position } from "../model/stockManagement/position.model";
 
 // Post a ItemGroup
-exports.create = (req, res) => {
+export function create(req, res) {
     const errorHandler = e => res.status(e.name === "SequelizeValidationError" || e.name === "SequelizeUniqueConstraintError" ? 400 : 500).send("Error: " + e.name + ": " + e.errors[0].message);
     ItemGroup.create(req.body)
         .then(o => res.status(201).send(o))
         .catch(errorHandler);
-};
+}
 
 // get all ItemGroups
-exports.getAll = (req, res) => {
+export function getAll(req, res) {
     ItemGroup.findAll().then(itemGroups => {
         res.send(itemGroups);
     }).catch(err => {
         res.status(500).send("Error -> " + err);
     });
-};
+}
 
 // get all ItemGroups
-exports.getAllWithPositions = (req, res) => {
+export function getAllWithPositions(req, res) {
     ItemGroup.findAll({
         include: [{
             model: Position,
@@ -30,10 +29,10 @@ exports.getAllWithPositions = (req, res) => {
     }).catch(err => {
         res.status(500).send("Error -> " + err);
     });
-};
+}
 
 // get all ItemGroups for select
-exports.getAllForSelect = (req, res) => {
+export function getAllForSelect(req, res) {
     ItemGroup.findAll({
         attributes: [
             ['id', 'value'],
@@ -45,10 +44,10 @@ exports.getAllForSelect = (req, res) => {
     }).catch(err => {
         res.status(500).send("Error -> " + err);
     });
-};
+}
 
 
-exports.update = async(req, res) => {
+export async function update(req, res) {
     if (req.params.id === undefined) {
         res.status(400).send("The request does not contains a id parameter");
     } else {
@@ -60,10 +59,10 @@ exports.update = async(req, res) => {
             res.status(500).send("Error -> " + err);
         }
     }
-};
+}
 
 // Find a ItemGroup by Id
-exports.findById = (req, res) => {
+export function findById(req, res) {
     ItemGroup.findByPk(req.params.id, {
         include: [{ model: Position }]
     }).then(itemGroup => {
@@ -71,13 +70,13 @@ exports.findById = (req, res) => {
     }).catch(err => {
         res.status(500).send("Error -> " + err);
     });
-};
+}
 
 // get all Item Groups for a position
-exports.getAllItemGroupsAtPosition = (req, res) => {
+export function getAllItemGroupsAtPosition(req, res) {
     ItemGroup.findAll({
         where: {
             stockPositionId: req.params.positionId,
         },
     }).then(groups => res.send(groups)).catch(e => res.status(500).send("Err" + e));
-};
+}

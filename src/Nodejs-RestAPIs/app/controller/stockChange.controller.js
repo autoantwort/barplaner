@@ -1,14 +1,13 @@
-const db = require('../config/db.config.js');
-const StockChange = db.stock.Change;
-const Item = db.stock.Item;
-const ItemGroup = db.stock.ItemGroup;
-const Invoice = db.stock.Invoice;
-const InvoiceEntry = db.stock.InvoiceEntry;
-const Position = db.stock.Position;
-const User = db.User;
-const sequelize = db.sequelize;
-const Op = db.Sequelize.Op;
-const StockChangeLog = db.stock.ChangeLog;
+import { StockChangeLog } from '../model/stockManagement/changeLog.model.js';
+import { StockChange } from '../model/stockManagement/change.model.js';
+import { Item } from '../model/stockManagement/item.model.js';
+import { ItemGroup } from '../model/stockManagement/itemGroup.model.js';
+import { Invoice } from '../model/stockManagement/invoice.model.js';
+import { InvoiceEntry } from '../model/stockManagement/invoiceEntry.model.js';
+import { Position } from '../model/stockManagement/position.model.js';
+import { User } from '../model/user.model.js';
+import { sequelize, Sequelize } from '../config/database.js';
+const Op = Sequelize.Op;
 
 /**
  * Returns a date string for the next day. E.g.: 2020-01-10 for input 2020-01-09
@@ -23,13 +22,13 @@ const nextDay = (date) => {
 
 
 // Post a Stock Change
-exports.create = (req, res) => {
+export function create(req, res) {
     StockChange.create({ ...req.body, userId: req.user.id })
         .then(o => res.status(201).send(o))
         .catch(e => res.status(400).send(e));
-};
+}
 
-exports.changeStockChange = async (req, res) => {
+export async function changeStockChange(req, res) {
     try {
         const stockChange = await StockChange.findByPk(req.params.id);
         if (!stockChange) {
@@ -56,18 +55,18 @@ exports.changeStockChange = async (req, res) => {
     } catch (err) {
         res.status(500).send("Error -> " + err);
     }
-};
+}
 
-exports.deleteStockChange = (req, res) => {
+export function deleteStockChange(req, res) {
     if (req.body.reason?.length < 6 ?? false) {
         res.status(400).send("Reason must be at least 6 characters long.");
         return;
     }
     req.body = { change: { amount: 0 }, note: req.body.reason };
-    exports.changeStockChange(req, res);
+    changeStockChange(req, res);
 }
 
-exports.getStockChangeLog = (req, res) => {
+export function getStockChangeLog(req, res) {
     StockChangeLog.findAll({
         where: {
             stockChangeId: req.params.id,
@@ -85,7 +84,7 @@ exports.getStockChangeLog = (req, res) => {
 }
 
 // get Stock Changes
-exports.getStockChanges = (req, res) => {
+export function getStockChanges(req, res) {
     let where;
     const date = /\d{4}-(0\d|1[0-2])-([0-2]\d|30|31)/;
     if (req.query.from || req.query.to) {
@@ -143,9 +142,9 @@ exports.getStockChanges = (req, res) => {
     }).catch(err => {
         res.status(500).send("Error -> " + err);
     });
-};
+}
 
-exports.getStockChange = (req, res) => {
+export function getStockChange(req, res) {
     StockChange.findByPk(req.params.id, {
         include: [{
             model: User,
@@ -166,11 +165,11 @@ exports.getStockChange = (req, res) => {
     }).catch(err => {
         res.status(500).send("Error -> " + err);
     });
-};
+}
 
 
 // get current Stock
-exports.getItemStock = (req, res) => {
+export function getItemStock(req, res) {
     Item.findAll({
         attributes: {
             include: [
@@ -196,9 +195,9 @@ exports.getItemStock = (req, res) => {
     }).catch(err => {
         res.status(500).send("Error -> " + err);
     });
-};
+}
 
-exports.getStockForItem = (req, res) => {
+export function getStockForItem(req, res) {
     Item.findAll({
         where: {
             id: req.params.itemId,
@@ -216,9 +215,9 @@ exports.getStockForItem = (req, res) => {
     }).catch(err => {
         res.status(500).send("Error -> " + err);
     });
-};
+}
 
-exports.getStockChangesForItem = (req, res) => {
+export function getStockChangesForItem(req, res) {
     StockChange.findAll({
         where: {
             itemId: req.params.itemId,
@@ -238,9 +237,9 @@ exports.getStockChangesForItem = (req, res) => {
     }).catch(err => {
         res.status(500).send("Error -> " + err);
     });
-};
+}
 
-exports.getItemStockForItemGroup = (req, res) => {
+export function getItemStockForItemGroup(req, res) {
     sequelize.query(`Select stockItems.*, itemsWithChanges.*, stockItems.id as id from stockItems left join ( 
                         Select itemId as id,
                                SUM(stockChanges.amount) as inStock, 
@@ -253,9 +252,9 @@ exports.getItemStockForItemGroup = (req, res) => {
         replacements: { itemGroupId: req.params.itemGroupId },
         type: sequelize.QueryTypes.SELECT
     }).then(stock => res.send(stock)).catch(err => res.status(500).send("Error -> " + err));
-};
+}
 
-exports.getItemStockForPosition = (req, res) => {
+export function getItemStockForPosition(req, res) {
     sequelize.query(`WITH searchedItems as (
                         Select stockitems.*, stockitems.stockPositionId as itemPos, itemGroups.stockpositionId as groupPos
                         From stockitems left join itemGroups on stockitems.itemGroupId = itemGroups.id
@@ -273,9 +272,9 @@ exports.getItemStockForPosition = (req, res) => {
         replacements: { positionId: req.params.positionId },
         type: sequelize.QueryTypes.SELECT
     }).then(stock => res.send(stock)).catch(err => res.status(500).send("Error -> " + err));
-};
+}
 
-exports.getStockChangesForItemGroup = (req, res) => {
+export function getStockChangesForItemGroup(req, res) {
     StockChange.findAll({
         include: [{
             model: Item,
@@ -299,9 +298,9 @@ exports.getStockChangesForItemGroup = (req, res) => {
     }).catch(err => {
         res.status(500).send("Error -> " + err);
     });
-};
+}
 
-exports.getItemGroupStock = (req, res) => {
+export function getItemGroupStock(req, res) {
     ItemGroup.findAll({
         include: [
             {
@@ -326,9 +325,9 @@ exports.getItemGroupStock = (req, res) => {
     }).catch(err => {
         res.status(500).send("Error -> " + err);
     });
-};
+}
 
-exports.getAllDatesWhereChangesHappen = (req, res) => {
+export function getAllDatesWhereChangesHappen(req, res) {
     StockChange.findAll({
         attributes: [
             [sequelize.fn('DATE', sequelize.col('date'), 'localtime'), "realDate"],
@@ -340,9 +339,9 @@ exports.getAllDatesWhereChangesHappen = (req, res) => {
     }).catch(err => {
         res.status(500).send("Error -> " + err);
     });
-};
+}
 
-exports.getAllChangesAtDay = (req, res) => {
+export function getAllChangesAtDay(req, res) {
     StockChange.findAll({
         where: {
             date: {
@@ -375,9 +374,9 @@ exports.getAllChangesAtDay = (req, res) => {
     }).catch(err => {
         res.status(500).send("Error -> " + err);
     });
-};
+}
 
-exports.getAllChangesFromInvoice = (req, res) => {
+export function getAllChangesFromInvoice(req, res) {
     StockChange.findAll({
         where: {
             invoiceId: req.params.invoiceId,
@@ -397,4 +396,4 @@ exports.getAllChangesFromInvoice = (req, res) => {
     }).catch(err => {
         res.status(500).send("Error -> " + err);
     });
-};
+}

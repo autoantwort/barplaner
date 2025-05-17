@@ -1,13 +1,11 @@
-const db = require('../config/db.config.js');
-const File = require('./file.controller');
-const Position = db.stock.Position;
-const Item = db.stock.Item;
-const ItemGroup = db.stock.ItemGroup;
-const Image = db.Image;
-const sequelize = db.sequelize;
+import { Image } from '../model/image.model';
+import { Item } from '../model/stockManagement/item.model';
+import { ItemGroup } from '../model/stockManagement/itemGroup.model';
+import { Position } from '../model/stockManagement/position.model';
+import { coreCreateImage, coreCreateImageFromRequest } from './file.controller';
 
 // Post a Position
-exports.create = (req, res) => {
+export function create(req, res) {
     const errorHandler = e => res.status(e.name === "SequelizeValidationError" || e.name === "SequelizeUniqueConstraintError" ? 400 : 500).send("Error: " + e.name + ": " + e.errors[0].message);
     // a already existing image is used
     if (req.body.imageId) {
@@ -27,7 +25,7 @@ exports.create = (req, res) => {
                 return res.status(400).send("More than one image was uploaded");
             }
             const file = req.files[keys[0]];
-            File.coreCreateImage(req.body.titel, file.name, file.data, file.mimetype).then(image => {
+            coreCreateImage(req.body.titel, file.name, file.data, file.mimetype).then(image => {
                 Position.create({
                     ...req.body,
                     imageId: image.id,
@@ -37,16 +35,16 @@ exports.create = (req, res) => {
             }).catch(errorHandler);
         }
     }
-};
+}
 
-exports.update = async (req, res) => {
+export async function update(req, res) {
     try {
         if (req.files && Object.keys(req.files).length > 0) {
             const keys = Object.keys(req.files);
             if (keys.length > 1) {
                 return res.status(400).send("More than one image was uploaded");
             }
-            req.body.imageId = (await File.coreCreateImageFromRequest(req, req.body.titel, keys[0])).id;
+            req.body.imageId = (await coreCreateImageFromRequest(req, req.body.titel, keys[0])).id;
         }
         const affected = await Position.update({
             ...req.body,
@@ -59,12 +57,12 @@ exports.update = async (req, res) => {
     } catch (e) {
         res.status(e.name === "SequelizeValidationError" || e.name === "SequelizeUniqueConstraintError" ? 400 : 500).send("Error: " + e.name + ": " + e.errors[0].message);
     }
-};
+}
 
 const order = [['room', 'ASC'], ['name', 'ASC']];
 
 // get all Positions
-exports.findAll = (req, res) => {
+export function findAll(req, res) {
     Position.findAll({
         order,
     }).then(positions => {
@@ -72,10 +70,10 @@ exports.findAll = (req, res) => {
     }).catch(err => {
         res.status(500).send("Error -> " + err);
     });
-};
+}
 
 // get all positions with images
-exports.getAllWithImages = (req, res) => {
+export function getAllWithImages(req, res) {
     Position.findAll({
         include: [{
             model: Image,
@@ -86,10 +84,10 @@ exports.getAllWithImages = (req, res) => {
     }).catch(err => {
         res.status(500).send("Error -> " + err);
     });
-};
+}
 
 // get all Positions for select
-exports.getAllForSelect = (req, res) => {
+export function getAllForSelect(req, res) {
     Position.findAll({
         attributes: [
             ['id', 'value'],
@@ -102,10 +100,10 @@ exports.getAllForSelect = (req, res) => {
     }).catch(err => {
         res.status(500).send("Error -> " + err);
     });
-};
+}
 
 // get all Position images
-exports.getAllUsedImages = (req, res) => {
+export function getAllUsedImages(req, res) {
     console.log("getAllUsedImages");
     Image.findAll({
         attributes: ['id', 'titel', 'original', 'compressed'],
@@ -119,10 +117,10 @@ exports.getAllUsedImages = (req, res) => {
     }).catch(err => {
         res.status(500).send("Error -> " + err);
     });
-};
+}
 
 // get all images, that are not used as Position image
-exports.getAllNotUsedImages = (req, res) => {
+export function getAllNotUsedImages(req, res) {
     // "exclude": see https://github.com/sequelize/sequelize/issues/4099 
     Image.findAll({
         attributes: ['id', 'titel', 'original', 'compressed'],
@@ -140,9 +138,9 @@ exports.getAllNotUsedImages = (req, res) => {
     }).catch(err => {
         res.status(500).send("Error -> " + err);
     });
-};
+}
 
-exports.update = (req, res) => {
+export function update(req, res) {
     if (req.params.name !== undefined) {
         res.status(400).send("You can not update the name of a position");
     } else if (req.params.id === undefined) {
@@ -163,10 +161,10 @@ exports.update = (req, res) => {
         });
         // TODO check if the last reference to a image was deleted => delete image, files
     }
-};
+}
 
 // Find a Position by Id
-exports.findById = (req, res) => {
+export function findById(req, res) {
     Position.findByPk(req.params.id, {
         include: [{ model: Image }]
     }).then(position => {
@@ -174,10 +172,10 @@ exports.findById = (req, res) => {
     }).catch(err => {
         res.status(500).send("Error -> " + err);
     });
-};
+}
 
 // Delete a Position by Id
-exports.delete = (req, res) => {
+const _delete = (req, res) => {
     const errorHandler = e => res.status(500).send("Error : " + e);
     Item.count({
         where: {
@@ -205,3 +203,4 @@ exports.delete = (req, res) => {
         }
     }).catch(errorHandler);
 };
+export { _delete as delete };
