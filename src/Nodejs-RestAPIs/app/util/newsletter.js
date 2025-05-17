@@ -1,5 +1,21 @@
-import { Wordpress, Bar, Setting } from '../config/db.config.js';
+import { Sequelize } from 'sequelize';
+import { Bar, Setting } from '../config/db.config.js';
 import { NewsletterAdminRoleName } from './rolesNames.js';
+
+const wordpressDB = new Sequelize(env.wordpress.database, env.wordpress.username, env.wordpress.password, {
+    host: env.wordpress.host,
+    dialect: env.wordpress.dialect,
+    logging: (e, t) => {}, 
+});
+
+wordpressDB
+    .authenticate()
+    .then(() => {
+        console.log('Connection to the wordpress database has been established successfully.');
+    })
+    .catch(err => {
+        console.error('Unable to connect to the wordpress database:', err);
+    });
 
 const [SendDaysBefore, _1] = await Setting.findCreateFind({
     where: {
@@ -115,11 +131,11 @@ function sendNewsletter(barObject, newsletterId, sendTime) {
         return;
     }
     // get template newsletter
-    Wordpress.query("Select * from wp_2_newsletter_emails where id = ?", { replacements: [newsletterId], type: Wordpress.QueryTypes.SELECT }).then(rows => {
+    wordpressDB.query("Select * from wp_2_newsletter_emails where id = ?", { replacements: [newsletterId], type: wordpressDB.QueryTypes.SELECT }).then(rows => {
         if (rows.length === 1) {
             const template = rows[0];
             // only create one newsletter per bar, update old one
-            Wordpress.query("Select id from wp_2_newsletter_emails where barId = ?", { replacements: [barObject.id], type: Wordpress.QueryTypes.SELECT }).then(bars => {
+            wordpressDB.query("Select id from wp_2_newsletter_emails where barId = ?", { replacements: [barObject.id], type: wordpressDB.QueryTypes.SELECT }).then(bars => {
                 DefaultImageURL.reload().then(() => {
                     // when there is no newsletter for the bar
                     if (bars.length === 0) {
@@ -140,7 +156,7 @@ function sendNewsletter(barObject, newsletterId, sendTime) {
                         sql += '(' + Object.getOwnPropertyNames(template).join(', ') + ')';
                         sql += " VALUES ";
                         sql += '(' + Object.getOwnPropertyNames(template).map(n => ":" + n).join(', ') + ')';
-                        Wordpress.query(sql, { replacements: template, type: Wordpress.QueryTypes.INSERT }).catch(console.error);
+                        wordpressDB.query(sql, { replacements: template, type: wordpressDB.QueryTypes.INSERT }).catch(console.error);
                     } else {
                         // update existing newsletters
                         for (let newsletter of bars) {
@@ -149,7 +165,7 @@ function sendNewsletter(barObject, newsletterId, sendTime) {
                                 if (barObject.canceled) {
                                     // delete existing newsletter
                                     let sql = "Delete from wp_2_newsletter_emails WHERE id = ?";
-                                    Wordpress.query(sql, { replacements: [newsletter.id], type: Wordpress.QueryTypes.DELETE }).catch(console.error);
+                                    wordpressDB.query(sql, { replacements: [newsletter.id], type: wordpressDB.QueryTypes.DELETE }).catch(console.error);
                                     return;
                                 }
                                 let update = {};
@@ -162,7 +178,7 @@ function sendNewsletter(barObject, newsletterId, sendTime) {
                                 sql += Object.getOwnPropertyNames(update).map(p => p + " = :" + p).join(', '); /* message = :message, ... */
                                 sql += " WHERE id = :id";
                                 update.id = newsletter.id;
-                                Wordpress.query(sql, { replacements: update, type: Wordpress.QueryTypes.UPDATE }).catch(console.error);
+                                wordpressDB.query(sql, { replacements: update, type: wordpressDB.QueryTypes.UPDATE }).catch(console.error);
                             }
                         }
                     }
