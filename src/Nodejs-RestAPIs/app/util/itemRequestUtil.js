@@ -65,6 +65,12 @@ sendItemRequestQuere();
 // TODO Check for reactions. See https://github.com/yagop/node-telegram-bot-api/issues/1266
 // bot.addListener("", ())
 
+bot.onText(/\/sendItemRequestsToThisChat/, msg => {
+    chatIdSetting.value = msg.chat.id;
+    chatIdSetting.save();
+    bot.sendMessage(msg.chat.id, `Item Requests will now be sent to this chat.`);
+});
+
 /**
  * 
  * @param {int} amount How often is the item requested
