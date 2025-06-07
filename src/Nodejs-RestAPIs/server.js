@@ -172,6 +172,7 @@ require('./app/route/item.route')(app);
 require('./app/route/itemGroup.route')(app);
 require('./app/route/stockChanges.route')(app);
 require('./app/route/invoice.route')(app);
+(await import('./app/route/itemRequest.route')).registerItemRequestsRoutes(app);
 
 // distribute files from file db
 console.log("Store at and load files from: ", env.fileStoragePath);

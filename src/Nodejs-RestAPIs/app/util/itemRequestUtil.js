@@ -131,7 +131,7 @@ async function changeRequest(itemRequest, change) {
  */
 async function deleteRequest(itemRequest) {
     bot.deleteMessage(itemRequest.chatId, itemRequest.messageId);
-    itemRequest.destroy();
+    await itemRequest.destroy();
     if (await ItemRequest.count() === 0) {
         state.gotReaction = false;
         sendItemRequestGotReactionState(false);

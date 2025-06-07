@@ -167,6 +167,11 @@ const router = createRouter({
           component: () => import('../views/restricted/stock/ItemStockListView.vue'),
         },
         {
+          path: '/itemRequests',
+          name: 'itemRequests',
+          component: () => import('../views/restricted/stock/ItemRequestsView.vue'),
+        },
+        {
           path: '/addStockChange',
           name: 'addStockChange',
           component: () => import('../views/restricted/stock/AddStockChangeView.vue'),
