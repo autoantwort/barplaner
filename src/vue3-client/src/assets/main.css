@@ -15,6 +15,35 @@ a:hover {
   text-decoration: none;
 }
 
+/* Dark mode for table-danger and table-warning */
+[data-bs-theme="dark"] .table-danger {
+  --bs-table-color: #f8d7da;
+  --bs-table-bg: #2c0b0e;
+  --bs-table-border-color: #41171a;
+  --bs-table-striped-bg: #331011;
+  --bs-table-striped-color: #f8d7da;
+  --bs-table-active-bg: #3a1114;
+  --bs-table-active-color: #f8d7da;
+  --bs-table-hover-bg: #371013;
+  --bs-table-hover-color: #f8d7da;
+  color: var(--bs-table-color);
+  border-color: var(--bs-table-border-color);
+}
+
+[data-bs-theme="dark"] .table-warning {
+  --bs-table-color: #ffecb5;
+  --bs-table-bg: #332701;
+  --bs-table-border-color: #4d3d02;
+  --bs-table-striped-bg: #3d2f01;
+  --bs-table-striped-color: #ffecb5;
+  --bs-table-active-bg: #473602;
+  --bs-table-active-color: #ffecb5;
+  --bs-table-hover-bg: #423201;
+  --bs-table-hover-color: #ffecb5;
+  color: var(--bs-table-color);
+  border-color: var(--bs-table-border-color);
+}
+
 /* Bootstrap 4 Print css removed in bootstrap 5 */
 @media print {
   *,
