@@ -1,17 +1,9 @@
 <template>
   <div id="restricted">
-    <nav class="navbar navbar-expand-sm bg-light navbar-light justify-content-end d-print-none">
+    <nav class="navbar navbar-expand-sm justify-content-end d-print-none" style="background-color: var(--bs-tertiary-bg);">
       <!-- <a class="navbar-brand" href="#">Menü</a> -->
-      <button
-        class="navbar-toggler"
-        type="button"
-        data-toggle="collapse"
-        data-target="#navbarSupportedContent"
-        aria-controls="navbarSupportedContent"
-        aria-expanded="false"
-        aria-label="Toggle navigation"
-        v-on:click="showNav = !showNav"
-      >
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+        aria-expanded="false" aria-label="Toggle navigation" v-on:click="showNav = !showNav">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarSupportedContent" v-bind:class="{ show: showNav }">
@@ -68,6 +60,14 @@
           <li class="nav-item">
             <router-link class="nav-link" to="/logout">Logout</router-link>
           </li>
+          <BNavItemDropdown>
+            <template #button-content>
+              <component :is="map[colorMode]" hight="1.1em" :aria-label="`Toggle theme (${colorMode})`" class="d-inline-block" />
+            </template>
+            <BDropdownItem v-for="el in Object.keys(map)" :key="el" :active="colorMode === el" @click="colorMode = el">
+              <component :is="map[el]" /> {{ el }}
+            </BDropdownItem>
+          </BNavItemDropdown>
         </ul>
       </div>
     </nav>
@@ -79,6 +79,11 @@
 
 <script>
 import Roles from '@/roles';
+import MoonStarsFill from '~icons/bi/moon-stars-fill'
+import SunFill from '~icons/bi/sun-fill'
+import CircleHalf from '~icons/bi/circle-half'
+import { useColorMode } from 'bootstrap-vue-next'
+
 
 export default {
   name: 'app',
@@ -88,12 +93,21 @@ export default {
       cleaningAdmin: false,
       userAdmin: false,
       barAdmin: false,
+      map: {
+        dark: MoonStarsFill,
+        light: SunFill,
+        auto: CircleHalf,
+      },
     };
   },
   mounted() {
     this.cleaningAdmin = Roles.haveRole('CleaningAdmin');
     this.userAdmin = Roles.haveRole('UserAdmin');
     this.barAdmin = Roles.haveRole('BarAdmin');
+  },
+  setup() {
+    const colorMode = useColorMode({ persist: true, emitAuto: true });
+    return { colorMode };
   },
 };
 </script>
