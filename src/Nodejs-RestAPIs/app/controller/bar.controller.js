@@ -157,7 +157,7 @@ export function getAllBarsWithBarduties(req, res) {
 
 // Find a Bar by Id
 export function findById(req, res) {
-    Bar.findById(req.params.barID).then(bar => {
+    Bar.findByPk(req.params.barID).then(bar => {
         res.send(bar);
     }).catch(err => {
         res.status(500).send("Error -> " + err);
