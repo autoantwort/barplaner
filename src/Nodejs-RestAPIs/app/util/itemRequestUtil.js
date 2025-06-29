@@ -42,6 +42,9 @@ const sendItemRequestQuerePrevious = (index) => {
 const sendItemRequestGotReactionState = (gotReaction) => {
     client.publish('barplaner/itemRequest/gotReaction', gotReaction ? 1 : 0, retain);
 }
+const sendItemRequestLEDState = (state) => {
+    client.publish('barplaner/itemRequest/ledState', state, retain);
+}
 
 const [chatIdSetting, created] = await Setting.findCreateFind({
     where: {
@@ -98,6 +101,7 @@ async function createRequest(item) {
         request.save();
     }
     sendItemRequestQuere();
+    sendItemRequestLEDState("n:1");
 }
 
 /**
@@ -123,6 +127,7 @@ async function changeRequest(itemRequest, change) {
         message_id: itemRequest.messageId,
     }).catch(console.error);
     sendItemRequestQuere();
+    sendItemRequestLEDState(`c:${itemRequest.amount}`);
 }
 
 /**
@@ -137,6 +142,7 @@ async function deleteRequest(itemRequest) {
         sendItemRequestGotReactionState(false);
     }
     sendItemRequestQuere();
+    sendItemRequestLEDState("d");
 }
 
 async function findRequest(item) {
