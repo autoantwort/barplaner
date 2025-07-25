@@ -10,12 +10,6 @@ const StockChange = stock.Change;
 const Position = stock.Position;
 const Op = Sequelize.Op;
 
-const controllers = [];
-
-function sendMessageToController(msg) {
-    controllers.filter(c => c.readyState === 1 /*WebSocket.OPEN*/).forEach(c => c.send(msg));
-}
-
 const sendMQTTBeep = () => {
     client.publish('barplaner/beep', '1');
 };
@@ -68,8 +62,6 @@ const setChangeToNull = () => {
     sendMQTTChangeAmount(0);
     sendMQTTItemNameAndPosition("", null);
 }
-
-const haveWebsiteConsumer = () => controllers.length > 0;
 
 const determineDefaultReason = () => {
     const SUNDAY = 0;
@@ -202,9 +194,8 @@ const onBarcode = async (barcode) => {
         return;
     }
     if (state.reason === null) {
-        if (!haveWebsiteConsumer()) {
-            sendMQTTBeep();
-        }
+        // TODO: check if someone is using the website right now
+        sendMQTTBeep();
         return;
     }
     resetIdleTimeout();
@@ -285,38 +276,14 @@ const onBarcode = async (barcode) => {
     }
 }
 
-export function registerClients (app) {
-    app.ws('/scanner', (ws, req) => {
-        ws.on('error', err => {
-            console.error("Fehler bei einem Websocket unter /scanner", err);
-        });
-        ws.on('message', msg => {
-            if (ArrayBuffer.isView(msg)) {
-                const decoder = new TextDecoder();
-                msg = decoder.decode(msg);
-            }
-            sendMessageToController(msg);
-            onBarcode(msg);
-        });
-        ws.on('close', (code, reason) => {
-            // ignore
-        });
-    });
-}
-export function registerMasters(app) {
-    app.ws('/scannerConsumer', (ws, req) => {
-        ws.on('error', err => {
-            console.error("Fehler bei einem Websocket unter /scannerConsumer", err);
-        });
-        controllers.push(ws);
-        ws.on('message', msg => {
-            // I don't know what they want to send
-        });
-        ws.on('close', (code, reason) => {
-            const index = controllers.indexOf(ws);
-            if (index > -1) {
-                controllers.splice(index, 1);
-            }
-        });
-    });
-}
+client.on("connect", () => {
+    client.subscribe("barplaner/scanner");
+});
+
+client.on("message", (topic, message) => {
+    if (topic === "barplaner/scanner") {
+        const decoder = new TextDecoder();
+        message = decoder.decode(message);
+        onBarcode(message);
+    }
+});

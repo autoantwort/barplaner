@@ -59,14 +59,12 @@ const remoteVolumeControl = require("./app/util/remoteVolumeControl");
 remoteVolumeControl.registerClients(app);
 const remoteControlPane = require("./app/util/remoteControlPane");
 remoteControlPane.registerClients(app);
-const scanner = await import("./app/util/scanner");
-scanner.registerClients(app);
+import "./app/util/scanner";
 const shoppingListState = require("./app/util/shoppingListState");
 shoppingListState.registerWebSocketListener(app);
 const shoppingListText = require("./app/util/shoppingListText");
 shoppingListText.registerWebSocketListener(app);
-const { registerWebSocketListener } = await import("./app/util/itemRequestScanner");
-registerWebSocketListener(app);
+import "./app/util/itemRequestScanner";
 
 const ical = require("./app/util/icalCalendar");
 app.get(env.ical.urlPath, (req, res) => ical.serve(res));
@@ -161,7 +159,6 @@ app.post('/api/logout', (req, res) => {
 });
 remoteVolumeControl.registerMasters(app);
 remoteControlPane.registerMasters(app);
-scanner.registerMasters(app);
 require('./app/route/user.route.js')(app);
 (await import('./app/route/bar.route.js')).default(app);
 require('./app/route/duty.route.js')(app);

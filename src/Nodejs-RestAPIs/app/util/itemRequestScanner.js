@@ -1,4 +1,5 @@
 import { commands } from '../common/stockChangeReasons.js';
+import { client } from './mqttClient.js';
 import db from '../config/db.config.js';
 
 const Item = db.stock.Item;
@@ -67,22 +68,14 @@ const onBarcode = async (barcode) => {
     }
 }
 
-const registerWebSocketListener = function (app) {
-    app.ws('/itemRequestScanner', (ws, req) => {
-        ws.on('error', err => {
-            console.error("Fehler bei einem Websocket unter /itemRequestScanner", err);
-        });
-        ws.on('message', msg => {
-            if (ArrayBuffer.isView(msg)) {
-                const decoder = new TextDecoder();
-                msg = decoder.decode(msg);
-            }
-            onBarcode(msg);
-        });
-        ws.on('close', (code, reason) => {
-            // ignore
-        });
-    });
-};
+client.on("connect", () => {
+    client.subscribe("barplaner/itemRequestScanner");
+});
 
-export { registerWebSocketListener };
+client.on("message", (topic, message) => {
+    if (topic === "barplaner/itemRequestScanner") {
+        const decoder = new TextDecoder();
+        message = decoder.decode(message);
+        onBarcode(message);
+    }
+});
