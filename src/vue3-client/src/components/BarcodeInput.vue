@@ -9,8 +9,8 @@
 </template>
 
 <script>
+import { subscribeMqtt } from '@/mqttSub';
 import BarcodeScanner from './BarcodeScanner.vue';
-import http from '@/http-common';
 
 export default {
   name: 'barcode-input',
@@ -29,15 +29,18 @@ export default {
     },
   },
   created() {
-    this.webSocket = new WebSocket(http.defaults.baseWsURL + '/scannerConsumer');
-    this.webSocket.onmessage = e => {
-      this.$refs.barcode.value = e.data;
-      this.$emit('update:modelValue', e.data.trim());
-      this.$emit('enter');
-    };
+    this.client = subscribeMqtt('barplaner/scanner');
+    this.client.on('message', (topic, message) => {
+      if (topic === 'barplaner/scanner') {
+        const value = message.toString().trim();
+        this.$refs.barcode.value = value;
+        this.$emit('update:modelValue', value);
+        this.$emit('enter');
+      }
+    });
   },
   beforeUnmount() {
-    this.webSocket.close();
+    this.client.end();
   },
 };
 </script>

@@ -288,6 +288,7 @@ import { useToastController } from 'bootstrap-vue-next';
 import { BToast } from 'bootstrap-vue-next';
 import NavigationDataService from '@/router/navigationDataService';
 import { RouterLink } from 'vue-router';
+import { subscribeMqtt } from '@/mqttSub';
 
 const round = v => Math.round(v * 1000) / 1000;
 
@@ -619,14 +620,16 @@ export default {
     });
   },
   created() {
-    this.webSocket = new WebSocket(http.defaults.baseWsURL + '/scannerConsumer');
-    this.webSocket.onmessage = e => {
-      const barcode = e.data.trim();
-      this.onBarcode(barcode);
-    };
+    this.client = subscribeMqtt('barplaner/scanner');
+    this.client.on('message', (topic, message) => {
+      if (topic === 'barplaner/scanner') {
+        const value = message.toString().trim();
+        this.onBarcode(value);
+      }
+    });
   },
   beforeUnmount() {
-    this.webSocket.close();
+    this.client.end();
   },
 };
 </script>

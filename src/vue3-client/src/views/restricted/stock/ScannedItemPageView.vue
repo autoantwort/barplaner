@@ -55,7 +55,7 @@
 </template>
 
 <script>
-import mqtt from 'mqtt';
+import { subscribeMqtt } from '@/mqttSub';
 
 import http from '@/http-common';
 import PositionImage from '@/components/PositionImage.vue';
@@ -132,19 +132,7 @@ export default {
   },
   created() {
     this.baseURL = http.defaults.baseURL + '/file/';
-    console.log('Connecting to MQTT started');
-    this.client = mqtt.connect('wss://mqtt-ws.hilton.rwth-aachen.de'); // create a client
-    this.client.on('error', err => {
-      console.log('Error: ', err);
-    });
-    this.client.on('connect', () => {
-      console.log('Connected to MQTT');
-      this.client.subscribe('barplaner/#', err => {
-        if (!err) {
-          console.log('Subscribed to stockChange');
-        }
-      });
-    });
+    this.client = subscribeMqtt('barplaner/#');
     this.client.on('message', (topic, message) => {
       if (topic !== 'barplaner/debug') {
         console.log('Received message: ', message.toString(), ' on topic: ', topic);

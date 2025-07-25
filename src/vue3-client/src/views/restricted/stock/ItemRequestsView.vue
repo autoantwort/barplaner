@@ -24,8 +24,8 @@
 </template>
 
 <script>
-import mqtt from 'mqtt';
 import http from '@/http-common';
+import { subscribeMqtt } from '@/mqttSub';
 
 export default {
   data() {
@@ -42,19 +42,7 @@ export default {
   },
   created() {
     this.baseURL = http.defaults.baseURL + '/file/';
-    console.log('Connecting to MQTT started');
-    this.client = mqtt.connect('wss://mqtt-ws.hilton.rwth-aachen.de'); // create a client
-    this.client.on('error', err => {
-      console.log('Error: ', err);
-    });
-    this.client.on('connect', () => {
-      console.log('Connected to MQTT');
-      this.client.subscribe('barplaner/itemRequest/quere', err => {
-        if (!err) {
-          console.log('Subscribed to itemRequest/quere');
-        }
-      });
-    });
+    this.client = subscribeMqtt('barplaner/itemRequest/quere');
     this.client.on('message', (topic, message) => {
       if (topic === 'barplaner/itemRequest/quere') {
         this.quere = JSON.parse(message.toString());
