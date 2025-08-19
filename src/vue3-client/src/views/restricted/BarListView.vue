@@ -6,8 +6,10 @@
         <!-- new bars -->
         <div v-for="bar in bars" :key="bar.id">
           <div class="card mt-3 mb-3">
-            <div class="card-header text-center pressable text-primary" @click="bar.show = !bar.show">
+            <div class="card-header text-center pressable text-primary d-flex justify-content-between align-items-center" @click="bar.show = !bar.show">
+              <div></div>
               {{ bar.name }} ({{ $filters.asDate(bar.start) }}) {{ bar.canceled ? 'Abgesagt' : '' }}
+              <button @click.stop="sendTelegram(bar.id)" class="btn btn-sm"><i-fa-paper-plane title="Send Telegram" /></button>
             </div>
             <div>
               <BCollapse v-model="bar.show">
@@ -31,13 +33,8 @@
                       <tbody>
                         <tr v-for="duty in bar.duties" :key="duty.id">
                           <th v-if="cleaningAdmin /*|| (user.id === duty.userID &&!duty.have_to_clean && bar.start > now)*/ /*sich selber eintragen*/">
-                            <input
-                              type="checkbox"
-                              v-on:click="updateActive(bar.id, duty.userID, $event)"
-                              v-model="duty.have_to_clean"
-                              :false-value="0"
-                              :true-value="1"
-                            />
+                            <input type="checkbox" v-on:click="updateActive(bar.id, duty.userID, $event)" v-model="duty.have_to_clean" :false-value="0"
+                              :true-value="1" />
                           </th>
                           <th v-else-if="duty.have_to_clean">❌</th>
                           <th v-else></th>
@@ -56,12 +53,8 @@
                           </template>
                           <template v-if="duty.userID === user.id && bar.start > now">
                             <td>
-                              <select
-                                class="form-control minWidth"
-                                v-model="duty.job"
-                                @change="save(duty)"
-                                :style="duty.state === 'present' ? 'visibility:visible;' : 'visibility:hidden;'"
-                              >
+                              <select class="form-control minWidth" v-model="duty.job" @change="save(duty)"
+                                :style="duty.state === 'present' ? 'visibility:visible;' : 'visibility:hidden;'">
                                 <option>Biertheke</option>
                                 <option>Cocktailtheke</option>
                               </select>
@@ -73,12 +66,8 @@
                                 ></vue-single-select>-->
                             </td>
                             <td>
-                              <select
-                                class="form-control minWidth"
-                                v-model="duty.from"
-                                @change="save(duty)"
-                                :style="duty.state === 'present' ? 'visibility:visible;' : 'visibility:hidden;'"
-                              >
+                              <select class="form-control minWidth" v-model="duty.from" @change="save(duty)"
+                                :style="duty.state === 'present' ? 'visibility:visible;' : 'visibility:hidden;'">
                                 <option>20:00</option>
                                 <option>20:30</option>
                                 <option>21:00</option>
@@ -99,12 +88,8 @@
                                 ></vue-single-select>-->
                             </td>
                             <td>
-                              <select
-                                class="form-control minWidth"
-                                v-model="duty.to"
-                                @change="save(duty)"
-                                :style="duty.state === 'present' ? 'visibility:visible;' : 'visibility:hidden;'"
-                              >
+                              <select class="form-control minWidth" v-model="duty.to" @change="save(duty)"
+                                :style="duty.state === 'present' ? 'visibility:visible;' : 'visibility:hidden;'">
                                 <option>Ende</option>
                                 <option>22:00</option>
                                 <option>22:30</option>
@@ -203,6 +188,7 @@
         <!-- End code dublication -->
       </div>
     </div>
+    <BToastOrchestrator />
   </div>
 </template>
 
@@ -210,6 +196,7 @@
 import http from '@/http-common';
 import Bars from '@/bars';
 import Roles from '@/roles';
+import { useToastController } from 'bootstrap-vue-next';
 
 export default {
   data() {
@@ -223,6 +210,10 @@ export default {
       cleaningBreakpoint: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7), // you can change the cleaning state for bars that are not older then 7 days
       now: new Date(),
     };
+  },
+  setup() {
+    const { show } = useToastController();
+    return { show };
   },
   methods: {
     retrieveBars() {
@@ -328,6 +319,28 @@ export default {
       this.oldBars = this.oldBars.concat(this.veryOldBars);
       this.veryOldBars = [];
     },
+    async sendTelegram(barId) {
+      try {
+        await http.post('/duty/' + barId + '/sendTelegramNewsletter');
+        this.show?.({
+          props: {
+            variant: 'info',
+            pos: 'middle-center',
+            value: 10000,
+            body: 'Telegram Survey send',
+          },
+        });
+      } catch (error) {
+        this.show?.({
+          props: {
+            variant: 'danger',
+            pos: 'middle-center',
+            value: 10000,
+            body: `Error while sending Telegram Survey: ${error.message}`,
+          },
+        });
+      }
+    }
   },
   mounted() {
     this.cleaningAdmin = Roles.haveRole('CleaningAdmin');

@@ -186,6 +186,8 @@ function sendBarInfo(bar, userID) {
     });
 }
 
+exports.sendBarInfo = sendBarInfo;
+
 // handle responses to the bar
 const addBarMessageCreator = Telegram.registerResponseSystem("addBar", (message) => {
     let whereObj = {
