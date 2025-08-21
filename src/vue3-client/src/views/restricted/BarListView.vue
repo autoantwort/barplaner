@@ -9,7 +9,9 @@
             <div class="card-header text-center pressable text-primary d-flex justify-content-between align-items-center" @click="bar.show = !bar.show">
               <div></div>
               {{ bar.name }} ({{ $filters.asDate(bar.start) }}) {{ bar.canceled ? 'Abgesagt' : '' }}
-              <button @click.stop="sendTelegram(bar.id)" class="btn btn-sm"><i-fa-paper-plane title="Send Telegram" /></button>
+              <button v-if="cleaningAdmin && bar.start > now" @click.stop="sendBarId = bar.id; modal = true" class="btn btn-sm"><i-fa-paper-plane
+                  title="Send Telegram" /></button>
+              <div v-else></div>
             </div>
             <div>
               <BCollapse v-model="bar.show">
@@ -189,6 +191,9 @@
       </div>
     </div>
     <BToastOrchestrator />
+    <BModal v-model="modal" ok-title="Send" @ok="sendTelegram">Telegram Bot Umfrage "Wer kommt wann?" versenden?<br>
+      <small>(Nur an die Leute, die noch nicht abgestimmt haben)</small>
+    </BModal>
   </div>
 </template>
 
@@ -209,6 +214,8 @@ export default {
       cleaningAdmin: false,
       cleaningBreakpoint: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7), // you can change the cleaning state for bars that are not older then 7 days
       now: new Date(),
+      sendBarId: null,
+      modal: false,
     };
   },
   setup() {
@@ -319,9 +326,10 @@ export default {
       this.oldBars = this.oldBars.concat(this.veryOldBars);
       this.veryOldBars = [];
     },
-    async sendTelegram(barId) {
+    async sendTelegram() {
+      this.modal = false;
       try {
-        await http.post('/duty/' + barId + '/sendTelegramNewsletter');
+        await http.post('/duty/' + this.sendBarId + '/sendTelegramNewsletter');
         this.show?.({
           props: {
             variant: 'info',
