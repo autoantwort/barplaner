@@ -6,7 +6,7 @@
           <router-link class="btn btn-success m-3" to="/addItem">Add Item</router-link>
         </div>
         <div class="mb-3">
-          <barcode-input placeholder="Search" @update:modelValue="filter" />
+          <barcode-input placeholder="Search" v-model="searchQuery" />
         </div>
         <div class="mt-3 mb-3">
           <div v-if="items.length !== 0" class="table-responsive">
@@ -59,6 +59,7 @@ import phoneticsFilter from '@/phoneticsFilter';
 import BarcodeInput from '@/components/BarcodeInput.vue';
 import ImageButton from '@/components/ImageButton.vue';
 import PositionLink from '@/components/PositionLink.vue';
+import { useSearchURL } from '@/router/urlSearchParams';
 
 const formatter = new Intl.NumberFormat('de-DE', {
   style: 'currency',
@@ -75,18 +76,26 @@ export default {
   data() {
     return {
       items: [],
-      filteredItems: [],
     };
   },
-  methods: {
-    filter(value) {
-      this.filteredItems = phoneticsFilter(
+  setup() {
+    const { searchQuery, clearSearch } = useSearchURL();
+    return {
+      searchQuery, clearSearch
+    };
+  },
+  computed: {
+    filteredItems() {
+      console.log('Filtering items with search query:', this.searchQuery);
+      return phoneticsFilter(
         this.items,
-        value,
-        (item, exactNameFilter) => item.barcode === value || item.barcodePack === value || exactNameFilter(item.itemGroup?.name ?? ''),
+        this.searchQuery,
+        (item, exactNameFilter) => item.barcode === this.searchQuery || item.barcodePack === this.searchQuery || exactNameFilter(item.itemGroup?.name ?? ''),
         (item, phoneticsNameFilter) => phoneticsNameFilter(item.itemGroup?.name ?? ''),
       );
     },
+  },
+  methods: {
     print(price) {
       return formatter.format(price);
     },
@@ -94,7 +103,7 @@ export default {
       http
         .get('/itemStock')
         .then(response => {
-          this.filteredItems = this.items = response.data;
+          this.items = response.data;
         })
         .catch(e => {
           console.error(e);

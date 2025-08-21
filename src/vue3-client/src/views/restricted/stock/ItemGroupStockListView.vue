@@ -3,7 +3,7 @@
     <div class="row">
       <div class="col-12 offset-md-1 col-md-10">
         <div class="mb-1">
-          <input type="text" class="mt-3 form-control" placeholder="Search" v-on:input="filter" />
+          <SearchInput class="mt-3" placeholder="Search" ref="search" />
         </div>
         <div class="mb-1">
           <SharedTextArea class="mt-3 form-control" />
@@ -63,7 +63,6 @@ export default {
   data() {
     return {
       itemGroups: [],
-      filteredItemGroups: [],
       selectedPosition: null,
       onlyUnchecked: false,
       connected: 2,
@@ -76,13 +75,13 @@ export default {
       }
       return this.filteredItemGroups;
     },
+    filteredItemGroups() {
+      return phoneticsFilter(this.itemGroups, this.$refs.search.searchQuery);
+    },
   },
   methods: {
     setNavigationData(item) {
       NavigationDataService.set(item);
-    },
-    filter(event) {
-      this.filteredItemGroups = phoneticsFilter(this.itemGroups, event.target.value);
     },
     retrieveItemGroupStock() {
       http
@@ -116,7 +115,6 @@ export default {
             return b.rank - a.rank;
           });
           this.itemGroups = itemGroups;
-          this.filteredItemGroups = this.itemGroups;
           this.initWebSocket();
           setTimeout(() => {
             if (this.connected === 2) {

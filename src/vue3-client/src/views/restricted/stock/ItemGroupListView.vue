@@ -6,7 +6,7 @@
           <router-link class="btn btn-success mt-3 me-3" to="/addItemGroup">Add ItemGroup</router-link>
         </div>
         <div class="mb-3">
-          <input type="text" class="mt-3 form-control" placeholder="Search" v-on:input="filter" />
+          <SearchInput class="mt-3" placeholder="Search" ref="search" />
         </div>
         <div class="mt-3 mb-3">
           <div v-if="itemGroups.length !== 0" class="table-responsive">
@@ -65,23 +65,26 @@ import http from '@/http-common';
 import PositionImage from '@/components/PositionImage.vue';
 import phoneticsFilter from '@/phoneticsFilter';
 import NavigationDataService from '@/router/navigationDataService';
+import SearchInput from '@/components/SearchInput.vue';
 
 export default {
   name: 'itemGroup-list',
   data() {
     return {
       itemGroups: [],
-      filteredItemGroups: [],
       selectedPosition: null,
     };
   },
   components: {
     PositionImage,
+    SearchInput,
+  },
+  computed: {
+    filteredItemGroups() {
+      return phoneticsFilter(this.itemGroups, this.$refs.search.searchQuery);
+    },
   },
   methods: {
-    filter(event) {
-      this.filteredItemGroups = phoneticsFilter(this.itemGroups, event.target.value);
-    },
     openModal(position) {
       this.selectedPosition = position;
       this.$refs.modal.show();
@@ -90,7 +93,7 @@ export default {
       http
         .get('/itemGroupsWithPositions')
         .then(response => {
-          this.filteredItemGroups = this.itemGroups = response.data;
+          this.itemGroups = response.data;
         })
         .catch(e => {
           console.log(e);

@@ -28,6 +28,11 @@ export default {
       this.$emit('update:modelValue', e.target.value.trim());
     },
   },
+  watch: {
+    modelValue(newValue) {
+      this.$refs.barcode.value = newValue;
+    },
+  },
   created() {
     this.client = subscribeMqtt('barplaner/scanner');
     this.client.on('message', (topic, message) => {
