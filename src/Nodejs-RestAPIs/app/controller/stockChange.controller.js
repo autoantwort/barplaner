@@ -291,6 +291,9 @@ export function getStockChangesForItemGroup(req, res) {
         }, {
             model: InvoiceEntry,
             attributes: ['invoiceId'],
+        }, {
+            model: User,
+            attributes: ['id', 'name'],
         }],
         order: [['date', 'DESC']],
     }).then(changes => {
