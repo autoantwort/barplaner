@@ -15,38 +15,26 @@
           <div v-if="item">
             <ul class="pagination">
               <li class="page-item" :class="{ active: sign == '+' }">
-                <span
-                  class="page-link cursor-pointer"
-                  v-on:click="
-                    sign = '+';
-                    paginatorClicked();
-                  "
-                  >Hinzugabe</span
-                >
+                <span class="page-link cursor-pointer" v-on:click="
+                  sign = '+';
+                paginatorClicked();
+                ">Hinzugabe</span>
               </li>
               <li class="page-item" :class="{ active: sign == '-' }">
-                <span
-                  class="page-link cursor-pointer"
-                  v-on:click="
-                    sign = '-';
-                    paginatorClicked();
-                  "
-                  >Entnahme</span
-                >
+                <span class="page-link cursor-pointer" v-on:click="
+                  sign = '-';
+                paginatorClicked();
+                ">Entnahme</span>
               </li>
             </ul>
           </div>
           <div v-if="sign !== null">
             <ul class="pagination">
               <li class="page-item" v-for="i of [1, 2, 3, 4, 5, 6, 7, 8, 10, 12]" :key="i">
-                <span
-                  class="page-link cursor-pointer"
-                  v-on:click="
-                    change = i;
-                    paginatorClicked();
-                  "
-                  >{{ i }}</span
-                >
+                <span class="page-link cursor-pointer" v-on:click="
+                  change = i;
+                paginatorClicked();
+                ">{{ i }}</span>
               </li>
             </ul>
           </div>
@@ -60,35 +48,15 @@
             <div class="input-group">
               <div class="input-group-text" style="min-width: 36px">{{ this.sign }}</div>
 
-              <input
-                id="change"
-                type="number"
-                v-on:keypress="onlyNumbers"
-                v-on:input="onInputForChange"
-                class="form-control text-end"
-                step="any"
-                v-model.number="change"
-                :disabled="item === null"
-                required
-                title="Die Lagerstandsveränderung. Links steht ob diese positiv oder negativ ist."
-              />
+              <input id="change" type="number" v-on:keypress="onlyNumbers" v-on:input="onInputForChange" class="form-control text-end" step="any"
+                v-model.number="change" :disabled="item === null" required title="Die Lagerstandsveränderung. Links steht ob diese positiv oder negativ ist." />
             </div>
             <div class="input-group mt-2">
               <div class="input-group-text">=</div>
 
-              <input
-                type="number"
-                class="form-control text-end"
-                v-model.number="result"
-                v-on:keypress="onlyNumbers"
-                v-on:input="onInputForResult"
-                step="any"
-                :min="sign === '+' ? currentItemStock + 1 : null"
-                :max="sign === '-' ? currentItemStock - 1 : null"
-                :disabled="item === null"
-                required
-                title="Der neue Lagerstand"
-              />
+              <input type="number" class="form-control text-end" v-model.number="result" v-on:keypress="onlyNumbers" v-on:input="onInputForResult" step="any"
+                :min="sign === '+' ? currentItemStock + 1 : null" :max="sign === '-' ? currentItemStock - 1 : null" :disabled="item === null" required
+                title="Der neue Lagerstand" />
             </div>
             <div v-if="item === null" class="invalid-feedback" style="display: block">You have to select an item to edit this fields.</div>
             <div v-show="resultError !== null" class="invalid-feedback" style="display: block">{{ resultError }}</div>
@@ -172,33 +140,13 @@
             <div class="input-group" v-show="showNetto">
               <div class="input-group-text" style="min-width: 71px">Netto</div>
               <div class="input-group-text">{{ Math.abs(change) }} ×</div>
-              <input
-                type="number"
-                class="form-control text-end"
-                step="any"
-                placeholder="Einzelpreis    "
-                v-model.number="einzelNetto"
-                v-on:input="onNewEinzelNetto"
-                min="0"
-                :disabled="priceInputDisabled"
-                v-on:keypress="onlyNumbers"
-                :required="showNetto"
-              />
+              <input type="number" class="form-control text-end" step="0.01" placeholder="Einzelpreis    " lang="de-DE" v-model.number="einzelNetto"
+                v-on:input="onNewEinzelNetto" min="0" :disabled="priceInputDisabled" v-on:keypress="onlyNumbers" :required="showNetto" />
 
               <div class="input-group-text">=</div>
 
-              <input
-                type="number"
-                class="form-control text-end"
-                step="any"
-                placeholder="Gesamtpreis    "
-                v-model.number="gesamtNetto"
-                min="0"
-                v-on:input="onNewGesamtNetto"
-                :disabled="priceInputDisabled"
-                v-on:keypress="onlyNumbers"
-                :required="showNetto"
-              />
+              <input type="number" class="form-control text-end" step="0.01" placeholder="Gesamtpreis    " lang="de-DE" v-model.number="gesamtNetto" min="0"
+                v-on:input="onNewGesamtNetto" :disabled="priceInputDisabled" v-on:keypress="onlyNumbers" :required="showNetto" />
 
               <div class="input-group-text">€</div>
             </div>
@@ -220,19 +168,8 @@
               <div class="input-group-text px-sm">
                 <input type="radio" id="own" value="own" name="tax" v-model="tax" :disabled="change === null" />
               </div>
-              <input
-                type="text"
-                step="any"
-                class="form-control px-1"
-                :required="tax === 'own' ? true : null"
-                v-model.number="ownTax"
-                min="0"
-                max="1000"
-                v-on:keypress="onlyNumbers"
-                v-on:click="tax = 'own'"
-                :placeholder="taxPlaceholder"
-                :disabled="change === null"
-              />
+              <input type="text" step="any" class="form-control px-1" :required="tax === 'own' ? true : null" v-model.number="ownTax" min="0" max="1000"
+                v-on:keypress="onlyNumbers" v-on:click="tax = 'own'" :placeholder="taxPlaceholder" :disabled="change === null" />
 
               <div class="input-group-text px-sm">%</div>
             </div>
@@ -240,31 +177,11 @@
             <div class="input-group">
               <div class="input-group-text">Brotto</div>
               <div class="input-group-text">{{ Math.abs(change) }} ×</div>
-              <input
-                type="number"
-                class="form-control text-end"
-                step="any"
-                placeholder="Einzelpreis    "
-                v-model.number="einzelBrotto"
-                v-on:input="onNewEinzelBrotto"
-                min="0"
-                :disabled="priceInputDisabled"
-                v-on:keypress="onlyNumbers"
-                :required="showBrotto"
-              />
+              <input type="number" class="form-control text-end" step="0.01" placeholder="Einzelpreis    " v-model.number="einzelBrotto" lang="de-DE"
+                v-on:input="onNewEinzelBrotto" min="0" :disabled="priceInputDisabled" v-on:keypress="onlyNumbers" :required="showBrotto" />
               <div class="input-group-text">=</div>
-              <input
-                type="number"
-                class="form-control text-end"
-                step="any"
-                placeholder="Gesamtpreis    "
-                v-model.number="gesamtBrotto"
-                min="0"
-                v-on:input="onNewGesamtBrotto"
-                :disabled="priceInputDisabled"
-                v-on:keypress="onlyNumbers"
-                :required="showBrotto"
-              />
+              <input type="number" class="form-control text-end" step="0.01" placeholder="Gesamtpreis    " lang="de-DE" v-model.number="gesamtBrotto" min="0"
+                v-on:input="onNewGesamtBrotto" :disabled="priceInputDisabled" v-on:keypress="onlyNumbers" :required="showBrotto" />
               <div class="input-group-text">€</div>
             </div>
           </div>
@@ -290,7 +207,7 @@ import NavigationDataService from '@/router/navigationDataService';
 import { RouterLink } from 'vue-router';
 import { subscribeMqtt } from '@/mqttSub';
 
-const round = v => Math.round(v * 1000) / 1000;
+const round = v => Math.round(v * 100) / 100;
 
 export default {
   data() {
@@ -311,7 +228,7 @@ export default {
       einzelNetto: null,
       gesamtNetto: null,
       priceFrom: null,
-      tax: null,
+      tax: 19,
       ownTax: null,
       taxPlaceholder: 'Eigener',
       note: null,
@@ -468,18 +385,21 @@ export default {
     },
     onlyNumbers(evt) {
       const charCode = evt.which ? evt.which : evt.keyCode;
-      // replace , by . for non german browsers
-      if (charCode === 44 && navigator.language !== 'de') {
-        if (evt.target.value.indexOf('.') === -1) {
-          evt.target.value += '.';
+      // replace . by ,
+      const CHAR_CODE_COMMA = 44;
+      const CHAR_CODE_DOT = 46;
+      const CHAR_CODE_MINUS = 45;
+      const CHAR_CODE_PLUS = 43;
+      if (charCode === CHAR_CODE_DOT || charCode === CHAR_CODE_COMMA) {
+        if (evt.target.value.indexOf(',') !== -1 || evt.target.value.indexOf('.') !== -1) {
+          evt.preventDefault();
         }
-        evt.preventDefault();
         return;
       }
-      if ((charCode < 48 || charCode > 57) && charCode !== 46 && charCode !== 44) {
+      if ((charCode < 48 || charCode > 57) && charCode !== CHAR_CODE_DOT && charCode !== CHAR_CODE_COMMA) {
         evt.preventDefault();
       }
-      if ((charCode === 43 || charCode === 45) && this.reason === 'other' && evt.target.id === 'change') {
+      if ((charCode === CHAR_CODE_PLUS || charCode === CHAR_CODE_MINUS) && this.reason === 'other' && evt.target.id === 'change') {
         this.sign = evt.key;
         this.result = this.currentItemStock + this.change * (this.sign === '+' ? 1 : -1);
       }
