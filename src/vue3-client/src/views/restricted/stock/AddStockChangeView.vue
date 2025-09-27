@@ -135,56 +135,8 @@
             </div>
             <div v-if="priceAccuracy === null" class="invalid-feedback" style="display: block">Please select an price accuracy.</div>
           </div>
-          <div class="mb-3 was-validated" v-show="showBrotto">
-            <label for class="form-label">Preis (Netto: ohne Steuern, Brotto: mit Steuern)</label>
-            <div class="input-group" v-show="showNetto">
-              <div class="input-group-text" style="min-width: 71px">Netto</div>
-              <div class="input-group-text">{{ Math.abs(change) }} ×</div>
-              <input type="number" class="form-control text-end" step="0.01" placeholder="Einzelpreis    " lang="de-DE" v-model.number="einzelNetto"
-                v-on:input="onNewEinzelNetto" min="0" :disabled="priceInputDisabled" v-on:keypress="onlyNumbers" :required="showNetto" />
-
-              <div class="input-group-text">=</div>
-
-              <input type="number" class="form-control text-end" step="0.01" placeholder="Gesamtpreis    " lang="de-DE" v-model.number="gesamtNetto" min="0"
-                v-on:input="onNewGesamtNetto" :disabled="priceInputDisabled" v-on:keypress="onlyNumbers" :required="showNetto" />
-
-              <div class="input-group-text">€</div>
-            </div>
-
-            <div class="input-group my-2" v-show="showNetto">
-              <div class="input-group-text px-sm">Steuersatz:</div>
-              <div class="input-group-text px-sm">
-                <input type="radio" id="0%" value="0" name="tax" v-model="tax" :disabled="change === null" />
-                <label style="margin-bottom: 0px; padding-left: 4px" for="0%">0%</label>
-              </div>
-              <div class="input-group-text px-sm">
-                <input type="radio" id="7%" value="7" name="tax" v-model="tax" :disabled="change === null" />
-                <label style="margin-bottom: 0px; padding-left: 4px" for="7%">7%</label>
-              </div>
-              <div class="input-group-text px-sm">
-                <input type="radio" id="19%" value="19" name="tax" v-model="tax" :disabled="change === null" />
-                <label style="margin-bottom: 0px; padding-left: 4px" for="19%">19%</label>
-              </div>
-              <div class="input-group-text px-sm">
-                <input type="radio" id="own" value="own" name="tax" v-model="tax" :disabled="change === null" />
-              </div>
-              <input type="text" step="any" class="form-control px-1" :required="tax === 'own' ? true : null" v-model.number="ownTax" min="0" max="1000"
-                v-on:keypress="onlyNumbers" v-on:click="tax = 'own'" :placeholder="taxPlaceholder" :disabled="change === null" />
-
-              <div class="input-group-text px-sm">%</div>
-            </div>
-
-            <div class="input-group">
-              <div class="input-group-text">Brotto</div>
-              <div class="input-group-text">{{ Math.abs(change) }} ×</div>
-              <input type="number" class="form-control text-end" step="0.01" placeholder="Einzelpreis    " v-model.number="einzelBrotto" lang="de-DE"
-                v-on:input="onNewEinzelBrotto" min="0" :disabled="priceInputDisabled" v-on:keypress="onlyNumbers" :required="showBrotto" />
-              <div class="input-group-text">=</div>
-              <input type="number" class="form-control text-end" step="0.01" placeholder="Gesamtpreis    " lang="de-DE" v-model.number="gesamtBrotto" min="0"
-                v-on:input="onNewGesamtBrotto" :disabled="priceInputDisabled" v-on:keypress="onlyNumbers" :required="showBrotto" />
-              <div class="input-group-text">€</div>
-            </div>
-          </div>
+          <PriceInput ref="priceInput" :showBrotto="showBrotto" :showNetto="showNetto" :change="change" v-model:einzelNetto="einzelNetto"
+            v-model:einzelBrotto="einzelBrotto" :initialTax="tax" :priceInputDisabled="priceInputDisabled" />
           <div class="mt-2 text-danger" v-if="errorString.length !== 0">{{ errorString }}</div>
           <button v-if="change !== null" type="button" class="btn btn-success my-3" v-on:click="addChange('another')">Add Change and add similar</button>
           <button v-if="change !== null" type="button" class="btn btn-success ms-own" v-on:click="addChange('list')">Add Change and view list</button>
@@ -206,10 +158,12 @@ import { BToast } from 'bootstrap-vue-next';
 import NavigationDataService from '@/router/navigationDataService';
 import { RouterLink } from 'vue-router';
 import { subscribeMqtt } from '@/mqttSub';
-
-const round = v => Math.round(v * 100) / 100;
+import PriceInput from '@/components/PriceInput.vue';
 
 export default {
+  components: {
+    PriceInput,
+  },
   data() {
     return {
       item: null,
@@ -224,13 +178,8 @@ export default {
       resultError: null,
       sign: null,
       einzelBrotto: null,
-      gesamtBrotto: null,
       einzelNetto: null,
-      gesamtNetto: null,
-      priceFrom: null,
       tax: 19,
-      ownTax: null,
-      taxPlaceholder: 'Eigener',
       note: null,
       reasons,
     };
@@ -238,10 +187,6 @@ export default {
   computed: {
     noteRequired() {
       return this.reason !== null && this.reason === 'other';
-    },
-    realTax() {
-      if (this.tax !== null && (this.tax !== 'own' || this.ownTax !== null)) return this.tax === 'own' ? this.ownTax : Number(this.tax);
-      else return -1;
     },
     showNetto() {
       return this.reason === 'bought';
@@ -261,29 +206,7 @@ export default {
   },
   watch: {
     change: function () {
-      if (this.priceFrom === 'einzelBrotto') {
-        this.gesamtBrotto = this.einzelBrotto * Math.abs(this.change);
-        this.updateNetto();
-      } else if (this.priceFrom === 'gesamtBrotto') {
-        this.einzelBrotto = round(this.gesamtBrotto / Math.abs(this.change));
-        this.updateNetto();
-      } else if (this.priceFrom === 'einzelNetto') {
-        this.gesamtNetto = this.einzelNetto * Math.abs(this.change);
-        this.updateBrotto();
-      } else if (this.priceFrom === 'gesamtNetto') {
-        this.einzelNetto = round(this.gesamtNetto / Math.abs(this.change));
-        this.updateBrotto();
-      }
       if (this.reason === null && this.einzelNetto !== null) this.reason = 'bought'; // Wenn das erste mal nen Menge gewählt wird und wir von "Add Item" kommen
-    },
-    realTax: function (tax) {
-      if (tax >= 0 && this.priceFrom) {
-        if (this.priceFrom.endsWith('Brotto')) {
-          this.updateNetto();
-        } else if (this.priceFrom.endsWith('Netto')) {
-          this.updateBrotto();
-        }
-      }
     },
     result: function (result) {
       if (this.currentItemStock !== null) {
@@ -344,44 +267,6 @@ export default {
       const change = this.currentItemStock - this.result;
       this.sign = change > 0 ? '-' : '+';
       this.change = Math.abs(change);
-    },
-    onNewEinzelNetto() {
-      this.gesamtNetto = this.einzelNetto * Math.abs(this.change);
-      this.updateBrotto();
-      this.priceFrom = 'einzelNetto';
-    },
-    onNewGesamtNetto() {
-      this.einzelNetto = round(this.gesamtNetto / Math.abs(this.change));
-      this.updateBrotto();
-      this.priceFrom = 'gesamtNetto';
-    },
-    onNewEinzelBrotto() {
-      this.gesamtBrotto = this.einzelBrotto * Math.abs(this.change);
-      this.updateNetto();
-      this.priceFrom = 'einzelBrotto';
-    },
-    onNewGesamtBrotto() {
-      this.einzelBrotto = round(this.gesamtBrotto / Math.abs(this.change));
-      this.updateNetto();
-      this.priceFrom = 'gesamtBrotto';
-    },
-    updateBrotto() {
-      const tax = this.realTax;
-      if (tax >= 0) {
-        this.einzelBrotto = round(this.einzelNetto * (1 + tax / 100));
-        this.gesamtBrotto = round(this.gesamtNetto * (1 + tax / 100));
-      } else if (this.gesamtBrotto && this.gesamtNetto) {
-        this.taxPlaceholder = round((1 - this.gesamtBrotto / this.gesamtNetto) * -100);
-      }
-    },
-    updateNetto() {
-      const tax = this.realTax;
-      if (tax >= 0) {
-        this.einzelNetto = round(this.einzelBrotto * (100 / (100 + tax)));
-        this.gesamtNetto = round(this.gesamtBrotto * (100 / (100 + tax)));
-      } else if (this.gesamtNetto && this.gesamtBrotto) {
-        this.taxPlaceholder = round((1 - this.gesamtBrotto / this.gesamtNetto) * -100);
-      }
     },
     onlyNumbers(evt) {
       const charCode = evt.which ? evt.which : evt.keyCode;
@@ -453,14 +338,7 @@ export default {
                 this.change = null;
                 this.result = null;
                 this.resultError = null;
-                this.einzelBrotto = null;
-                this.gesamtBrotto = null;
-                this.einzelNetto = null;
-                this.gesamtNetto = null;
-                this.priceFrom = null;
-                this.tax = null;
-                this.ownTax = null;
-                this.taxPlaceholder = 'Eigener';
+                this.$refs.priceInput.clearPrices();
                 this.lastChanges = null;
               }
               this.errorString = 'Change added';
