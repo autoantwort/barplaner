@@ -159,6 +159,7 @@ import NavigationDataService from '@/router/navigationDataService';
 import { RouterLink } from 'vue-router';
 import { subscribeMqtt } from '@/mqttSub';
 import PriceInput from '@/components/PriceInput.vue';
+import { onlyNumbers } from '@/components/eventFilters';
 
 export default {
   components: {
@@ -269,21 +270,10 @@ export default {
       this.change = Math.abs(change);
     },
     onlyNumbers(evt) {
+      onlyNumbers(evt);
       const charCode = evt.which ? evt.which : evt.keyCode;
-      // replace . by ,
-      const CHAR_CODE_COMMA = 44;
-      const CHAR_CODE_DOT = 46;
       const CHAR_CODE_MINUS = 45;
       const CHAR_CODE_PLUS = 43;
-      if (charCode === CHAR_CODE_DOT || charCode === CHAR_CODE_COMMA) {
-        if (evt.target.value.indexOf(',') !== -1 || evt.target.value.indexOf('.') !== -1) {
-          evt.preventDefault();
-        }
-        return;
-      }
-      if ((charCode < 48 || charCode > 57) && charCode !== CHAR_CODE_DOT && charCode !== CHAR_CODE_COMMA) {
-        evt.preventDefault();
-      }
       if ((charCode === CHAR_CODE_PLUS || charCode === CHAR_CODE_MINUS) && this.reason === 'other' && evt.target.id === 'change') {
         this.sign = evt.key;
         this.result = this.currentItemStock + this.change * (this.sign === '+' ? 1 : -1);
