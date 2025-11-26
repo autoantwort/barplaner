@@ -1,9 +1,9 @@
-var fs = require('fs');
-const db = require("../config/db.config");
+import { readFile } from 'fs';
+import db from "../config/db.config";
 
-exports.loadOldData = function() {
+export function loadOldData() {
     db.addSyncCallback(() => {
-        fs.readFile(__dirname + '/user.json', 'utf8', function(err, data) {
+        readFile(__dirname + '/user.json', 'utf8', function(err, data) {
             if (err) throw err; // we'll not consider error handling for now
             let users = JSON.parse(data);
             let userRoles = [];
@@ -30,7 +30,7 @@ exports.loadOldData = function() {
                     .then(() => console.log("Added User Roles!"))
                     .catch(console.error);
 
-                fs.readFile(__dirname + '/bars.json', 'utf8', function(err, data) {
+                readFile(__dirname + '/bars.json', 'utf8', function(err, data) {
                     if (err) throw err; // we'll not consider error handling for now
                     let bars = JSON.parse(data);
                     for (let i = 0; i < bars.length; ++i) {
@@ -39,7 +39,7 @@ exports.loadOldData = function() {
                     }
                     db.Bar.bulkCreate(bars).then(() => {
 
-                        fs.readFile(__dirname + '/bardienst.json', 'utf8', function(err, data) {
+                        readFile(__dirname + '/bardienst.json', 'utf8', function(err, data) {
                             if (err) throw err; // we'll not consider error handling for now
                             let obj = JSON.parse(data);
                             let status = ['no_info', 'absent', 'present'];

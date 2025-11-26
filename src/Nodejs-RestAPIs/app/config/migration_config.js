@@ -1,25 +1,25 @@
-const env = require('./env.js');
+import env, { username, database, host, dialect, databaseFile } from './env.js';
 
 console.log(env)
 const config = {
     "development": {
-        "username": env.username,
-        "password": env.database,
-        "database": env.database,
-        "host": env.host,
-        "dialect": env.dialect,
-        "storage": env.databaseFile,
+        "username": username,
+        "password": database,
+        "database": database,
+        "host": host,
+        "dialect": dialect,
+        "storage": databaseFile,
         "operatorsAliases": false
     },
     "production": {
-        "username": env.username,
-        "password": env.database,
-        "database": env.database,
-        "host": env.host,
-        "dialect": env.dialect,
-        "storage": env.databaseFile,
+        "username": username,
+        "password": database,
+        "database": database,
+        "host": host,
+        "dialect": dialect,
+        "storage": databaseFile,
         "operatorsAliases": false
     }
 };
 
-module.exports = config;
+export default config;

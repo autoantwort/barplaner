@@ -1,5 +1,5 @@
-module.exports = function(app) {
-    const file = require('../controller/file.controller');
+import { getImageById } from '../controller/file.controller';
+export default function (app) {
 
-    app.get('/api/image/:id', file.getImageById);
+    app.get('/api/image/:id', getImageById);
 };

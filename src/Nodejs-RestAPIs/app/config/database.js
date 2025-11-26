@@ -1,21 +1,21 @@
-import { database, username, password, host, dialect, pool, databaseFile } from './env.js';
+import env from './env.js';
 import Sequelize from 'sequelize';
 
-const sequelize = new Sequelize(database, username, password, {
-    host: host,
-    dialect: dialect,
+const sequelize = new Sequelize(env.database, env.username, env.password, {
+    host: env.host,
+    dialect: env.dialect,
     operatorsAliases: false,
 
     pool: {
-        max: pool.max,
-        min: pool.min,
-        acquire: pool.acquire,
-        idle: pool.idle
+        max: env.pool.max,
+        min: env.pool.min,
+        acquire: env.pool.acquire,
+        idle: env.pool.idle
     },
     benchmark: true,
     logging: null, //(e, t) => console.log(e, " time : ", t),
 
-    storage: databaseFile
+    storage: env.databaseFile
 });
 
 export {sequelize, Sequelize};

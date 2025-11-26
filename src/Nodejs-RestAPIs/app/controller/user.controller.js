@@ -1,12 +1,17 @@
 import { createTransport } from 'nodemailer';
-import { Bar, User, Role, UserRoles, BarDuty, Sequelize } from '../config/db.config.js';
-import { mailServer, frontendURL } from '../config/env.js';
+import env from '../config/env.js';
 import { hash as _hash } from 'bcrypt';
 import { randomBytes } from 'crypto';
 import { UserAdminRole, CleaningAdminRole } from '../util/roles.js';
+import { UserRoles } from '../model/userroles.model.js';
+import { User } from '../model/user.model.js';
+import { Sequelize } from '../config/database.js';
+import { Bar } from '../model/bar.model.js';
+import { Role } from '../model/role.model.js';
+import { Barduty } from '../model/barduty.model.js';
 const Op = Sequelize.Op;
 
-let transporter = createTransport(mailServer);
+let transporter = createTransport(env.mailServer);
 
 // Post a User
 export function create(req, res) {
@@ -34,7 +39,7 @@ export function create(req, res) {
                     birthday: req.body.birthday
                 }).then(user => {
                     if (user.active) {
-                        // add user to barduty of every bar in the future
+                        // add user to Barduty of every bar in the future
                         Bar.findAll({
                             where: {
                                 start: {
@@ -48,7 +53,7 @@ export function create(req, res) {
                                     userID: user.id,
                                 };
                             }
-                            BarDuty.bulkCreate(bars).catch(err => {
+                            Barduty.bulkCreate(bars).catch(err => {
                                 console.error(err);
                             });
                         }).catch(err => {
@@ -110,7 +115,7 @@ export function sendPasswordResetLink(req, res) {
             from: mailServer.auth.user,
             to: user.email,
             subject: 'Password reset Barplaner',
-            text: 'To reset your password, please click the following link: ' + frontendURL + '/#/resetPassword/' + user.passwordResetKey
+            text: 'To reset your password, please click the following link: ' + env.frontendURL + '/#/resetPassword/' + user.passwordResetKey
         };
         // Send mail with defined transport object
         transporter.sendMail(mailOptions, (error, info) => {
@@ -298,7 +303,7 @@ export function update(req, res) {
                             // create bar duty for every bar
                             bars.forEach(bar => {
                                 // if it is already there, we get an error, but we ignore the result
-                                BarDuty.create({
+                                Barduty.create({
                                     barID: bar.id,
                                     userID: req.params.userID,
                                 }).catch(err => { });
@@ -306,7 +311,7 @@ export function update(req, res) {
                         }).catch(console.error);
                     } else {
                         // delete BarDuties in the future if state is 'no_info'
-                        BarDuty.findAll({
+                        Barduty.findAll({
                             where: {
                                 userID: req.params.userID,
                                 state: 'no_info',

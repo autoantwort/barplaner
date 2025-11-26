@@ -1,4 +1,6 @@
-import { UserRoles, Setting, Sequelize } from '../config/db.config.js';
+import { Sequelize } from '../config/database.js';
+import { Setting } from '../model/setting.model.js';
+import { UserRoles } from '../model/userroles.model.js';
 import { CleaningAdminRole } from '../util/roles.js';
 
 // create default settings if not exists:

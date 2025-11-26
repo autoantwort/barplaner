@@ -5,7 +5,7 @@ function sendMessageToController(msg) {
     controllers.filter(c => c.readyState === 1 /*WebSocket.OPEN*/ ).forEach(c => c.send(msg));
 }
 
-exports.registerClients = function(app) {
+export function registerClients(app) {
     app.ws('/volumeClient', (ws, req) => {
         let name = "unnamed";
         clients[name] = ws;
@@ -40,8 +40,8 @@ exports.registerClients = function(app) {
             sendMessageToController("Remove:" + name);
         });
     });
-};
-exports.registerMasters = app => {
+}
+export function registerMasters(app) {
     app.ws('/volumeMaster', (ws, req) => {
         ws.on('error', err => {
             console.error("Fehler bei einem Websocket unter /volumeMaster", err);
@@ -74,4 +74,4 @@ exports.registerMasters = app => {
             }
         });
     });
-};
+}

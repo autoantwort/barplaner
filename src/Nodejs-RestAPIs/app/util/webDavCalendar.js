@@ -1,9 +1,10 @@
-const ICal = require('ical-generator');
-const env = require('../config/env');
-const db = require('../config/db.config');
-const BarUtil = require('./addBar');
-const Bar = db.Bar;
-const Op = db.Sequelize.Op;
+import ICal from 'ical-generator';
+import env from '../config/env';
+import db from '../config/db.config';
+import { onBarAdded, onBarChanged } from './addBar';
+import { Bar } from '../model/bar.model';
+import { Op } from 'sequelize';
+import { Client, transport, Credentials } from "dav";
 
 // see https://www.npmjs.com/package/dav for the api
 // the api feels often like a C api (you have the client and pass 
@@ -40,11 +41,9 @@ const createEvent = event => {
     return toICalString(e);
 };
 
-const dav = require("dav");
-
 const clients = [];
 for (const config of env.webDavCalendars) {
-    const client = new dav.Client(new dav.transport.Basic(new dav.Credentials(config.auth)));
+    const client = new Client(new transport.Basic(new Credentials(config.auth)));
     clients.push(client);
     client.createAccount({
         server: config.url,
@@ -92,7 +91,7 @@ for (const config of env.webDavCalendars) {
                     start: {
                         [Op.gt]: oldest,
                     },
-                    ...(config.publishPrivateEvents || { public: true}),
+                    ...(config.publishPrivateEvents || { public: true }),
                 }
             }).then(bars => {
                 for (const bar of bars) {
@@ -103,13 +102,13 @@ for (const config of env.webDavCalendars) {
     });
 }
 
-BarUtil.onBarAdded(bar => {
+onBarAdded(bar => {
     for (const c of clients) {
         c.saveBar(bar);
     }
 });
 
-BarUtil.onBarChanged(bar => {
+onBarChanged(bar => {
     for (const c of clients) {
         c.saveBar(bar);
     }

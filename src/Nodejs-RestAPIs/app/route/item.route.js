@@ -1,12 +1,12 @@
-module.exports = function(app) {
-    const item = require('../controller/item.controller');
+import { getAll, getAllWithGroupsAndPositions, getAllForSelect, getAllWithImage, findById, create, update } from '../controller/item.controller';
+export default function (app) {
 
-    app.get('/api/items', item.getAll);
-    app.get('/api/itemsWithGroupsAndPositions', item.getAllWithGroupsAndPositions);
-    app.get('/api/itemsForSelect', item.getAllForSelect);
-    app.get('/api/itemsWithImage', item.getAllWithImage);
-    app.get('/api/item/:id', item.findById);
+    app.get('/api/items', getAll);
+    app.get('/api/itemsWithGroupsAndPositions', getAllWithGroupsAndPositions);
+    app.get('/api/itemsForSelect', getAllForSelect);
+    app.get('/api/itemsWithImage', getAllWithImage);
+    app.get('/api/item/:id', findById);
 
-    app.post('/api/item', item.create);
-    app.put('/api/item/:id', item.update);
+    app.post('/api/item', create);
+    app.put('/api/item/:id', update);
 };

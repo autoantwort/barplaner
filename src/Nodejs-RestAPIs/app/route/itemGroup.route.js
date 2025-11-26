@@ -1,12 +1,12 @@
-module.exports = function(app) {
-    const itemGroup = require('../controller/itemgroup.controller');
+import { getAll, findById, getAllForSelect, getAllWithPositions, getAllItemGroupsAtPosition, create, update } from '../controller/itemgroup.controller';
+export default function (app) {
 
-    app.get('/api/itemGroups', itemGroup.getAll);
-    app.get('/api/itemGroup/:id', itemGroup.findById);
-    app.get('/api/itemGroupsForSelect', itemGroup.getAllForSelect);
-    app.get('/api/itemGroupsWithPositions', itemGroup.getAllWithPositions);
-    app.get('/api/position/:positionId/itemGroups', itemGroup.getAllItemGroupsAtPosition);
+    app.get('/api/itemGroups', getAll);
+    app.get('/api/itemGroup/:id', findById);
+    app.get('/api/itemGroupsForSelect', getAllForSelect);
+    app.get('/api/itemGroupsWithPositions', getAllWithPositions);
+    app.get('/api/position/:positionId/itemGroups', getAllItemGroupsAtPosition);
 
-    app.post('/api/itemGroup', itemGroup.create);
-    app.put('/api/itemGroup/:id', itemGroup.update);
+    app.post('/api/itemGroup', create);
+    app.put('/api/itemGroup/:id', update);
 };

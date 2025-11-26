@@ -1,14 +1,14 @@
 import { promises as fs } from 'fs';
-import { Sequelize } from '../config/db.config.js';
-import { fileStoragePath } from '../config/env';
+import env from '../config/env';
 import sharp from 'sharp';
 import { createHash } from 'crypto';
 import { File } from '../model/file.model.js';
 import { Image } from '../model/image.model.js';
+import { Sequelize } from '../config/database';
 
-fs.mkdir(fileStoragePath, { recursive: true });
+fs.mkdir(env.fileStoragePath, { recursive: true });
 
-export function getFilePathForId(id) { return fileStoragePath + '/' + id; }
+export function getFilePathForId(id) { return env.fileStoragePath + '/' + id; }
 
 export async function coreCreateFile(buffer, mimeType, filename = null, md5) {
     if (md5 === undefined) {

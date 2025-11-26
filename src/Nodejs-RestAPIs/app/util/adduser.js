@@ -1,24 +1,23 @@
-const db = require('../config/db.config.js');
-const bcrypt = require('bcrypt');
-const crypto = require('crypto');
-const Bar = db.Bar;
-const User = db.User;
-const UserRoles = db.UserRoles;
-const BarDuty = db.BarDuty;
-const Role = db.Role;
-const Op = db.Sequelize.Op;
+import { hash as _hash } from 'bcrypt';
+import { randomBytes } from 'crypto';
+import { Bar } from '../model/bar.model.js';
+import { User } from '../model/user.model.js';
+import { Role } from '../model/role.model.js';
+import { Sequelize } from '../config/database.js';
+import { Barduty } from '../model/barduty.model.js';
+const Op = Sequelize.Op;
 
 // Post a User
-exports.createAdmin = (name, password, callback) => {
+export function createAdmin(name, password, callback) {
     if (password === undefined || name === undefined) {
         callback("password or name was not defined");
         return;
     }
-    bcrypt.hash(password, 10).then(function(hash) {
+    _hash(password, 10).then(function(hash) {
         User.create({
             name: name,
             password: hash,
-            sessionID: crypto.randomBytes(32).toString('hex'),
+            sessionID: randomBytes(32).toString('hex'),
         }).then(user => {
             callback("user created : " + user);
             if (user.active) {
@@ -36,13 +35,13 @@ exports.createAdmin = (name, password, callback) => {
                             userID: user.id,
                         };
                     }
-                    BarDuty.bulkCreate(bars).catch(err => {
+                    Barduty.bulkCreate(bars).catch(err => {
                         callback(err);
                     });
                     Role.findAll().then(res => {
-                        callback("suuccess : " + res);
+                        callback("success : " + res);
                         user.addRoles(res).then(() => {
-                            callback("suuccess");
+                            callback("success");
                         }).catch(err => {
                             callback("Error -> " + err);
                         });
@@ -57,5 +56,4 @@ exports.createAdmin = (name, password, callback) => {
             callback("Error -> " + err);
         });
     });
-
-};
+}

@@ -5,7 +5,7 @@ function sendMessageToController(msg) {
     controllers.filter(c => c.readyState === 1 /*WebSocket.OPEN*/ ).forEach(c => c.send(msg));
 }
 
-exports.registerClients = function(app) {
+export function registerClients(app) {
     app.ws('/controlPaneClient', (ws, req) => {
         ws.on('error', err => {
             console.error("Fehler bei einem Websocket unter /controlPaneClient", err);
@@ -61,8 +61,8 @@ exports.registerClients = function(app) {
             sendMessageToController("remove:" + name);
         });
     });
-};
-exports.registerMasters = app => {
+}
+export function registerMasters(app) {
     app.ws('/controlPaneMaster', (ws, req) => {
         ws.on('error', err => {
             console.error("Fehler bei einem Websocket unter /controlPaneMaster", err);
@@ -99,4 +99,4 @@ exports.registerMasters = app => {
             }
         });
     });
-};
+}

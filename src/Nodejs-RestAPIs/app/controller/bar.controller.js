@@ -1,8 +1,11 @@
-import { Bar, User, BarDuty, UserRoles } from '../config/db.config.js';
 import { computeCleaning } from '../util/cleaning';
 import { addBar } from '../util/addBar';
 import { BarAdminRole, CleaningAdminRole } from '../util/roles.js';
 import { changeCleaningStatus } from '../util/telegramBarFeedback.js';
+import { Bar } from '../model/bar.model';
+import { User } from '../model/user.model';
+import { Barduty } from '../model/barduty.model';
+import { UserRoles } from '../model/userroles.model';
 // Post a Bar
 export function create(req, res) {
 
@@ -45,15 +48,15 @@ export function findAll(req, res) {
 // Update cleaning
 export function updateCleaning(req, res) {
     let update = () => {
-        BarDuty.update(req.body, {
+        Barduty.update(req.body, {
             where: {
                 userID: req.params.userID,
                 barID: req.params.barID,
             }
-        }).spread((affectedCount, affectedRows) => {
+        }).then(result => {
             changeCleaningStatus(req.params.barID, req.params.userID, req.body.have_to_clean);
             // Send all bars to Client
-            res.status(200).send(JSON.stringify(affectedCount));
+            res.status(200).send(JSON.stringify(result[0]));
         }).catch(err => {
             res.status(500).send("Error -> " + err);
         });
@@ -85,14 +88,14 @@ export function updateCleaning(req, res) {
 } // Update cleaning
 export function updateDuty(req, res) {
     if (req.user.id === Number(req.params.userID)) {
-        BarDuty.update(req.body, {
+        Barduty.update(req.body, {
             where: {
                 userID: req.params.userID,
                 barID: req.params.barID,
             }
-        }).spread((affectedCount, affectedRows) => {
+        }).then(result => {
             // Send all bars to Client
-            res.status(200).send(JSON.stringify(affectedCount));
+            res.status(200).send(JSON.stringify(result[0]));
         }).catch(err => {
             res.status(500).send("Error -> " + err);
         });
@@ -125,7 +128,7 @@ export function getAllBarsWithBarduties(req, res) {
                 map[bars[i].id] = bars[i];
             }
             console.timeEnd("order by");
-            BarDuty.findAll({
+            Barduty.findAll({
                 raw: true,
                 order: [
                     ['state', 'DESC'],

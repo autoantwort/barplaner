@@ -2,7 +2,7 @@ const clients = new Set();
 const selectedItems = new Set();
 
 
-exports.registerWebSocketListener = function (app) {
+export function registerWebSocketListener (app) {
     app.ws('/shoppingListState', (ws, req) => {
         clients.add(ws);
         ws.send("Init:" + Array.from(selectedItems).join(","));
@@ -31,4 +31,4 @@ exports.registerWebSocketListener = function (app) {
             clients.delete(ws);
         });
     });
-};
+}

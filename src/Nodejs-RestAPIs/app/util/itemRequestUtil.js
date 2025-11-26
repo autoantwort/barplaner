@@ -1,10 +1,12 @@
 import { client, retain } from './mqttClient.js';
-import db, { Setting } from '../config/db.config.js';
 import { bot } from './telegram.js';
 import { StockAdminRole } from './roles.js';
-const Item = db.stock.Item;
-const ItemGroup = db.stock.ItemGroup;
-const ItemRequest = db.stock.ItemRequest;
+import { Setting } from '../model/setting.model.js';
+import { Item } from '../model/stockManagement/item.model.js';
+import { ItemGroup } from '../model/stockManagement/itemGroup.model.js';
+import { ItemRequest } from '../model/stockManagement/itemRequest.model.js';
+import { Position } from '../model/stockManagement/position.model.js';
+import { Image } from '../model/image.model.js';
 
 const sendMQTTError = () => {
     client.publish('barplaner/itemRequest/beep', '1');
@@ -16,18 +18,18 @@ const sendItemRequestQuere = async () => {
             include: [{
                 model: ItemGroup,
                 include: [{
-                    model: db.stock.Position,
+                    model: Position,
                     include: [{
-                        model: db.Image,
+                        model: Image,
                     }],
                 }]
             }, {
-                model: db.stock.Position,
+                model: Position,
                 include: [{
-                    model: db.Image,
+                    model: Image,
                 }],
             }, {
-                model: db.Image,
+                model: Image,
             }]
         }],
     });

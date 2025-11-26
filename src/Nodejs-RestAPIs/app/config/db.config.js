@@ -46,4 +46,4 @@ db.callSyncCallbacks = function () {
     funcArray = null;
 };
 
-module.exports = db;
+export default db;

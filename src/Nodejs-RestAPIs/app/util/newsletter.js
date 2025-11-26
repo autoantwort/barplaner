@@ -1,7 +1,7 @@
 import { Sequelize } from 'sequelize';
-import { Bar, Setting } from '../config/db.config.js';
 import { NewsletterAdminRoleName } from './rolesNames.js';
 import env from '../config/env.js';
+import { Setting } from '../model/setting.model.js';
 
 const wordpressDB = new Sequelize(env.wordpress.database, env.wordpress.username, env.wordpress.password, {
     host: env.wordpress.host,

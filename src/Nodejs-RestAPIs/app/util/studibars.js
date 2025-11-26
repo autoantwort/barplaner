@@ -1,8 +1,10 @@
-import { Bar, Setting, Sequelize } from '../config/db.config.js';
 import Axios from "axios";
 import { CronJob } from 'cron';
-
+import WebSocket from 'ws';
+import { Bar } from "../model/bar.model.js";
+import { Setting } from "../model/setting.model.js";
 import { changeBar, addBar } from './addBar.js';
+import { Sequelize } from "../config/database.js";
 
 let axios = Axios.create({
     baseURL: "https://studibars-ac.de/api",
@@ -49,7 +51,6 @@ export async function syncStudibarsEvents() {
 
 const wssUrl = 'wss://studibars-ac.de/api/bar/1/events/subscribe';
 
-import WebSocket from 'ws';
 
 let ws;
 let reconnectInterval = 1000; // Start with a 1-second interval

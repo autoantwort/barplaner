@@ -1,15 +1,12 @@
-const db = require('../config/db.config.js');
-const Bar = db.Bar;
-const User = db.User;
-const BarDuty = db.BarDuty;
-const sequelize = db.sequelize;
-const Role = db.Role;
-const UserRoles = db.UserRoles;
-const Setting = db.Setting;
-
+import { sequelize, Sequelize } from '../config/database.js';
+const Op = Sequelize.Op;
+import { Bar } from '../model/bar.model.js';
+import { Barduty } from '../model/barduty.model.js';
+import { Setting } from '../model/setting.model.js';
+import { User } from '../model/user.model.js';
 
 // Post a Bar
-exports.computeCleaning = (barID, numberOfPersons) => {
+export function computeCleaning(barID, numberOfPersons) {
     return new Promise((resolve, reject) => {
         let what = 0;
         //console.log("---------------", ++what, "---------------");
@@ -25,7 +22,7 @@ exports.computeCleaning = (barID, numberOfPersons) => {
                 Bar.findAll({
                     where: {
                         start: {
-                            [db.Sequelize.Op.lt]: bar.start
+                            [Op.lt]: bar.start
                         }
                     },
                     limit: wieOftNicht,
@@ -38,10 +35,10 @@ exports.computeCleaning = (barID, numberOfPersons) => {
                     let barIDs = bars.map(b => b.id);
                     barIDs.push(barID);
                     //console.log("---------------", ++what, "---------------");
-                    BarDuty.findAll({
+                    Barduty.findAll({
                         where: {
                             barID: {
-                                [db.Sequelize.Op.in]: barIDs
+                                [Op.in]: barIDs
                             }
                         }
                     }).then(duties => {
@@ -79,23 +76,23 @@ exports.computeCleaning = (barID, numberOfPersons) => {
                         // es gibt genau richtig viele
                         if (newUsers.length === numberOfPersons) {
                             //console.log("---------------", ++what, "---------------");
-                            BarDuty.update({ have_to_clean: true }, {
+                            Barduty.update({ have_to_clean: true }, {
                                 where: {
                                     userID: {
-                                        [db.Sequelize.Op.in]: users.map(u => u.id),
+                                        [Op.in]: users.map(u => u.id),
                                     },
                                     barID: barID,
                                 }
                             }).then(() => resolve(users.map(u => u.id))).catch(reject);;
                         } else {
                             //console.log("---------------", ++what, "---------------");
-                            BarDuty.findAll({
+                            Barduty.findAll({
                                 attributes: ['userID', [sequelize.fn('count', sequelize.col('userID')), "count"]],
                                 group: "userID",
                                 raw: true
                             }).then(barCount => {
                                 //console.log("---------------", ++what, "---------------");
-                                BarDuty.findAll({
+                                Barduty.findAll({
                                     attributes: ['userID', [sequelize.fn('COUNT', sequelize.col('userID')), "count"]],
                                     where: {
                                         have_to_clean: true
@@ -161,10 +158,10 @@ exports.computeCleaning = (barID, numberOfPersons) => {
                                         }
                                     }
                                     //console.log("---------------", ++what, "---------------");
-                                    BarDuty.update({ have_to_clean: true }, {
+                                    Barduty.update({ have_to_clean: true }, {
                                         where: {
                                             userID: {
-                                                [db.Sequelize.Op.in]: userIDs
+                                                [Op.in]: userIDs
                                             },
                                             barID: barID,
                                         }
@@ -180,19 +177,19 @@ exports.computeCleaning = (barID, numberOfPersons) => {
             }).catch(reject);;
         }).catch(reject);;
     });
-};
+}
 
-exports.computeRatio = function() {
+export function computeRatio() {
     return new Promise((resolve, reject) => {
         User.findAll({ where: { active: true }, raw: true }).then(users => {
 
 
-            BarDuty.findAll({
+            Barduty.findAll({
                 attributes: ['userID', [sequelize.fn('count', sequelize.col('userID')), "count"]],
                 group: "userID",
                 raw: true
             }).then(barCount => {
-                BarDuty.findAll({
+                Barduty.findAll({
                     attributes: ['userID', [sequelize.fn('COUNT', sequelize.col('userID')), "count"]],
                     where: {
                         have_to_clean: true
@@ -236,4 +233,4 @@ exports.computeRatio = function() {
         }).catch(reject);
     });
 
-};
+}

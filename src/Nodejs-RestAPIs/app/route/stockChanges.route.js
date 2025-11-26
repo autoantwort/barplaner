@@ -1,19 +1,19 @@
-module.exports = function(app) {
-    const changes = require('../controller/stockChange.controller');
+import { create, getItemStock, getStockChanges, getStockChange, deleteStockChange, getStockChangeLog, getAllChangesAtDay, getItemGroupStock, getStockForItem, getStockChangesForItem, getItemStockForItemGroup, getStockChangesForItemGroup, getItemStockForPosition, getAllDatesWhereChangesHappen } from '../controller/stockChange.controller';
+export default function (app) {
 
-    app.post('/api/stockChange', changes.create);
+    app.post('/api/stockChange', create);
 
-    app.get('/api/itemStock', changes.getItemStock);
-    app.get('/api/stockChanges', changes.getStockChanges);
-    app.get('/api/stockChange/:id', changes.getStockChange);
-    app.delete('/api/stockChange/:id', changes.deleteStockChange);
-    app.get('/api/stockChange/:id/changeLog', changes.getStockChangeLog);
-    app.get('/api/:date/stockChanges', changes.getAllChangesAtDay);
-    app.get('/api/itemGroupStock', changes.getItemGroupStock);
-    app.get('/api/item/:itemId/stock', changes.getStockForItem);
-    app.get('/api/item/:itemId/stockChanges', changes.getStockChangesForItem);
-    app.get('/api/itemGroup/:itemGroupId/itemStock', changes.getItemStockForItemGroup);
-    app.get('/api/itemGroup/:itemGroupId/stockChanges', changes.getStockChangesForItemGroup);
-    app.get('/api/position/:positionId/itemStock', changes.getItemStockForPosition);
-    app.get('/api/stockChanges/dates', changes.getAllDatesWhereChangesHappen);
+    app.get('/api/itemStock', getItemStock);
+    app.get('/api/stockChanges', getStockChanges);
+    app.get('/api/stockChange/:id', getStockChange);
+    app.delete('/api/stockChange/:id', deleteStockChange);
+    app.get('/api/stockChange/:id/changeLog', getStockChangeLog);
+    app.get('/api/:date/stockChanges', getAllChangesAtDay);
+    app.get('/api/itemGroupStock', getItemGroupStock);
+    app.get('/api/item/:itemId/stock', getStockForItem);
+    app.get('/api/item/:itemId/stockChanges', getStockChangesForItem);
+    app.get('/api/itemGroup/:itemGroupId/itemStock', getItemStockForItemGroup);
+    app.get('/api/itemGroup/:itemGroupId/stockChanges', getStockChangesForItemGroup);
+    app.get('/api/position/:positionId/itemStock', getItemStockForPosition);
+    app.get('/api/stockChanges/dates', getAllDatesWhereChangesHappen);
 };

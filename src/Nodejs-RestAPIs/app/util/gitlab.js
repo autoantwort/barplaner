@@ -1,15 +1,13 @@
-const db = require('../config/db.config.js');
-const env = require('../config/env');
-const Telegram = require('./telegram.js');
-const CronJob = require('cron').CronJob;
-const Axios = require("axios");
-const fs = require("fs");
-const path = require('path');
+import env from '../config/env';
+import { sendMessage, bot } from './telegram.js';
+import { CronJob } from 'cron';
+import { Axios } from "axios";
+import { createReadStream } from "fs";
+import { join } from 'path';
+import { User } from '../model/user.model.js';
+import { Op } from 'sequelize';
 
-const User = db.User;
-const Op = db.Sequelize.Op;
-
-let axios = Axios.create({
+let axios = new Axios({
     baseURL: "https://git.rwth-aachen.de/api/v4",
     headers: {
         "Private-Token": env.gitLabAccessToken,
@@ -17,10 +15,10 @@ let axios = Axios.create({
 });
 
 const issueCronJob = new CronJob('00 00 12 1,15 * *', function () {
-    exports.sendNotificationsForIssus().then(() => console.log("Git Nachrichten erfolgreich versendet.")).catch(e => console.error("Fehler beim Senden der Issues: ", e));
+    sendNotificationsForIssus().then(() => console.log("Git Nachrichten erfolgreich versendet.")).catch(e => console.error("Fehler beim Senden der Issues: ", e));
 }, null, true);
 
-exports.getUser = async (userObject) => {
+export async function getUser(userObject) {
     if (userObject.id === undefined || userObject.username === undefined || userObject.name === undefined) {
         throw new Error(`The given user object ${JSON.stringify(userObject)} is not a user object. It must have the parameters id, username, name.`);
     }
@@ -73,7 +71,7 @@ exports.getUser = async (userObject) => {
     } else {
         return null;
     }
-};
+}
 
 function inviteViaEmail(email) {
     return axios.post(`/groups/${env.gitLabSymposionGroupId}/invitations`, {
@@ -86,7 +84,7 @@ function inviteViaEmail(email) {
 
 let screenShotFileID = null;
 
-exports.sendNotificationsForIssus = async () => {
+export async function sendNotificationsForIssus() {
     const projectsResponse = await axios.get("/projects?membership=true&per_page=100");
     const projects = {};
     const issues = [];
@@ -184,7 +182,7 @@ exports.sendNotificationsForIssus = async () => {
 
         try {
             if (finalMessage !== undefined) {
-                Telegram.sendMessage(user, finalMessage);
+                sendMessage(user, finalMessage);
             }
         } catch (e) {
             console.warn("Couldn't send telegram message.");
@@ -199,12 +197,12 @@ exports.sendNotificationsForIssus = async () => {
     });
 
     for (const user of users) {
-        const file = screenShotFileID === null ? fs.createReadStream(path.join(__dirname, "..", "images", "screenshot_user_settings.png")) : screenShotFileID;
+        const file = screenShotFileID === null ? createReadStream(join(__dirname, "..", "images", "screenshot_user_settings.png")) : screenShotFileID;
         try {
-            Telegram.bot.sendPhoto(user.telegramID, file, { caption: "Deinem Barplaner Account konnte kein GitLab Account automatisch zugeordnet werden. Du musst diese Zuordnung leider selber durchführen. Gehe dafür bitte auf git.rwth-aachen.de/-/user_settings/profile#user_name, kopiere die User ID, trage sie unter orga.symposion.hilton.rwth-aachen.de/#/account ein und klicke auf 'Update information'." }).then(response => console.log(response.body)).catch(console.error); // Besuche dafür die Seite: orga.symposion.hilton.rwth-aachen.de/#/account");
+            bot.sendPhoto(user.telegramID, file, { caption: "Deinem Barplaner Account konnte kein GitLab Account automatisch zugeordnet werden. Du musst diese Zuordnung leider selber durchführen. Gehe dafür bitte auf git.rwth-aachen.de/-/user_settings/profile#user_name, kopiere die User ID, trage sie unter orga.symposion.hilton.rwth-aachen.de/#/account ein und klicke auf 'Update information'." }).then(response => console.log(response.body)).catch(console.error); // Besuche dafür die Seite: orga.symposion.hilton.rwth-aachen.de/#/account");
             inviteViaEmail(user.email);
         } catch (e) {
             console.warn("Couldn't send telegram message.");
         }
     }
-};
+}

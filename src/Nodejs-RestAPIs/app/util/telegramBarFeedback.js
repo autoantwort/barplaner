@@ -1,22 +1,18 @@
-const db = require('../config/db.config.js');
-const env = require('../config/env');
-const cron = require('cron');
-const Telegram = require('./telegram');
+import db from '../config/db.config.js';
+import { CronTime, CronJob } from 'cron';
+import { bot, registerResponseSystem } from './telegram';
+import { Bar } from '../model/bar.model.js';
+import { Barduty } from '../model/barduty.model.js';
+import { Setting } from '../model/setting.model.js';
+import { Role } from '../model/role.model.js';
+import { Op } from 'sequelize';
 const SettingsController = import('../controller/setting.controller');
-
-
-const Bar = db.Bar;
-const User = db.User;
-const BarDuty = db.BarDuty;
-const Setting = db.Setting;
-const Role = db.Role;
-const Op = db.Sequelize.Op;
 
 let SendDaysBefore = null;
 let SendAt = null;
 
 const updateSendAtTime = value => {
-    sendCronJob.setTime(new cron.CronTime("0 " + value.substring(3, 5) + " " + value.substring(0, 2) + " * * *", "Europe/Berlin"));
+    sendCronJob.setTime(new CronTime("0 " + value.substring(3, 5) + " " + value.substring(0, 2) + " * * *", "Europe/Berlin"));
     sendCronJob.start();
 };
 
@@ -51,8 +47,6 @@ db.addSyncCallback(() => {
 });
 
 SettingsController.then(controller => controller.addSettingChangeListener("telegramBarFeedbackSendAt", updateSendAtTime));
-
-const bot = Telegram.bot;
 
 function login(msg, pin) {
     User.findOne({
@@ -119,7 +113,7 @@ function sendBarInfo(bar, userID) {
         if (userID !== undefined) {
             userWhere.userID = userID;
         }
-        BarDuty.findAll({
+        Barduty.findAll({
             where: {
                 ...userWhere,
                 barID: bar.id,
@@ -186,10 +180,10 @@ function sendBarInfo(bar, userID) {
     });
 }
 
-exports.sendBarInfo = sendBarInfo;
+export { sendBarInfo };
 
 // handle responses to the bar
-const addBarMessageCreator = Telegram.registerResponseSystem("addBar", (message) => {
+const addBarMessageCreator = registerResponseSystem("addBar", (message) => {
     let whereObj = {
         where: {
             barID: message.bar,
@@ -198,7 +192,7 @@ const addBarMessageCreator = Telegram.registerResponseSystem("addBar", (message)
     };
     message.addData('bar', message.bar);
     if (message.state === "state") {
-        BarDuty.update({
+        Barduty.update({
             state: message.data
         }, whereObj).then(() => {
             if (message.data === "present") {
@@ -214,7 +208,7 @@ const addBarMessageCreator = Telegram.registerResponseSystem("addBar", (message)
             }
         });
     } else if (message.state === "job") {
-        BarDuty.update({
+        Barduty.update({
             job: message.data
         }, whereObj).then(() => {
             message.newText = "Wann fängst du an?";
@@ -226,7 +220,7 @@ const addBarMessageCreator = Telegram.registerResponseSystem("addBar", (message)
             message.sendUpdatedMessage();
         });
     } else if (message.state === "from") {
-        BarDuty.update({
+        Barduty.update({
             from: message.data
         }, whereObj).then(() => {
             message.newText = "Bis wann bleibst du?";
@@ -239,7 +233,7 @@ const addBarMessageCreator = Telegram.registerResponseSystem("addBar", (message)
             message.sendUpdatedMessage();
         });
     } else if (message.state === "to") {
-        BarDuty.update({
+        Barduty.update({
             to: message.data
         }, whereObj).then(() => {
             message.newText = "Schön, dass du kommst!";
@@ -305,9 +299,9 @@ const getSendDaysBefore = async () => {
 }
 
 // every day at 3 pm
-const sendCronJob = new cron.CronJob('00 00 15 * * *', async () => checkForEventsAndSend(await getSendDaysBefore()), null, true, "Europe/Berlin");
+const sendCronJob = new CronJob('00 00 15 * * *', async () => checkForEventsAndSend(await getSendDaysBefore()), null, true, "Europe/Berlin");
 
-exports.barAdded = (bar) => {
+export function barAdded(bar) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const barDate = new Date(bar.start);
@@ -320,7 +314,7 @@ exports.barAdded = (bar) => {
     });
 }
 
-exports.changeCleaningStatus = (barId, userId, newHaveToCleanState) => {
+export function changeCleaningStatus(barId, userId, newHaveToCleanState) {
     Bar.findByPk(barId).then(bar => {
         const end = bar.start.setHours(bar.start.getHours() + 12);
         // bar is to old
@@ -329,7 +323,7 @@ exports.changeCleaningStatus = (barId, userId, newHaveToCleanState) => {
         }
         // do not change the original date
         const start = new Date(bar.start);
-        start.setDate(start.getDate() - sendDaysBefore.reduce((l, r) => Math.max(l, r)));
+        start.setDate(start.getDate() - SendDaysBefore.reduce((l, r) => Math.max(l, r)));
         // bar is to new
         if (start > new Date()) {
             return;
@@ -340,7 +334,7 @@ exports.changeCleaningStatus = (barId, userId, newHaveToCleanState) => {
                 this.sendMessage(user, startText + " doch nicht mehr putzen.");
             }).catch(console.error);
         }
-        BarDuty.findAll({
+        Barduty.findAll({
             where: {
                 barID: barId,
                 have_to_clean: true,

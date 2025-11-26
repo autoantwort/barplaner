@@ -1,14 +1,10 @@
 import { commands } from '../common/stockChangeReasons.js';
 import { client } from './mqttClient.js';
-import db from '../config/db.config.js';
-
-const Item = db.stock.Item;
-const ItemGroup = db.stock.ItemGroup;
-const ItemRequest = db.stock.ItemRequest;
-const Sequelize = db.Sequelize;
-const Op = Sequelize.Op;
-
 import { changeRequest, createRequest, deleteRequest, sendMQTTError, sendItemRequestQuereNext, sendItemRequestQuerePrevious, findRequest } from './itemRequestUtil.js';
+import { Item } from '../model/stockManagement/item.model.js';
+import { ItemGroup } from '../model/stockManagement/itemGroup.model.js';
+import { ItemRequest } from '../model/stockManagement/itemRequest.model.js';
+import { Op } from 'sequelize';
 
 const onBarcode = async (barcode) => {
     if (!isNaN(barcode)) {

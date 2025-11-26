@@ -1,19 +1,19 @@
-const db = require('../config/db.config.js');
-const Image = db.Image;
-const Item = db.stock.Item;
-const StockChange = db.stock.Change;
-const Invoice = db.stock.Invoice;
-const InvoiceEntry = db.stock.InvoiceEntry;
-const Files = db.File;
-const Op = db.Sequelize.Op;
-const File = require("./file.controller");
-const Axios = require("axios");
-const pdfParse = require('pdf-parse');
-const fs = require('fs');
-const analyser = require("../util/analyseBarcode");
+import { Image } from '../model/image.model.js';
+import { Item } from '../model/stockManagement/item.model.js';
+
+import { StockChange } from '../model/stockManagement/change.model.js';
+import { Invoice } from '../model/stockManagement/invoice.model.js';
+import { InvoiceEntry } from '../model/stockManagement/invoiceEntry.model.js';
+import { File } from '../model/file.model.js';
+import { Sequelize } from '../config/database.js';
+const Op = Sequelize.Op;
+import { coreCreateFileFromReqFile, getFilePathForId } from "./file.controller";
+import pdfParse from 'pdf-parse-debugging-disabled';
+import { readFileSync } from 'fs';
+import { getItemFromMetro, analyseBarcode } from "../util/analyseBarcode";
 
 // Post a Invoice
-exports.create = async (req, res) => {
+export async function create(req, res) {
     if (!req.files || Object.keys(req.files).length !== 1) {
         return res.status(400).send("The request must contain one pdf file");
     }
@@ -30,9 +30,9 @@ exports.create = async (req, res) => {
         if (invoices.length !== 0) {
             return res.status(409).send({ text: "For this file a invoice already exits.", invoice: invoices[0] });
         }
-        let file = await Files.findByPk(rFile.md5); // vielleicht wurde die Datei bereits in einem anderen Kontext hochgelanden
+        let file = await File.findByPk(rFile.md5); // vielleicht wurde die Datei bereits in einem anderen Kontext hochgelanden
         if (file === null) {
-            file = await File.coreCreateFileFromReqFile(rFile);
+            file = await coreCreateFileFromReqFile(rFile);
         }
         Invoice.create({
             fileId: file.id,
@@ -45,17 +45,17 @@ exports.create = async (req, res) => {
         console.error(error);
         res.status(500).send("Error : " + error);
     }
-};
+}
 
-exports.getInvoice = (req, res) => {
+export function getInvoice(req, res) {
     Invoice.findByPk(req.params.id).then(invoice => {
         res.send(invoice);
     }).catch(err => {
         res.status(500).send("Error -> " + err);
     });
-};
+}
 
-exports.updateInvoice = (req, res) => {
+export function updateInvoice(req, res) {
     Invoice.findByPk(req.params.id).then(invoice => {
         invoice.update(req.body)
             .then(() => res.send(invoice))
@@ -63,10 +63,10 @@ exports.updateInvoice = (req, res) => {
     }).catch(err => {
         res.status(500).send("Error -> " + err);
     });
-};
+}
 
 // get invoices
-exports.getInvoices = (req, res) => {
+export function getInvoices(req, res) {
     Invoice.findAll({
         order: [
             ["deliveryDate", "DESC"],
@@ -76,9 +76,9 @@ exports.getInvoices = (req, res) => {
     }).catch(err => {
         res.status(500).send("Error -> " + err);
     });
-};
+}
 
-exports.getInvoiceEntries = (req, res) => {
+export function getInvoiceEntries(req, res) {
     InvoiceEntry.findAll({
         where: { invoiceId: req.params.id },
         include: [{
@@ -94,9 +94,9 @@ exports.getInvoiceEntries = (req, res) => {
     }).catch(err => {
         res.status(500).send("Error -> " + err);
     });
-};
+}
 
-exports.deleteInvoice = async (req, res) => {
+export async function deleteInvoice(req, res) {
     try {
         const invoice = await Invoice.findByPk(req.params.id);
         if (invoice === null) {
@@ -116,9 +116,9 @@ exports.deleteInvoice = async (req, res) => {
         console.error(error);
         res.status(500).send("Error:" + error);
     }
-};
+}
 
-exports.setItem = async (req, res) => {
+export async function setItem(req, res) {
     try {
         if (req.params.id === undefined) {
             return res.status(400).send("No id given");
@@ -138,9 +138,9 @@ exports.setItem = async (req, res) => {
         console.error(error);
         res.status(500).send("Error:" + error);
     }
-};
+}
 
-exports.unlinkItemFromEntry = async (req, res) => {
+export async function unlinkItemFromEntry(req, res) {
     try {
         if (req.params.id === undefined) {
             return res.status(400).send("No id given");
@@ -168,9 +168,9 @@ exports.unlinkItemFromEntry = async (req, res) => {
         console.error(error);
         res.status(500).send("Error:" + error);
     }
-};
+}
 
-exports.linkItemWithEntry = async (req, res) => {
+export async function linkItemWithEntry(req, res) {
     try {
         if (req.params.id === undefined) {
             return res.status(400).send("No entry id given");
@@ -206,7 +206,7 @@ exports.linkItemWithEntry = async (req, res) => {
         console.error(error);
         res.status(500).send("Error:" + error);
     }
-};
+}
 
 
 const parseGermanDate = s => {
@@ -364,7 +364,7 @@ const exportForMetro = (invoice, text) => {
                             stockItemId: entry ? entry.stockItemId : null,
                             alcoholByVolume: item.alk,
                         }).then(invoiceEntry => {
-                            analyser.getItemFromMetro(item.articleNumber).then((item) => {
+                            getItemFromMetro(item.articleNumber).then((item) => {
                                 if (item) {
                                     if (invoiceEntry.amount === null) {
                                         invoiceEntry.amount = item.amount;
@@ -398,7 +398,7 @@ const exportForMetro = (invoice, text) => {
     });
 };
 
-exports.analyseInvoice = (req, res) => {
+export function analyseInvoice(req, res) {
     Invoice.findByPk(req.params.id).then(async invoice => {
         if (invoice === null)
             return res.status(404).send("No invoice with id: " + req.params.id);
@@ -406,7 +406,7 @@ exports.analyseInvoice = (req, res) => {
         if (count > 0) {
             return res.status(400).send("Analysis has already been carried out");
         }
-        const dataBuffer = fs.readFileSync(File.getFilePathForId(invoice.fileId));
+        const dataBuffer = readFileSync(getFilePathForId(invoice.fileId));
         pdfParse(dataBuffer).then(data => {
             const content = data.text.trim().replace("\n \n", "\n");
             if (content.startsWith("METRO Deutschland GmbH")) {
@@ -430,10 +430,10 @@ exports.analyseInvoice = (req, res) => {
             } else {
                 res.status(501).send("can not parse this invoice");
             }
-          }).catch(e => res.status(500).send("Error: " + e))
+        }).catch(e => res.status(500).send("Error: " + e))
     }).catch(e => res.status(500).send("Error: " + e))
-};
+}
 
-exports.analyseArticleIdentifier = async (req, res) => {
-    res.send(await analyser.analyseBarcode(req.params.identifier));
-};
+export async function analyseArticleIdentifier(req, res) {
+    res.send(await analyseBarcode(req.params.identifier));
+}

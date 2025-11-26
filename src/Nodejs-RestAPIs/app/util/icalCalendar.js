@@ -1,9 +1,10 @@
-const ical = require('ical-generator');
-const env = require('../config/env');
-const db = require('../config/db.config');
-const BarUtil = require('./addBar');
-const Bar = db.Bar;
-const Op = db.Sequelize.Op;
+import ical from 'ical-generator';
+import env from '../config/env';
+import db from '../config/db.config';
+import { onBarAdded, onBarChanged } from './addBar';
+import { Bar } from '../model/bar.model';
+import { Sequelize } from '../config/database';
+const Op = Sequelize.Op;
 
 const cal = ical({
     domain: env.ical.domain,
@@ -55,11 +56,11 @@ db.addSyncCallback(() => {
     }).catch(console.error);
 });
 
-BarUtil.onBarAdded(bar => {
+onBarAdded(bar => {
     addBar(bar);
 });
 
-BarUtil.onBarChanged(event => {
+onBarChanged(event => {
     for (let e of cal.events()) {
         if (e.uid() == event.id) {
             e.start(event.start);
@@ -75,4 +76,4 @@ BarUtil.onBarChanged(event => {
     }
 });
 
-exports.serve = res => cal.serve(res);
+export function serve(res) { return cal.serve(res); }

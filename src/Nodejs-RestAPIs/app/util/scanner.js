@@ -1,13 +1,13 @@
-import { where } from 'sequelize';
+import { Sequelize } from 'sequelize';
 import { inventoryReason, addReasons, findIndex, removeReasons, reasons, commands, REASON } from '../common/stockChangeReasons.js';
-import { User, stock, Image, Sequelize } from '../config/db.config.js';
 import { client, retain } from './mqttClient.js';
 import { changeRequest, findRequest } from './itemRequestUtil.js';
-const Item = stock.Item;
-const ItemGroup = stock.ItemGroup;
-const ItemRequest = stock.ItemRequest;
-const StockChange = stock.Change;
-const Position = stock.Position;
+import { User } from '../model/user.model.js';
+import { Image } from '../model/image.model.js';
+import { Item } from '../model/stockManagement/item.model.js';
+import { ItemGroup } from '../model/stockManagement/itemGroup.model.js';
+import { StockChange } from '../model/stockManagement/change.model.js';
+import { Position } from '../model/stockManagement/position.model.js';
 const Op = Sequelize.Op;
 
 const sendMQTTBeep = () => {

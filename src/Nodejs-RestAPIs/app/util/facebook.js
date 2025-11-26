@@ -1,9 +1,11 @@
-import { Bar, Setting, Sequelize } from '../config/db.config.js';
 import Axios from "axios";
 import { facebookAccessToken, symposionPageID, facebookFetchInterval } from '../config/env';
 import { FacebookAdminRole } from './roles.js';
 
 import { changeBar, addBar } from './addBar';
+import { Setting } from "../model/setting.model";
+import { Bar } from "../model/bar.model";
+import { Sequelize } from "../config/database";
 
 let axios = Axios.create({
     baseURL: "https://graph.facebook.com/v3.2",

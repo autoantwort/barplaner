@@ -1,8 +1,7 @@
-const fs = require('fs').promises;
-const env = require('../config/env');
+import { promises as fs } from 'fs';
+import env from '../config/env';
 
 const clients = new Set();
-const selectedItems = new Set();
 
 const filePath = env.fileStoragePath + '/shoppingListText.txt';
 let shoppingListText = "";
@@ -15,7 +14,7 @@ let shoppingListText = "";
 })();
 
 
-exports.registerWebSocketListener = function (app) {
+export function registerWebSocketListener (app) {
     app.ws('/shoppingListText', (ws, req) => {
         clients.add(ws);
         ws.send(shoppingListText);
@@ -39,4 +38,4 @@ exports.registerWebSocketListener = function (app) {
             clients.delete(ws);
         });
     });
-};
+}

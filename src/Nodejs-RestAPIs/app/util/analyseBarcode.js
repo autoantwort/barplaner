@@ -1,8 +1,8 @@
-const Axios = require("axios");
+import axios from "axios";
 
-const HTMLParser = require('node-html-parser');
-const util = require('node:util');
-const execFile = util.promisify(require('node:child_process').execFile);
+import { parse } from 'node-html-parser';
+import { promisify } from 'node:util';
+const execFile = promisify(require('node:child_process').execFile);
 
 const toNumber = s => Number(s.replace(',', '.'));
 
@@ -23,10 +23,10 @@ const fillAmountFromName = (item) => {
     }
 }
 
-exports.getItemFromMetro = async (articleIdentifier, bundleSize = undefined) => {
+export async function getItemFromMetro(articleIdentifier, bundleSize = undefined) {
     // habe auf der Seite https://produkte.metro.de/shop/search mal geschaut welche Requests so gemacht werden wenn man ein Produkt sucht
     const storeId = "00017";
-    let res = await Axios.get("https://produkte.metro.de/searchdiscover/articlesearch/search?language=de-DE&country=DE&categories=false&facets=false&storeId=" + storeId + "&query=" + articleIdentifier);
+    let res = await axios.get("https://produkte.metro.de/searchdiscover/articlesearch/search?language=de-DE&country=DE&categories=false&facets=false&storeId=" + storeId + "&query=" + articleIdentifier);
     let data = res.data;
     if (data.resultIds.length === 0) { // No item found for the article number
         return null;
@@ -35,7 +35,7 @@ exports.getItemFromMetro = async (articleIdentifier, bundleSize = undefined) => 
         return null;
     }
     const qids = data.resultIds.map(i => "ids=" + i).join("&");
-    res = await Axios.get("https://produkte.metro.de/evaluate.article.v1/betty-variants?country=DE&locale=de-DE&storeIds=" + storeId + "&details=true&" + qids, {
+    res = await axios.get("https://produkte.metro.de/evaluate.article.v1/betty-variants?country=DE&locale=de-DE&storeIds=" + storeId + "&details=true&" + qids, {
         headers: {
             "CallTreeId": "BTEV-548fafde-ff26-4420-a251-6ee5230188d5",
             "Host": "produkte.metro.de",
@@ -95,10 +95,10 @@ const userAgents = [
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
     "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
     "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36", 
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
 ]
-exports.analyseBarcode = async (barcode, bundleSize = undefined) => {
-    const metroResult = await exports.getItemFromMetro(barcode, bundleSize);
+export async function analyseBarcode(barcode, bundleSize = undefined) {
+    const metroResult = await getItemFromMetro(barcode, bundleSize);
     if (metroResult) {
         return metroResult;
     }
@@ -113,7 +113,7 @@ exports.analyseBarcode = async (barcode, bundleSize = undefined) => {
         await PromiseTimeout(10000);
         res = await execFile("curl", ["--user-agent", userAgents[userAgentIndex++ % userAgents.length], curlUrl]);
     }
-    const ddgRoot = HTMLParser.parse(res.stdout);
+    const ddgRoot = parse(res.stdout);
     // console.debug(res.stdout)
     const linkElements = ddgRoot.querySelectorAll(".result__url");
     if (linkElements.length === 0) {
@@ -123,7 +123,7 @@ exports.analyseBarcode = async (barcode, bundleSize = undefined) => {
     // Fragen einfach mal das erste Ergebnis und suchen nach Metadaten
     console.debug("curl '" + href + "'");
     res = await execFile("curl", [href]);
-    const siteRoot = HTMLParser.parse(res.stdout);
+    const siteRoot = parse(res.stdout);
     // Vielleicht ist die Seite cool und hat ein application/ld+json element
     for (let elem of siteRoot.querySelectorAll("script[type='application/ld+json']")) {
         try {

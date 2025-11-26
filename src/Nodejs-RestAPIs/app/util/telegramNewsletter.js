@@ -1,12 +1,8 @@
-const db = require('../config/db.config.js');
-const Telegram = require('./telegram.js');
-const cron = require('cron');
-const CronJob = cron.CronJob;
-const CronTime = cron.CronTime;
-
-const Op = db.Sequelize.Op;
-const TelegramNewsletter = db.TelegramNewsletter;
-const Bar = db.Bar;
+import { Bar } from '../model/bar.model.js';
+import { TelegramNewsletter } from '../model/telegramNewsletter.model.js';
+import { bot } from './telegram.js';
+import { CronJob, CronTime } from 'cron';
+import { Op } from 'sequelize';
 
 const helpText =
     "*Sende* `/newsletter off` um den Newsletter zu deabonnieren.  \n" +
@@ -49,10 +45,10 @@ const createCronJob = value => {
                         // send photo for the bar with description
                         const imageURL = bar.facebookCoverImageURL ? bar.facebookCoverImageURL : "https://www.hilton.rwth-aachen.de/wordpress/symposion/wp-content/uploads/sites/2/2019/08/67976531_2499717063420882_1963470524436709376_o.jpg";
                         if (bar.description.length > 1024) {
-                            Telegram.bot.sendPhoto(value.chatId, imageURL);
-                            Telegram.bot.sendMessage(value.chatId, bar.description);
+                            bot.sendPhoto(value.chatId, imageURL);
+                            bot.sendMessage(value.chatId, bar.description);
                         } else {
-                            Telegram.bot.sendPhoto(value.chatId, imageURL, { caption: bar.description });
+                            bot.sendPhoto(value.chatId, imageURL, { caption: bar.description });
                         }
                     });
             });
@@ -64,7 +60,7 @@ TelegramNewsletter.findAll().then(values => {
     values.forEach(value => createCronJob(value));
 });
 
-Telegram.bot.onText(/\/newsletter/, msg => {
+bot.onText(/\/newsletter/, msg => {
     const text = msg.text.substring(msg.text.indexOf(' ', msg.text.indexOf("/newsletter"))).trim();
     const chatId = msg.chat.id;
     if (text === "off") {
@@ -72,8 +68,8 @@ Telegram.bot.onText(/\/newsletter/, msg => {
             if (value) {
                 value.enabled = false;
                 value.save()
-                    .then(() => Telegram.bot.sendMessage(chatId, "Newsletter erfolgreich deabonniert. Nutze /newsletter um ihn wieder zu aktivieren"))
-                    .catch(() => Telegram.bot.sendMessage(chatId, "Error while disabling the newsletter :("));
+                    .then(() => bot.sendMessage(chatId, "Newsletter erfolgreich deabonniert. Nutze /newsletter um ihn wieder zu aktivieren"))
+                    .catch(() => bot.sendMessage(chatId, "Error while disabling the newsletter :("));
                 cronJobs[value.chatId].stop();
             }
         }).catch(console.error);
@@ -90,8 +86,8 @@ Telegram.bot.onText(/\/newsletter/, msg => {
                     chatId: chatId,
                 }
             })
-            .then(() => Telegram.bot.sendMessage(chatId, "Newsletter werden ab jetzt immer um " + hours + ":" + minutes + " gesendet." + extraText))
-            .catch(() => Telegram.bot.sendMessage(chatId, "Fehler beim Speichern der aktualisierten der Sendezeit :("));
+            .then(() => bot.sendMessage(chatId, "Newsletter werden ab jetzt immer um " + hours + ":" + minutes + " gesendet." + extraText))
+            .catch(() => bot.sendMessage(chatId, "Fehler beim Speichern der aktualisierten der Sendezeit :("));
 
         cronJobs[chatId].setTime(new CronTime('00 ' + minutes + ' ' + hours + ' * * *', "Europe/Berlin"));
         if (wasRunning) {
@@ -114,30 +110,30 @@ Telegram.bot.onText(/\/newsletter/, msg => {
                     chatId: chatId,
                 }
             })
-            .then(() => Telegram.bot.sendMessage(chatId, "Newsletter werden ab jetzt immer " + JSON.stringify(newDaysBefore).slice(1, -1) + " Tage vorher gesendet." + extraText))
-            .catch(() => Telegram.bot.sendMessage(chatId, "Fehler beim Aktualisieren der Sendezeit :("));
+            .then(() => bot.sendMessage(chatId, "Newsletter werden ab jetzt immer " + JSON.stringify(newDaysBefore).slice(1, -1) + " Tage vorher gesendet." + extraText))
+            .catch(() => bot.sendMessage(chatId, "Fehler beim Aktualisieren der Sendezeit :("));
     } else {
         TelegramNewsletter.findByPk(chatId).then(value => {
             if (value) {
                 if (!value.enabled) {
                     value.enabled = true;
                     value.save()
-                        .then(() => Telegram.bot.sendMessage(chatId, "Newsletter erfolgreich abonniert."))
-                        .catch(() => Telegram.bot.sendMessage(chatId, "Error while disabling the newsletter :("));
+                        .then(() => bot.sendMessage(chatId, "Newsletter erfolgreich abonniert."))
+                        .catch(() => bot.sendMessage(chatId, "Error while disabling the newsletter :("));
                     cronJobs[value.chatId].start();
                 } else {
-                    Telegram.bot.sendMessage(chatId, helpText, { parse_mode: "Markdown" });
+                    bot.sendMessage(chatId, helpText, { parse_mode: "Markdown" });
                 }
             } else {
                 TelegramNewsletter.create({
                         chatId: chatId,
                     })
                     .then(value => {
-                        Telegram.bot.sendMessage(chatId, "Newsletter erfolgreich abonniert.  \n" + helpText, { parse_mode: "Markdown" });
+                        bot.sendMessage(chatId, "Newsletter erfolgreich abonniert.  \n" + helpText, { parse_mode: "Markdown" });
                         createCronJob(value);
                     })
                     .catch(e => {
-                        Telegram.bot.sendMessage(chatId, "Interner Fehler beim Abonnieren des Newsletters.");
+                        bot.sendMessage(chatId, "Interner Fehler beim Abonnieren des Newsletters.");
                         console.error("Konnte kein TelegramNewsletter objekt erstellen: ", e);
                     });
             }

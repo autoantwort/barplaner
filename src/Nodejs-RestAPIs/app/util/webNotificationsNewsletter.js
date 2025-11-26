@@ -1,15 +1,15 @@
-const webPush = require('web-push');
-const env = require('../config/env');
-const db = require('../config/db.config');
-const BarUtil = require('./addBar');
-const CronJob = require('cron').CronJob;
-const Bar = db.Bar;
-const WebPushSubs = db.WebPushSubscription;
-const Op = db.Sequelize.Op;
+import { setVapidDetails, sendNotification as _sendNotification } from 'web-push';
+import env from '../config/env';
+import { onBarAdded, onBarChanged } from './addBar';
+import { CronJob } from 'cron';
+import { Bar } from '../model/bar.model';
+import { WebPushSubscription } from '../model/webPushSubscription.model';
+import { Op } from 'sequelize';
+const WebPushSubs = WebPushSubscription;
 
 // see https://serviceworke.rs/web-push.html for good examples
 
-webPush.setVapidDetails(
+setVapidDetails(
     env.webNotifications.contact,
     env.webNotifications.vapidKeys.publicKey,
     env.webNotifications.vapidKeys.privateKey
@@ -40,7 +40,7 @@ const sendCronJob = new CronJob('00 * ' + env.webNotifications.sendTime + ' * * 
 function sendNotification(data) {
     WebPushSubs.findAll().then(subs => {
         for (const sub of subs) {
-            webPush.sendNotification(JSON.parse(sub.subscription), data)
+            _sendNotification(JSON.parse(sub.subscription), data)
                 .catch(() => {
                     // da hat wohl jemand unsubscribed
                     sub.destroy().catch(console.error);
@@ -58,7 +58,7 @@ function sendNotificationForBar(bar) {
     }));
 }
 
-module.exports = function(app, route) {
+export default function(app, route) {
     app.get(route + 'vapidPublicKey', function(req, res) {
         res.send(env.webNotifications.vapidKeys.publicKey);
     });
@@ -97,7 +97,7 @@ module.exports = function(app, route) {
     });
 };
 
-BarUtil.onBarAdded(bar => {
+onBarAdded(bar => {
     if (!bar.public && !bar.canceled)
         return;
     // check if the bar is very soon    
@@ -112,7 +112,7 @@ BarUtil.onBarAdded(bar => {
     }
 });
 
-BarUtil.onBarChanged(bar => {
+onBarChanged(bar => {
     if (bar.canceled) {
         sendNotification({
             titel: "Die Bar " + bar.name + " wurde abgesagt!",

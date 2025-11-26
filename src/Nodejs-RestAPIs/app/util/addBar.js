@@ -1,9 +1,9 @@
-import { Bar, User, UserRoles, BarDuty, Role, Setting, Sequelize } from '../config/db.config.js';
 import { barAdded } from './telegramBarFeedback';
 import { sendEmailForBar } from './newsletter.js';
-
-const Op = Sequelize.Op;
 import { computeCleaning } from '../util/cleaning';
+import { Bar } from '../model/bar.model';
+import { User } from '../model/user.model';
+import { Barduty } from '../model/barduty.model';
 
 const barAddedListener = [];
 const barChangedListener = [];
@@ -23,7 +23,7 @@ export function addBar(barData, numberOfPersonsToClean) {
                         userID: users[i].id,
                     };
                 }
-                BarDuty.bulkCreate(users).then(() => {
+                Barduty.bulkCreate(users).then(() => {
                     console.log("## numberOfPersonsToClean", numberOfPersonsToClean);
                     if (numberOfPersonsToClean !== undefined && numberOfPersonsToClean > 0) {
                         computeCleaning(bar.id, numberOfPersonsToClean)
@@ -61,7 +61,7 @@ export function onBarAdded(callback) { return barAddedListener.push(callback); }
 export async function changeBar(barObject, newBarData) {
     if (!barObject.canceled && newBarData.canceled) {
         // if the bar was cancelled, delete all bar duties
-        BarDuty.destroy({
+        Barduty.destroy({
             where: {
                 barID: barObject.id,
             }

@@ -1,18 +1,16 @@
-const Axios = require("axios");
-const db = require('../config/db.config.js');
-const Item = db.stock.Item;
-const InvoiceEntry = db.stock.InvoiceEntry;
-const { Op } = require('sequelize');
-const Telegram = require('./telegram.js');
-const bot = Telegram.bot;
-const TelegramMetroPromoSubscription = db.TelegramMetroPromoSubscription;
-const CronJob = require('cron').CronJob;
+import axios from "axios";
+import { Op } from 'sequelize';
+import { bot } from './telegram.js';
+import { CronJob } from 'cron';
+import { Item } from "../model/stockManagement/item.model.js";
+import { InvoiceEntry } from "../model/stockManagement/invoiceEntry.model.js";
+import { TelegramMetroPromoSubscription } from "../model/telegramMetroPromoSubscription.model.js";
 
 const storeId = "00017";
 
 const getItemsFromMetro = async (ids, cookie) => {
     const qids = ids.map(i => "ids=" + i).join("&");
-    res = await Axios.get(`https://produkte.metro.de/evaluate.article.v1/betty-variants?country=DE&locale=de-DE&storeIds=${storeId}&details=true&${qids}`, {
+    res = await axios.get(`https://produkte.metro.de/evaluate.article.v1/betty-variants?country=DE&locale=de-DE&storeIds=${storeId}&details=true&${qids}`, {
         headers: {
             "CallTreeId": "||BTEX-E09F8846-A50C-425A-8EA5-C9CFF22EC701",
             "Host": "produkte.metro.de",
@@ -155,26 +153,26 @@ const formatPromotions = (promotions) => {
 
 
 
-Telegram.bot.onText(/\/metro/, msg => {
+bot.onText(/\/metro/, msg => {
     cookieRegex = /-H 'Cookie: ([^']*)/;
     const cookie = msg.text.match(cookieRegex);
     let cookieString = "";
     if (cookie && cookie[1]) {
         cookieString = cookie[1];
     }
-    let waitMsg = Telegram.bot.sendMessage(msg.chat.id, `Rufe Angebote ab (${cookieString ? "mit" : "ohne"} Cookie) ...`);
+    let waitMsg = bot.sendMessage(msg.chat.id, `Rufe Angebote ab (${cookieString ? "mit" : "ohne"} Cookie) ...`);
     getCurrentPromotions(cookieString).then(async p => {
         if (p.length > 0) {
             let message = formatPromotions(p);
             message += '\n\n Send /subscribeMetro to subscribe to Metro promotions\\.';
-            Telegram.bot.editMessageText(message, { chat_id: msg.chat.id, message_id: (await waitMsg).message_id, parse_mode: 'MarkdownV2', disable_web_page_preview: true }).catch(console.error);
+            bot.editMessageText(message, { chat_id: msg.chat.id, message_id: (await waitMsg).message_id, parse_mode: 'MarkdownV2', disable_web_page_preview: true }).catch(console.error);
         } else {
-            Telegram.bot.editMessageText("No promotions found.", { chat_id: msg.chat.id, message_id: (await waitMsg).message_id }).catch(console.error);
+            bot.editMessageText("No promotions found.", { chat_id: msg.chat.id, message_id: (await waitMsg).message_id }).catch(console.error);
         }
     }).catch(console.error);
 });
 
-Telegram.bot.onText(/\/subscribeMetro/, async (msg) => {
+bot.onText(/\/subscribeMetro/, async (msg) => {
     const chatId = msg.chat.id;
     try {
         await TelegramMetroPromoSubscription.findOrCreate({
@@ -188,7 +186,7 @@ Telegram.bot.onText(/\/subscribeMetro/, async (msg) => {
     }
 });
 
-Telegram.bot.onText(/\/unsubscribeMetro/, async (msg) => {
+bot.onText(/\/unsubscribeMetro/, async (msg) => {
     const chatId = msg.chat.id;
     try {
         await TelegramMetroPromoSubscription.destroy({
@@ -208,7 +206,7 @@ const issueCronJob = new CronJob('00 39 17 * * 4', function () {
             let message = formatPromotions(p);
             message += '\n\n Send /unsubscribeMetro to unsubscribe from Metro promotions\\.';
             for (let chat of await TelegramMetroPromoSubscription.findAll()) {
-                Telegram.bot.sendMessage(chat.chatId, message, { parse_mode: 'MarkdownV2', disable_web_page_preview: true }).catch(console.error);
+                bot.sendMessage(chat.chatId, message, { parse_mode: 'MarkdownV2', disable_web_page_preview: true }).catch(console.error);
             }
         }
     }).catch(console.error);

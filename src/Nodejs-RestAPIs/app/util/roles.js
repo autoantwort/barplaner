@@ -1,4 +1,4 @@
-import { Role } from '../config/db.config.js';
+import { Role } from '../model/role.model.js';
 import { BarAdminRoleName, CleaningAdminRoleName, FacebookAdminRoleName, NewsletterAdminRoleName, StockAdminRoleName, UserAdminRoleName } from './rolesNames.js';
 
 const [StockAdminRole, created] = await Role.findCreateFind({

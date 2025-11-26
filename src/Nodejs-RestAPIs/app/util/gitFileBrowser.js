@@ -1,15 +1,8 @@
-const db = require('../config/db.config.js');
-const env = require('../config/env');
-const Telegram = require('./telegram.js');
-const CronJob = require('cron').CronJob;
-const Axios = require("axios");
-const fs = require("fs");
-const path = require('path');
+import env from '../config/env';
+import { bot, registerResponseSystem, deleteTelegramMessage } from './telegram.js';
+import { Axios } from "axios";
 
-const User = db.User;
-const Op = db.Sequelize.Op;
-
-const axios = Axios.create({
+const axios = new Axios({
     baseURL: "https://" + env.gitLabBrowser.host + "/api/v4",
     headers: {
         "Private-Token": env.gitLabAccessToken,
@@ -44,7 +37,7 @@ const getDataMapping = (id) => {
 let convertFileEnding = new RegExp("\\.(" + env.gitLabBrowser.convertedToPdf.join("|") + ")$");
 
 
-Telegram.bot.onText(/\/(files?|datei(en)?|pdfs?|git|gitlab)/, msg => {
+bot.onText(/\/(files?|datei(en)?|pdfs?|git|gitlab)/, msg => {
     const fakeUser = {
         telegramID: "" + msg.chat.id,
         id: '',
@@ -63,9 +56,9 @@ Telegram.bot.onText(/\/(files?|datei(en)?|pdfs?|git|gitlab)/, msg => {
 });
 
 // handle responses to the bar
-const fileBrowserMessageCreator = Telegram.registerResponseSystem("gitBrowser", (message) => {
+const fileBrowserMessageCreator = registerResponseSystem("gitBrowser", (message) => {
     if (message.state === State.CLOSE) {
-        Telegram.deleteTelegramMessage(message.chatId, message.messageId, new Date());
+        deleteTelegramMessage(message.chatId, message.messageId, new Date());
         return;
     }
     const data = getDataMapping(message.data);
@@ -106,8 +99,8 @@ const fileBrowserMessageCreator = Telegram.registerResponseSystem("gitBrowser", 
             // send as original
             // https://docs.gitlab.com/ee/api/repositories.html#raw-blob-content
             axios.get("/projects/" + env.gitLabBrowser.projectId + "/repository/blobs/" + data.sha + "/raw", { responseType: 'stream' }).then(res => {
-                Telegram.bot.sendDocument(message.chatId, res.data, {}, fileOptions).catch(console.error);
-                Telegram.deleteTelegramMessage(message.chatId, message.messageId, new Date());
+                bot.sendDocument(message.chatId, res.data, {}, fileOptions).catch(console.error);
+                deleteTelegramMessage(message.chatId, message.messageId, new Date());
             }).catch(console.error);
         }
     } else if (message.state === State.PDF) {
@@ -115,8 +108,8 @@ const fileBrowserMessageCreator = Telegram.registerResponseSystem("gitBrowser", 
         const path = (data.path.endsWith(".md") ? data.path : data.path.substring(0, data.path.lastIndexOf("."))) + ".pdf";
         fileOptions.filename = path.substring(data.path.lastIndexOf('/') + 1);
         axios.get("/projects/" + env.gitLabBrowser.projectId + "/jobs/artifacts/master/raw/" + encodeURIComponent(path) + "?job=" + env.gitLabBrowser.jobName, { responseType: 'stream' }).then(res => {
-            Telegram.bot.sendDocument(message.chatId, res.data, {}, fileOptions).catch(console.error);
-            Telegram.deleteTelegramMessage(message.chatId, message.messageId, new Date());
+            bot.sendDocument(message.chatId, res.data, {}, fileOptions).catch(console.error);
+            deleteTelegramMessage(message.chatId, message.messageId, new Date());
         }).catch(console.error);
     } else {
         console.error("Unexpected state : ", message);
