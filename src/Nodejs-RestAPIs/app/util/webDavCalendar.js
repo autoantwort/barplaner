@@ -76,7 +76,7 @@ for (const config of env.webDavCalendars) {
             for (const e of calendar.objects) {
                 if (e.url.endsWith("bar" + bar.id)) {
                     e.calendarData = data;
-                    client.updateCalendarObject(e).catch(e => console.error("Can not update Calendar object: ", e));
+                    client.updateCalendarObject(e).catch(err => console.error("Can not update Calendar object: ", err, e, bar.dataValues));
                     return;
                 }
             }
