@@ -12,6 +12,7 @@ const REASON = Object.freeze({
     SOLD: 'sold',
     OTHER: 'other',
     INVENTORY: 'inventory',
+    STOCK_CORRECTION: 'stockCorrection',
 });
 
 const reasons = [
@@ -98,7 +99,14 @@ const reasons = [
         sign: '±',
         description: "Wenn keiner der obigen passt. Der richtige Grund muss in der Notiz angegeben werden.",
         id: 12,
-    }
+    },
+    {
+        name: REASON.STOCK_CORRECTION,
+        germanName: 'Lagerkorrektur',
+        sign: '±',
+        description: "Wenn der Lagerstand falsch ist und korrigiert werden muss.",
+        id: 13,
+    },
 ];
 
 const inventoryReason = {
@@ -112,6 +120,9 @@ const inventoryReason = {
 const reasonNames = reasons.map(reason => reason.name);
 const addReasons = reasons.filter(r => r.sign !== '-').map(r => ({ ...r, sign: '+' }));
 const removeReasons = reasons.filter(r => r.sign !== '+').map(r => ({ ...r, sign: '-' }));
+// Reasons that are printed and highlighted by leds
+const printedAddReasons = addReasons;
+const printedRemoveReasons = removeReasons.filter(r => r.name !== REASON.DISCARDED);
 
 const commands = {
     minusOne: 20001,
@@ -124,4 +135,4 @@ const commands = {
 const findIndex = (name, reasons) => {
     return reasons.findIndex((item) => item.name === name);
 }
-export { reasons, reasonNames, addReasons, removeReasons, findIndex, inventoryReason, commands, REASON };
+export { reasons, reasonNames, addReasons, removeReasons, printedAddReasons, printedRemoveReasons, findIndex, inventoryReason, commands, REASON };

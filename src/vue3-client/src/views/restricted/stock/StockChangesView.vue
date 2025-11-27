@@ -98,7 +98,7 @@
 import http from '@/http-common';
 import StockChangesList from './StockChangesListView.vue';
 import VueBarcode from '@/components/jsbarcode.js';
-import { reasons, addReasons, removeReasons, inventoryReason, commands } from '@common/stockChangeReasons.js';
+import { reasons, printedAddReasons, printedRemoveReasons, inventoryReason, commands } from '@common/stockChangeReasons.js';
 import MonthCalendar from '@/components/MonthCalendar.vue';
 
 function zipLists(list1, list2) {
@@ -112,9 +112,9 @@ function zipLists(list1, list2) {
   return zipped;
 }
 
-const reasonsZipped = zipLists(addReasons, removeReasons);
+const reasonsZipped = zipLists(printedAddReasons, printedRemoveReasons);
 
-reasonsZipped[addReasons.length + 1][0] = inventoryReason;
+reasonsZipped[printedAddReasons.length + 1][0] = inventoryReason;
 
 const dateFormat = new Intl.DateTimeFormat('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit', timeZone: 'Europe/Berlin' });
 

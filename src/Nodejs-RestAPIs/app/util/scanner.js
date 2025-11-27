@@ -1,5 +1,5 @@
 import { Sequelize } from 'sequelize';
-import { inventoryReason, addReasons, findIndex, removeReasons, reasons, commands, REASON } from '../common/stockChangeReasons.js';
+import { inventoryReason, printedAddReasons, findIndex, printedRemoveReasons, reasons, commands, REASON } from '../common/stockChangeReasons.js';
 import { client, retain } from './mqttClient.js';
 import { changeRequest, findRequest } from './itemRequestUtil.js';
 import { User } from '../model/user.model.js';
@@ -38,9 +38,9 @@ const sendMQTTPosition = (position) => {
 const sendMQTTReason = (sign, reason) => {
     client.publish('barplaner/reasonName', reason.germanName, retain);
     if (reason == inventoryReason) {
-        client.publish('barplaner/reasonIndex', `${1 + addReasons.length + 2 + 100}`, retain);
+        client.publish('barplaner/reasonIndex', `${1 + printedAddReasons.length + 2 + 100}`, retain);
     } else {
-        client.publish('barplaner/reasonIndex', `${(sign === '-' ? -1 : 1) * (1 + findIndex(reason.name, sign === '-' ? removeReasons : addReasons))}`, retain);
+        client.publish('barplaner/reasonIndex', `${(sign === '-' ? -1 : 1) * (1 + findIndex(reason.name, sign === '-' ? printedRemoveReasons : printedAddReasons))}`, retain);
     }
     setChangeToNull();
 };
