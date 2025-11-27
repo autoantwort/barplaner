@@ -11,9 +11,6 @@ const env = {
         idle: 10000
     },
     databaseFile: 'data.sqlite',
-    facebookAccessToken: '', // Insert your access token
-    symposionPageID: 'Facebook site id',
-    facebookFetchInterval: '5',
     telegramAccessToken: '', // Insert your access token (Create bot here: https://t.me/botfather)
     resetDatabase: false,
     loadOldData: false,

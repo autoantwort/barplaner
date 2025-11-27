@@ -2,8 +2,8 @@ self.addEventListener('push', function(event) {
     let data = event.data.json();
     event.waitUntil(self.registration.showNotification(data.titel, {
         body: data.description,
-        data: data.facebookEventID,
-        image: data.facebookCoverImageURL,
+        data: data.studibarsEventId,
+        image: data.studibarsEventPosterURL,
     }));
 });
 
@@ -11,7 +11,7 @@ self.addEventListener('notificationclick', function(event) {
     event.notification.close();
     if (event.notification.data) {
         event.waitUntil(
-            self.clients.openWindow("https://www.facebook.com/events/" + event.notification.data)
+            self.clients.openWindow(`https://studibars-ac.de/symposion/---${event.notification.data}/`)
         );
     }
 });

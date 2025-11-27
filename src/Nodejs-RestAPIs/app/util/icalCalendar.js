@@ -26,8 +26,8 @@ const addBar = event => {
         status: event.canceled ? "cancelled" : "confirmed",
 
     });
-    if (event.facebookEventID) {
-        e.url("https://www.facebook.com/events/" + event.facebookEventID);
+    if (event.studibarsEventId) {
+        e.url(`https://studibars-ac.de/symposion/${event.name}--${event.studibarsEventId}/`);
     }
     e.organizer(env.ical.organizer);
     e.geo(env.ical.geo);
@@ -68,8 +68,8 @@ onBarChanged(event => {
             e.summary(event.name);
             e.description(event.description);
             e.status(event.canceled ? "cancelled" : "confirmed");
-            if (event.facebookEventID) {
-                e.url("https://www.facebook.com/events/" + event.facebookEventID);
+            if (event.studibarsEventId) {
+                e.url(`https://studibars-ac.de/symposion/${event.name}--${event.studibarsEventId}/`);
             }
             break;
         }

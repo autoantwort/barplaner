@@ -47,12 +47,6 @@ if (env.loadOldData === true) {
     loadOldData();
 }
 
-if (typeof env.facebookAccessToken === "string" && env.facebookAccessToken.length > 0 &&
-    typeof env.symposionPageID === "string" && env.symposionPageID.length > 0) {
-    const { runFacebookSync } = await import("./app/util/facebook.js");
-    runFacebookSync();
-}
-
 import "./app/util/telegram.js";
 import "./app/util/gitFileBrowser.js";
 import "./app/util/telegramNewsletter.js";

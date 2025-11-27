@@ -27,8 +27,8 @@ const createEvent = event => {
         description: event.description,
         status: event.canceled ? "cancelled" : "confirmed",
     };
-    if (event.facebookEventID) {
-        e.url = "https://www.facebook.com/events/" + event.facebookEventID;
+    if (event.studibarsEventId) {
+        e.url = `https://studibars-ac.de/symposion/${event.name}--${event.studibarsEventId}/`;
     }
     e.organizer = env.ical.organizer;
     e.geo = env.ical.geo;

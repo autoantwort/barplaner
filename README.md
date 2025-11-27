@@ -16,20 +16,6 @@
  6. copy the access token to /src/Nodejs-RestAPIs/app/config/env.js into the `telegramAccessToken` field
  7. open the /src/Vue.js-Client/src/components/Account.vue file and search for `symposion_bot` and replace that with your bot name (ends with 'bot')
 
-### Enable Facebook API (You need to manage a Facebook site to use this future)
- 1. Visit [Facebook Developer](https://developers.facebook.com/apps/) and create a new app
- 2. Open [this](https://developers.facebook.com/tools/explorer/?method=GET&path=me%2Faccounts&version=v3.2) and press "Get Token" -> "Get User Access Token"
-    - Select `manage_pages` and press "Get Access Token"
- 3. Copy the id of the Page (data\.id)
- 4. Paste the Page id to /src/Nodejs-RestAPIs/app/config/env.js into the `symposionPageID` field
- 5. Copy the Access Token and open [this](https://developers.facebook.com/tools/debug/accesstoken/) and paste the Access Token in the text field
- 6. Press "Debug" and then "Extend Access Token" and enter your password
- 7. Press the "Debug" button next to the new green Access Token
- 8. Now copy the Access Token from the text field into the `facebookAccessToken` field of the /src/Nodejs-RestAPIs/app/config/env.js file
-
-### If I dont have a facebook or telegramm access key
- Remove the `facebookAccessToken`, `symposionPageID` and the `telegramAccessToken` fields from the /src/Nodejs-RestAPIs/app/config/env.js file or set them to an empty string.
-
 ## Run for development
  1. open /src/Nodejs-RestAPIs/app/config/env.js and set the following:  
  `resetDatabase` : true  

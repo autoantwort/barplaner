@@ -43,7 +43,7 @@ const createCronJob = value => {
                     })
                     .forEach(bar => {
                         // send photo for the bar with description
-                        const imageURL = bar.facebookCoverImageURL ? bar.facebookCoverImageURL : "https://www.hilton.rwth-aachen.de/wordpress/symposion/wp-content/uploads/sites/2/2019/08/67976531_2499717063420882_1963470524436709376_o.jpg";
+                        const imageURL = bar.studibarsEventPosterURL ? bar.studibarsEventPosterURL : "https://symposion.hilton.rwth-aachen.de/wp-content/uploads/2019/08/67976531_2499717063420882_1963470524436709376_o.jpg";
                         if (bar.description.length > 1024) {
                             bot.sendPhoto(value.chatId, imageURL);
                             bot.sendMessage(value.chatId, bar.description);

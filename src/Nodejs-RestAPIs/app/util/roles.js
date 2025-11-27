@@ -1,5 +1,5 @@
 import { Role } from '../model/role.model.js';
-import { BarAdminRoleName, CleaningAdminRoleName, FacebookAdminRoleName, NewsletterAdminRoleName, StockAdminRoleName, UserAdminRoleName } from './rolesNames.js';
+import { BarAdminRoleName, CleaningAdminRoleName, NewsletterAdminRoleName, StockAdminRoleName, UserAdminRoleName } from './rolesNames.js';
 
 const [StockAdminRole, created] = await Role.findCreateFind({
     where: {
@@ -45,12 +45,4 @@ const [NewsletterAdminRole, _4] = await Role.findCreateFind({
     }
 })
 
-const [FacebookAdminRole, _5] = await Role.findCreateFind({
-    where: { name: FacebookAdminRoleName },
-    defaults: {
-        name: "FacebookAdmin",
-        description: "You can change the the settings belongs to facebook",
-    },
-})
-
-export { StockAdminRole, BarAdminRole, CleaningAdminRole, NewsletterAdminRole, FacebookAdminRole, UserAdminRole };
+export { StockAdminRole, BarAdminRole, CleaningAdminRole, NewsletterAdminRole, UserAdminRole };

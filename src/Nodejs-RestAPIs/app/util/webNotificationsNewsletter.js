@@ -53,8 +53,8 @@ function sendNotificationForBar(bar) {
     sendNotification(JSON.stringify({
         titel: bar.name,
         description: bar.description,
-        facebookEventID: bar.facebookEventID,
-        facebookCoverImageURL: bar.facebookCoverImageURL,
+        studibarsEventId: bar.studibarsEventId,
+        studibarsEventPosterURL: bar.studibarsEventPosterURL,
     }));
 }
 
@@ -116,7 +116,7 @@ onBarChanged(bar => {
     if (bar.canceled) {
         sendNotification({
             titel: "Die Bar " + bar.name + " wurde abgesagt!",
-            facebookEventID: facebookEventID,
+            studibarsEventId: bar.studibarsEventId,
         });
     }
 });

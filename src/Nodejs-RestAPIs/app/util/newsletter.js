@@ -60,8 +60,8 @@ const [DefaultImageURL, _4] = await Setting.findCreateFind({
     },
     defaults: {
         name: "DefaultImageURL",
-        description: "The url to the image that should be used, if a bar has no cover image (created in the orga system and not on facebook).",
-        value: "https://www.hilton.rwth-aachen.de/wordpress/symposion/wp-content/uploads/sites/2/2019/08/67976531_2499717063420882_1963470524436709376_o.jpg",
+        description: "The url to the image that should be used, if a bar has no cover image (created in the orga system and not on studibars.de).",
+        value: "https://symposion.hilton.rwth-aachen.de/wp-content/uploads/2019/08/67976531_2499717063420882_1963470524436709376_o.jpg",
         permission: NewsletterAdminRoleName
     }
 });
@@ -95,10 +95,10 @@ function computeSendTime(start) {
 }
 
 /**
- * replaces the $... variables in the given text. The values are taken from the barObject. If the barObject has no facebookCoverImageURL, the defaultImageURL will be used
+ * replaces the $... variables in the given text. The values are taken from the barObject. If the barObject has no studibarsEventPosterURL, the defaultImageURL will be used
  * @param {string} text the text with the $... variables in it
  * @param {Bar} barObject the bar object
- * @param {string} defaultImageURL the default image URL, when the bar object has no facebookCoverImageURL
+ * @param {string} defaultImageURL the default image URL, when the bar object has no studibarsEventPosterURL
  * @returns {string} the text where all variables are replaced by values
  */
 function replacePlaceholders(text, barObject, defaultImageURL) {
@@ -106,14 +106,15 @@ function replacePlaceholders(text, barObject, defaultImageURL) {
     const date = barObject.start.getDate() + "." + (barObject.start.getMonth() + 1);
     const time = barObject.start.getHours();
     const content = barObject.description.replace(/\n/g, "<br>");
-    const facebookEventId = barObject.facebookEventID;
-    // image url https://www.hilton.rwth-aachen.de/wordpress/symposion/wp-content/uploads/sites/2/2019/10/coverImageURL.png => facebookCoverImageURL:
-    const coverImageURL = barObject.facebookCoverImageURL ? barObject.facebookCoverImageURL : defaultImageURL;
+    const studibarsEventPosterURL = barObject.studibarsEventPosterURL;
+    // image url https://symposion.hilton.rwth-aachen.de/wp-content/uploads/2019/08/67976531_2499717063420882_1963470524436709376_o.jpg => studibarsEventPosterURL:
+    const coverImageURL = barObject.studibarsEventPosterURL ? barObject.studibarsEventPosterURL : defaultImageURL;
     text = text.replace(/\$barname/g, barname);
     text = text.replace(/\$date/g, date);
     text = text.replace(/\$time/g, time);
     text = text.replace(/\$content/g, content);
-    text = text.replace(/\$facebookEventId/g, facebookEventId);
+    text = text.replace(/\$facebookEventId/g, studibarsEventPosterURL);
+    text = text.replace(/\$studibarsEventPosterURL/g, studibarsEventPosterURL);
     text = text.replace(/https:\/\/www\.hilton\.rwth-aachen\.de\/.+\/coverImageURL\.png/g, coverImageURL);
     return text;
 }
