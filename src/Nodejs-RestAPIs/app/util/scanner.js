@@ -276,9 +276,13 @@ const onBarcode = async (barcode) => {
     }
 }
 
-client.on("connect", () => {
+if (client.connected) {
     client.subscribe("barplaner/scanner");
-});
+} else {
+    client.on("connect", () => {
+        client.subscribe("barplaner/scanner");
+    });
+}
 
 client.on("message", (topic, message) => {
     if (topic === "barplaner/scanner") {
