@@ -220,5 +220,5 @@ app.use('/api/file/', express.static(env.fileStoragePath, {
 var server = app.listen(8080, function () {
     var host = server.address().address;
     var port = server.address().port;
-    console.log("App listening at http://%s:%s", host, port);
+    console.log("App listening at http://%s:%s", host.indexOf(':') !== -1 ? `[${host}]`: host, port);
 });
