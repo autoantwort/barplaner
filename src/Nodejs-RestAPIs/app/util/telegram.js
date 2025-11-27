@@ -251,7 +251,11 @@ const computeNewNextTimeout = () => {
     ShouldDelete.findOne({ order: Sequelize.col('deleteAfter') }).then(message => {
         if (message !== null) {
             nextDeleteExecution = message.deleteAfter;
-            //deleteTimeout = setTimeout(runMessageDeletion, nextDeleteExecution - Date.now());
+            if (nextDeleteExecution < new Date()) {
+                runMessageDeletion();
+            } else {
+                deleteTimeout = setTimeout(runMessageDeletion, nextDeleteExecution - Date.now());
+            }
         } else {
             nextDeleteExecution = null;
             deleteTimeout = null;
