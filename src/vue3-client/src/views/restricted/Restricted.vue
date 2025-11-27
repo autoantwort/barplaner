@@ -1,5 +1,5 @@
 <template>
-  <BNavbar toggleable="lg" style="background-color: var(--bs-tertiary-bg);">
+  <BNavbar class="d-print-none" toggleable="lg" style="background-color: var(--bs-tertiary-bg);">
     <BNavbarToggle target="nav-collapse" />
     <BCollapse id="nav-collapse" is-nav>
       <ul class="navbar-nav mx-auto">
@@ -66,6 +66,7 @@
       </ul>
     </BCollapse>
   </BNavbar>
+  <div class="print-only" style="margin-top: 1.7cm;"></div>
   <router-view></router-view>
 </template>
 
