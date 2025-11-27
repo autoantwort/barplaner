@@ -1,5 +1,6 @@
 <template>
   <div class="container">
+    <div class="print-only" style="margin-top: 1.3cm;"></div>
     <div class="row print-only" v-for="row in reasons">
       <div class="col-6 d-flex" style="margin-bottom: 3rem" v-for="r in row">
         <template v-if="r !== null">

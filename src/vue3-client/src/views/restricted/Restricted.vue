@@ -66,7 +66,6 @@
       </ul>
     </BCollapse>
   </BNavbar>
-  <div class="print-only" style="margin-top: 1.7cm;"></div>
   <router-view></router-view>
 </template>
 

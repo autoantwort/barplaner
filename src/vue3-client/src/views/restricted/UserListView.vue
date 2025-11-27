@@ -1,5 +1,6 @@
 <template>
   <div class="container">
+    <div class="print-only" style="margin-top: 1.7cm;"></div>
     <div ref="print" class="row print-only" v-for="row in activeUsers">
       <div class="col-3 d-flex justify-content-center align-items-center mb-4" v-for="user in row">
         <barcode :value="10000 + user.id" :width="2" :height="100" :text="shortUsername(user.name)" fontSize="25"></barcode>
