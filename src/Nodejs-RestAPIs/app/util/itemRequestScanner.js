@@ -64,9 +64,13 @@ const onBarcode = async (barcode) => {
     }
 }
 
-client.on("connect", () => {
+if (client.connected) {
     client.subscribe("barplaner/itemRequestScanner");
-});
+} else {
+    client.on("connect", () => {
+        client.subscribe("barplaner/itemRequestScanner");
+    });
+}
 
 client.on("message", (topic, message) => {
     if (topic === "barplaner/itemRequestScanner") {
