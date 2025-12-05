@@ -137,21 +137,23 @@ app.post('/api/users/sendPasswordResetLink', user.sendPasswordResetLink);
 app.post('/api/users/validPasswortResetKey', user.validPasswordResetKey);
 app.post('/api/users/resetPasswort', user.resetPasswort);
 
-app.use((req, res, next) => {
+app.use(async (req, res, next) => {
     if (req.cookies.auth === undefined) {
-        res.status(401).send("not authenticated");
-        return;
+        return res.status(401).send("not authenticated");
     }
-    User.findOne({ where: { sessionID: req.cookies.auth } }).then(user => {
+    
+    try {
+        const user = await User.findOne({ where: { sessionID: req.cookies.auth } });
+        
         if (user === null) {
-            res.status(401).send("not authenticated");
-        } else {
-            req.user = user;
-            next();
+            return res.status(401).send("not authenticated");
         }
-    }).catch(err => {
+        
+        req.user = user;
+        next();
+    } catch (err) {
         res.status(500).send("Error -> " + err);
-    });
+    }
 });
 
 app.post('/api/logout', (req, res) => {
