@@ -6,6 +6,7 @@ import { Barduty } from '../model/barduty.model.js';
 import { Setting } from '../model/setting.model.js';
 import { Role } from '../model/role.model.js';
 import { Op } from 'sequelize';
+import { User } from '../model/user.model.js';
 const SettingsController = import('../controller/setting.controller');
 
 let SendDaysBefore = null;
@@ -119,7 +120,7 @@ function sendBarInfo(bar, userID) {
                 barID: bar.id,
             },
             include: [{
-                model: User
+                model: User,
             }]
         }).then(duties => {
             const now = new Date();
