@@ -1,12 +1,12 @@
+import axiosLib from 'axios';
 import env from '../config/env';
 import { bot, registerResponseSystem, deleteTelegramMessage } from './telegram.js';
-import { Axios } from "axios";
 
-const axios = new Axios({
+const axios = axiosLib.create({
     baseURL: "https://" + env.gitLabBrowser.host + "/api/v4",
     headers: {
         "Private-Token": env.gitLabAccessToken,
-    }
+    },
 });
 
 const State = {
