@@ -316,7 +316,7 @@ export function barAdded(bar) {
 }
 
 export function changeCleaningStatus(barId, userId, newHaveToCleanState) {
-    Bar.findByPk(barId).then(bar => {
+    Bar.findByPk(barId).then(async bar => {
         const end = bar.start.setHours(bar.start.getHours() + 12);
         // bar is to old
         if (new Date() > end) {
@@ -324,7 +324,7 @@ export function changeCleaningStatus(barId, userId, newHaveToCleanState) {
         }
         // do not change the original date
         const start = new Date(bar.start);
-        start.setDate(start.getDate() - SendDaysBefore.reduce((l, r) => Math.max(l, r)));
+        start.setDate(start.getDate() - (await getSendDaysBefore()).reduce((l, r) => Math.max(l, r)));
         // bar is to new
         if (start > new Date()) {
             return;
