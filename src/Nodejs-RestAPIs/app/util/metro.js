@@ -66,7 +66,7 @@ function splitListIntoChunks(array, chunkSize) {
 const getCurrentPromotions = async (cookie) => {
     const links = await getLinksForAllMetroItems();
     const seenIds = new Set();
-    ids = links.map(link => link.substring(linkPrefix.length)).map(link => {
+    const ids = links.map(link => link.substring(linkPrefix.length)).map(link => {
         const res = link.split('/');
         return {
             id: res[0],
