@@ -157,7 +157,7 @@ const formatPromotions = (promotions) => {
 bot.onText(/\/metro/, async msg => {
     let waitMsg = bot.sendMessage(msg.chat.id, `Cookie für die Metro API ermitteln ...`);
     try {
-        const res = await axios.post(`http://10.72.126.17/login`, { username: env.metroScraper.username, password: env.metroScraper.password });
+        const res = await axios.post(`http://10.72.126.17:8000/login`, { username: env.metroScraper.username, password: env.metroScraper.password });
         waitMsg = await waitMsg;
         bot.editMessageText("Angebote ermitteln.", { chat_id: msg.chat.id, message_id: waitMsg.message_id }).catch(console.error);
         const cookieString = res.data.cookies.filter(c => c.domain == ".metro.de").map(c => c.name + "=" + c.value).join("; ");
