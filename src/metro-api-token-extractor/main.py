@@ -43,51 +43,46 @@ class MetroPriceMonitor:
     def login(self):
         """Führt den Login bei Metro durch"""
         print("🔐 Starte Login...")
-        
+
+        # Zur Login-Seite navigieren
+        self.page.goto("https://www.metro.de/", wait_until="domcontentloaded")
+        time.sleep(4)
+
         try:
-            # Zur Login-Seite navigieren
-            self.page.goto("https://www.metro.de/", wait_until="domcontentloaded")
-            time.sleep(4)
-            
-            try:
-                self.page.click("text=Alles ablehnen", timeout=5000)
-                # input("Alles ablehnen geklickt")
-            except:
-                print("⚠️ Login-Button nicht gefunden, versuche direkte URL...")
-            # Login-Button/Link finden und klicken
-            # Hinweis: Die Selektoren müssen ggf. angepasst werden!
-            try:
-                self.page.click("text=Login", timeout=5000)
-                # input("Login-Button geklickt")
-            except:
-                # Alternative: Direkter Link zur Login-Seite
-                # self.page.goto("https://www.metro.de/anmelden")
-                print("⚠️ Login-Button nicht gefunden, versuche direkte URL...")
-            
-            time.sleep(4)
-            # input("test")
-            
-            # Username eingeben
-            username_selector = 'input[type="email"], input[id*="user_id"]'
-            self.page.fill(username_selector, self.username)
-            
-            # Password eingeben
-            password_selector = '#password'
-            self.page.fill(password_selector, self.password)
-            
-            # Login-Button klicken
-            submit_selector = 'button[type="submit"], button:has-text("Anmelden")'
-            self.page.click(submit_selector)
-            
-            # Warten bis Login erfolgreich (z.B. auf Dashboard oder Account-Element)
-            # self.page.wait_for_load_state("networkidle", timeout=10000)
-            time.sleep(4)
-            print("✅ Login erfolgreich!")
-            return True
-            
-        except Exception as e:
-            print(f"❌ Login fehlgeschlagen: {e}")
-            return False
+            self.page.click("text=Alles ablehnen", timeout=5000)
+            # input("Alles ablehnen geklickt")
+        except:
+            print("⚠️Cookie Banner nicht gefunden")
+            self.page.screenshot(path="test.png", full_page=True)
+
+        # Login-Button/Link finden und klicken
+        # Hinweis: Die Selektoren müssen ggf. angepasst werden!
+        try:
+            self.page.click("text=Login", timeout=5000)
+            # input("Login-Button geklickt")
+        except:
+            raise Exception("⚠️ Login-Button nicht gefunden")
+
+        time.sleep(4)
+
+        # Username eingeben
+        username_selector = 'input[type="email"], input[id*="user_id"]'
+        self.page.fill(username_selector, self.username)
+
+        # Password eingeben
+        password_selector = '#password'
+        self.page.fill(password_selector, self.password)
+
+        # Login-Button klicken
+        submit_selector = 'button[type="submit"], button:has-text("Anmelden")'
+        self.page.click(submit_selector)
+
+        # Warten bis Login erfolgreich (z.B. auf Dashboard oder Account-Element)
+        # self.page.wait_for_load_state("networkidle", timeout=10000)
+        time.sleep(4)
+        print("✅ Login erfolgreich!")
+        return True
+
     
     def save_session(self, filename: str = "metro_session.json"):
         """Speichert Cookies für spätere Wiederverwendung"""
@@ -95,6 +90,9 @@ class MetroPriceMonitor:
         with open(filename, 'w') as f:
             json.dump(cookies, f)
         print(f"💾 Session gespeichert in: {filename}")
+
+    def get_cookies(self):
+        return self.context.cookies()
     
     def load_session(self, filename: str = "metro_session.json"):
         """Lädt gespeicherte Cookies"""
