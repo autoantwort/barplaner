@@ -79,7 +79,7 @@ class MetroPriceMonitor:
 
         # Warten bis Login erfolgreich (z.B. auf Dashboard oder Account-Element)
         # self.page.wait_for_load_state("networkidle", timeout=10000)
-        time.sleep(4)
+        time.sleep(8)
         print("✅ Login erfolgreich!")
         return True
 
