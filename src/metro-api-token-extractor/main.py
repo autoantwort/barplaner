@@ -45,7 +45,7 @@ class MetroPriceMonitor:
         print("🔐 Starte Login...")
 
         # Zur Login-Seite navigieren
-        self.page.goto("https://www.metro.de/", wait_until="domcontentloaded")
+        self.page.goto("https://produkte.metro.de/shop/pv/BTY-X697339/0032/0021/", wait_until="domcontentloaded")
         time.sleep(4)
 
         try:
