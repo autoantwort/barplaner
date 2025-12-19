@@ -5,6 +5,7 @@ import { CronJob } from 'cron';
 import { Item } from "../model/stockManagement/item.model.js";
 import { InvoiceEntry } from "../model/stockManagement/invoiceEntry.model.js";
 import { TelegramMetroPromoSubscription } from "../model/telegramMetroPromoSubscription.model.js";
+import env from "../config/env.js";
 
 const storeId = "00017";
 
@@ -153,23 +154,26 @@ const formatPromotions = (promotions) => {
 
 
 
-bot.onText(/\/metro/, msg => {
-    cookieRegex = /-H 'Cookie: ([^']*)/;
-    const cookie = msg.text.match(cookieRegex);
-    let cookieString = "";
-    if (cookie && cookie[1]) {
-        cookieString = cookie[1];
+bot.onText(/\/metro/, async msg => {
+    let waitMsg = bot.sendMessage(msg.chat.id, `Cookie für die Metro API ermitteln ...`);
+    try {
+        const res = await axios.post(`http://10.72.4.53/login`, { username: env.metroScraper.username, password: env.metroScraper.password });
+        waitMsg = await waitMsg;
+        bot.editMessageText("Angebote ermitteln.", { chat_id: msg.chat.id, message_id: waitMsg.message_id }).catch(console.error);
+        const cookieString = res.data.cookies.filter(c => c.domain == ".metro.de").map(c => c.name + "=" + c.value).join("; ");
+        getCurrentPromotions(cookieString).then(async p => {
+            if (p.length > 0) {
+                let message = formatPromotions(p);
+                message += '\n\n Send /subscribeMetro to subscribe to Metro promotions\\.';
+                bot.editMessageText(message, { chat_id: msg.chat.id, message_id: waitMsg.message_id, parse_mode: 'MarkdownV2', disable_web_page_preview: true }).catch(console.error);
+            } else {
+                bot.editMessageText("No promotions found.", { chat_id: msg.chat.id, message_id: waitMsg.message_id }).catch(console.error);
+            }
+        }).catch(console.error);
+    } catch (error) {
+        waitMsg = await waitMsg;
+        bot.editMessageText(`Sorry, there was an error fetching the promotions: ${error}`, { chat_id: msg.chat.id, message_id: waitMsg.message_id }).catch(console.error);
     }
-    let waitMsg = bot.sendMessage(msg.chat.id, `Rufe Angebote ab (${cookieString ? "mit" : "ohne"} Cookie) ...`);
-    getCurrentPromotions(cookieString).then(async p => {
-        if (p.length > 0) {
-            let message = formatPromotions(p);
-            message += '\n\n Send /subscribeMetro to subscribe to Metro promotions\\.';
-            bot.editMessageText(message, { chat_id: msg.chat.id, message_id: (await waitMsg).message_id, parse_mode: 'MarkdownV2', disable_web_page_preview: true }).catch(console.error);
-        } else {
-            bot.editMessageText("No promotions found.", { chat_id: msg.chat.id, message_id: (await waitMsg).message_id }).catch(console.error);
-        }
-    }).catch(console.error);
 });
 
 bot.onText(/\/subscribeMetro/, async (msg) => {
