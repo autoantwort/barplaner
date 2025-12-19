@@ -11,7 +11,7 @@ const storeId = "00017";
 
 const getItemsFromMetro = async (ids, cookie) => {
     const qids = ids.map(i => "ids=" + i).join("&");
-    res = await axios.get(`https://produkte.metro.de/evaluate.article.v1/betty-variants?country=DE&locale=de-DE&storeIds=${storeId}&details=true&${qids}`, {
+    const res = await axios.get(`https://produkte.metro.de/evaluate.article.v1/betty-variants?country=DE&locale=de-DE&storeIds=${storeId}&details=true&${qids}`, {
         headers: {
             "CallTreeId": "||BTEX-E09F8846-A50C-425A-8EA5-C9CFF22EC701",
             "Host": "produkte.metro.de",
