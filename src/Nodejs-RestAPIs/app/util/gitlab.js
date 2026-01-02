@@ -1,13 +1,13 @@
 import env from '../config/env';
+import axiosLib from 'axios';
 import { sendMessage, bot } from './telegram.js';
 import { CronJob } from 'cron';
-import { Axios } from "axios";
 import { createReadStream } from "fs";
 import { join } from 'path';
 import { User } from '../model/user.model.js';
 import { Op } from 'sequelize';
 
-let axios = new Axios({
+let axios = axiosLib.create({
     baseURL: "https://git.rwth-aachen.de/api/v4",
     headers: {
         "Private-Token": env.gitLabAccessToken,
