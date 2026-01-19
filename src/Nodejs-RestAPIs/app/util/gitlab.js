@@ -101,7 +101,7 @@ export async function sendNotificationsForIssus() {
         const issuesResponse = await axios.get(`/projects/${projectId}/issues?scope=all&state=opened&per_page=100`);
 
         if (issuesResponse.data >= 100) {
-            console.warn(`Not all issus were returned for project ${project.name}`);
+            console.warn(`Not all issues were returned for project ${project.name}`);
         }
 
         const participantPromises = [];
@@ -121,7 +121,7 @@ export async function sendNotificationsForIssus() {
         const project = projects[issue.project_id];
 
         for (const participant of issue.participants) {
-            const user = await this.getUser(participant);
+            const user = await getUser(participant);
 
             if (user !== null) {
                 let userMessage = userMessages[participant.id];
@@ -167,7 +167,7 @@ export async function sendNotificationsForIssus() {
     }
 
     for (const [participantId, message] of Object.entries(userMessages)) {
-        const user = await this.getUser(messageParticipants[participantId]);
+        const user = await getUser(messageParticipants[participantId]);
 
         if (user.gitLabID === null) {
             user.gitLabID = participantId;
