@@ -74,7 +74,7 @@ for (const config of env.webDavCalendars) {
             const data = createEvent(bar);
             // first look if the event already exists and we have to update it
             for (const e of calendar.objects) {
-                if (e.url.endsWith("bar" + bar.id)) {
+                if (e.url && e.url.endsWith("bar" + bar.id)) {
                     e.calendarData = data;
                     client.updateCalendarObject(e).catch(err => console.error("Can not update Calendar object: ", err, e, bar.dataValues));
                     return;
