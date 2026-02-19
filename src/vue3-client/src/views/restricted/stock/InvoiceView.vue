@@ -263,8 +263,12 @@
             <i-fa-image />
           </button>
         </p>
-        <div class="mb-3 mx-2">
-          <input type="text" class="mt-3 form-control" placeholder="Search" v-on:input="filter" />
+        <div class="mx-2">
+          <input type="text" class="mt-3 form-control" placeholder="Search" v-model="searchText" />
+          <div class="form-check mt-2">
+            <input class="form-check-input" id="onlyShowRelevantItems" type="checkbox" v-model="onlyShowRelevantItems" />
+            <label class="form-check-label" for="onlyShowRelevantItems">Only show relevant items</label>
+          </div>
         </div>
         <table class="table table-hover">
           <thead>
@@ -281,8 +285,7 @@
               v-for="item in filteredItems"
               :key="item.id"
               :class="{
-                'table-active':
-                  (item.seller && item.seller !== realInvoice.seller) || (item.amount && currentEntry.amount && item.amount !== currentEntry.amount),
+                'table-active': isIrrelevant(item),
               }"
             >
               <td>
@@ -365,7 +368,8 @@ export default {
       loading: false,
       currentImageURL: null,
       existingItems: [],
-      filteredItems: [],
+      searchText: '',
+      onlyShowRelevantItems: true,
     };
   },
   setup() {
@@ -382,10 +386,20 @@ export default {
     fluid() {
       return this.pdfURL && window.innerWidth >= 1850;
     },
+    filteredItems() {
+      let items = this.existingItems;
+      if (this.onlyShowRelevantItems) {
+        items = items.filter(item => !this.isIrrelevant(item));
+      }
+      if (this.searchText) {
+        return phoneticsFilter(items, this.searchText);
+      }
+      return items;
+    },
   },
   methods: {
-    filter(event) {
-      this.filteredItems = phoneticsFilter(this.existingItems, event.target.value);
+    isIrrelevant(item) {
+      return (item.seller && item.seller !== this.realInvoice.seller) || (item.amount && this.currentEntry.amount && item.amount !== this.currentEntry.amount);
     },
     newChange(entry) {
       http
@@ -404,7 +418,7 @@ export default {
     },
     linkItem(entry) {
       this.currentEntry = entry;
-      this.filteredItems = this.existingItems;
+      this.searchText = (this.currentEntry.itemDescription.match(/\p{L}{5,}/ug)??[]).join(" ");
       this.$refs.linkModal.show();
     },
     linkItemClicked(item) {
