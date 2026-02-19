@@ -66,7 +66,9 @@
       </ul>
     </BCollapse>
   </BNavbar>
-  <router-view></router-view>
+  <BApp>
+    <router-view></router-view>
+  </BApp>
 </template>
 
 <script>

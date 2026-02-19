@@ -322,6 +322,8 @@ import PercentInput from '@/components/PercentInput.vue';
 import ItemGroupCard from '@/components/ItemGroupCard.vue';
 import BarcodeInput from '@/components/BarcodeInput.vue';
 import NavigationDataService from '@/router/navigationDataService';
+import { useModal } from 'bootstrap-vue-next';
+import { h } from 'vue';
 
 function parseDate(input) {
   if (input === undefined) return undefined;
@@ -365,6 +367,10 @@ export default {
       existingItems: [],
       filteredItems: [],
     };
+  },
+  setup() {
+    const { create } = useModal();
+    return { createModal: create };
   },
   computed: {
     canSave: function () {
@@ -422,19 +428,19 @@ export default {
         extraText = `The seller of the item and the seller of the invoice is different!<br>${item.seller} vs ${this.realInvoice.seller}`;
       }
       if (extraText) {
-        const htmlMessage = this.$createElement('div', {
-          domProps: { innerHTML: extraText },
-        });
-        this.$bvModal
-          .msgBoxConfirm(htmlMessage, {
-            title: 'Link Item to Entry Warning',
-            headerBgVariant: 'warning',
-            okVariant: 'warning',
-            okTitle: 'Link item to entry',
-            centered: true,
-          })
-          .then(link => {
-            if (link) {
+        const htmlMessage = h('div', { innerHTML: extraText });
+        this.createModal({
+          title: 'Link Item to Entry Warning',
+          headerBgVariant: 'warning',
+          okVariant: 'warning',
+          okTitle: 'Link item to entry',
+          centered: true,
+          slots: {
+            default: () => htmlMessage,
+          },
+        }).show()
+          .then(state => {
+            if (state.ok) {
               linkItem();
             }
           })
@@ -448,18 +454,15 @@ export default {
       if (entry.stockItem.barcode === entry.gtin) {
         extraText = 'This will delete the barcode for the item.';
       }
-      this.$bvModal
-        .msgBoxConfirm(
-          `Do you really want to unlink entry "${entry.itemDescription}", Content: ${entry.amount} ${entry.unit} from Item "${entry.stockItem.name}", Content: ${entry.stockItem.amount} ${entry.stockItem.unit}. ${extraText}`,
-          {
-            title: 'Unlink Item',
-            okVariant: 'danger',
-            okTitle: 'Unlink',
-            centered: true,
-          },
-        )
-        .then(unlink => {
-          if (unlink) {
+      this.createModal({
+        title: 'Unlink Item',
+        body: `Do you really want to unlink entry "${entry.itemDescription}", Content: ${entry.amount} ${entry.unit} from Item "${entry.stockItem.name}", Content: ${entry.stockItem.amount} ${entry.stockItem.unit}. ${extraText}`,
+        okVariant: 'danger',
+        okTitle: 'Unlink',
+        centered: true,
+      }).show()
+        .then(state => {
+          if (state.ok) {
             http
               .delete(`/invoice/entry/${entry.id}/itemLink`)
               .then(() => {
