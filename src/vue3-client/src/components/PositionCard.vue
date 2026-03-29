@@ -1,6 +1,6 @@
 <template>
   <b-card no-body class="border-info">
-    <b-tabs card v-model="positionTabIndex">
+    <b-tabs card v-model:index="positionTabIndex">
       <b-tab title="Position:" title-link-class="text-dark" disabled></b-tab>
       <b-tab title="None" active>
         <b-card-text>

@@ -1,6 +1,6 @@
 <template>
   <b-card no-body class="border-info">
-    <b-tabs card v-model="itemGroupTabIndex">
+    <b-tabs card v-model:index="itemGroupTabIndex">
       <b-tab title="Item Group:" title-link-class="text-dark" disabled></b-tab>
       <b-tab title="None" active>
         <b-card-text>The item is in no item group.</b-card-text>

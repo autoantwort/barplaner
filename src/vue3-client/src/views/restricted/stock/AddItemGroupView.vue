@@ -17,7 +17,7 @@
           </div>
           <div class="mb-3">
             <b-card no-body class="border-info">
-              <b-tabs card v-model="itemGroup.positionTabIndex">
+              <b-tabs card v-model:index="itemGroup.positionTabIndex">
                 <b-tab title="Position:" title-link-class="text-dark" disabled></b-tab>
                 <b-tab title="None" active>
                   <b-card-text>The item group, respectively the items in the group have no position or a own position.</b-card-text>
