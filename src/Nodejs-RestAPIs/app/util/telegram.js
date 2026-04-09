@@ -16,7 +16,7 @@ const bot = new TelegramBot(TOKEN, options);
 console.log("## start bot, polling : ", bot.isPolling());
 
 bot.on('polling_error', (error) => {
-    console.log(error);
+    console.error("Error while polling telegram API: ", error);
 });
 
 bot.onText(/\/start/, msg => {
