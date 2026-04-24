@@ -1,3 +1,5 @@
+import { client, retain } from "./mqttClient";
+
 const clients = {};
 const controllers = [];
 
@@ -30,8 +32,10 @@ export function registerClients(app) {
             } else if (msg.startsWith("Value:")) {
                 if (name !== "unnamed") {
                     // save last volume, so that new mastern know the current volume
-                    clients[name].lastValue = msg.substring(6);
-                    sendMessageToController("Value:" + name + ":" + msg.substring(6));
+                    const value = msg.substring(6);
+                    clients[name].lastValue = value;
+                    sendMessageToController("Value:" + name + ":" + value);
+                    client.publish(`barplaner/volume/${name}/value`, value, retain);
                 }
             }
         });
