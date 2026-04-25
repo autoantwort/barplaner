@@ -24,11 +24,13 @@ export function registerClients(app) {
                 if (name === "unnamed") {
                     sendMessageToController("Add:" + newName);
                 } else {
+                    client.publish(`barplaner/volume/${name}/online`, '0', retain);
                     sendMessageToController("Rename:" + name + ":" + newName);
                 }
                 delete clients[name];
                 name = newName;
                 clients[name] = ws;
+                client.publish(`barplaner/volume/${name}/online`, '1', retain);
             } else if (msg.startsWith("Value:")) {
                 if (name !== "unnamed") {
                     // save last volume, so that new mastern know the current volume
@@ -42,6 +44,8 @@ export function registerClients(app) {
         ws.on('close', (code, reason) => {
             delete clients[name];
             sendMessageToController("Remove:" + name);
+            client.publish(`barplaner/volume/${name}/value`, 'None', retain);
+            client.publish(`barplaner/volume/${name}/online`, '0', retain);
         });
     });
 }
