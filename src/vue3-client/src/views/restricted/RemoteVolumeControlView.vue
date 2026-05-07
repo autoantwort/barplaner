@@ -78,10 +78,13 @@ export default {
       this.webSocket.onmessage = event => {
         const msg = event.data.split(':');
         if (msg[0] === 'Add') {
-          this.clients.push({
-            name: msg[1],
-            value: 0,
-          });
+          const c = this.clients.find(c => c.name === msg[1]);
+          if (c === undefined) { // After a reconnect the entry is probably already there
+            this.clients.push({
+              name: msg[1],
+              value: 0,
+            });
+          }
         } else if (msg[0] === 'Remove') {
           const name = msg[1];
           const c = this.clients.find(c => c.name === name);
