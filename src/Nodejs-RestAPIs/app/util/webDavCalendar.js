@@ -44,7 +44,6 @@ const createEvent = event => {
 const clients = [];
 for (const config of env.webDavCalendars) {
     const client = new Client(new transport.Basic(new Credentials(config.auth)));
-    clients.push(client);
     client.createAccount({
         server: config.url,
         accountType: 'caldav',
@@ -83,6 +82,7 @@ for (const config of env.webDavCalendars) {
             // no existing calendar/event object found, create one
             client.createCalendarObject(calendar, { data, filename: "bar" + bar.id }).then(co => calendar.objects.push(co)).catch(e => console.error("Can not create Calendar object: ", e, data, bar));
         };
+        clients.push(client);
         db.addSyncCallback(() => {
             const oldest = new Date();
             oldest.setDate(oldest.getDate() - env.ical.oldestEvent);
