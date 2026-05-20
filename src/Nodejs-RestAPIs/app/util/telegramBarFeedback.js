@@ -332,7 +332,7 @@ export function changeCleaningStatus(barId, userId, newHaveToCleanState) {
         const startText = "Du musst bei der " + bar.name + " am " + bar.start.getDate() + '.' + (bar.start.getMonth() + 1) + '.' + bar.start.getFullYear();
         if (!newHaveToCleanState) {
             User.findByPk(userId).then(user => {
-                this.sendMessage(user, startText + " doch nicht mehr putzen.");
+                bot.sendMessage(user.telegramID, startText + " nun nicht mehr putzen.");
             }).catch(console.error);
         }
         Barduty.findAll({
@@ -346,7 +346,7 @@ export function changeCleaningStatus(barId, userId, newHaveToCleanState) {
             }],
         }).then(duties => {
             if (duties.length === 1) {
-                this.sendMessage(duties[0].user, startText + " aktuell alleine putzen.");
+                bot.sendMessage(duties[0].user.telegramID, startText + " aktuell alleine putzen.");
             } else {
                 for (let i = 0; i < duties.length; ++i) {
                     let message = startText + " nun mit ";
@@ -365,7 +365,7 @@ export function changeCleaningStatus(barId, userId, newHaveToCleanState) {
                         }
                     }
                     message += "putzen.";
-                    this.sendMessage(duties[i].user, message);
+                    bot.sendMessage(duties[i].user.telegramID, message);
                 }
             }
         }).catch(console.error);
