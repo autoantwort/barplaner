@@ -41,12 +41,7 @@
         </div>
         <div class="mb-3 row">
           <label class="col-3 form-label">Image</label>
-          <label class="col-9">
-            <button v-if="realItem.imageId !== null" class="ms-2 btn btn-sm btn-sm-flat btn-secondary" type="button" v-on:click="openImage">
-              <i-fa-image />
-            </button>
-            <template v-else>None</template>
-          </label>
+          <edit-image-component :object="realItem" />
         </div>
         <div class="mb-3 row">
           <label class="col-3 form-label">Position</label>
@@ -67,12 +62,6 @@
         <div class="row" v-if="stockChanges && stockChanges.length > 0">
           <stock-changes-list :changes="stockChanges" :showItem="false" />
         </div>
-        <b-modal ref="image" hide-footer no-fade centered :title="realItem && realItem.name">
-          <div v-if="loading === true" class="justify-content-center" style="display: flex">
-            <b-spinner class="center" label="Loading..."></b-spinner>
-          </div>
-          <img v-if="imageId" style="width: 100%; height: 80dvh; object-fit: contain" :src="baseURL + imageId" v-on:load="loading = false" />
-        </b-modal>
       </div>
     </div>
   </div>
@@ -88,6 +77,7 @@ import EditItemGroupComponent from '@/components/EditItemGroupComponent.vue';
 import EditTextareaComponent from '@/components/EditTextareaComponent.vue';
 import EditUrlComponent from '@/components/EditUrlComponent.vue';
 import EditPercentComponent from '@/components/EditPercentComponent.vue';
+import EditImageComponent from '@/components/EditImageComponent.vue';
 
 import StockChangesList from './StockChangesListView.vue';
 
@@ -109,30 +99,17 @@ export default {
     EditTextareaComponent,
     EditUrlComponent,
     EditPercentComponent,
+    EditImageComponent,
     StockChangesList,
   },
   data() {
     return {
       realItem: null,
-      imageId: null,
-      loading: false,
       stock: undefined,
       stockChanges: null,
     };
   },
   methods: {
-    openImage() {
-      this.loading = true;
-      http
-        .get('/image/' + this.realItem.imageId)
-        .then(response => {
-          this.imageId = response.data.original;
-        })
-        .catch(e => {
-          console.log(e);
-        });
-      this.$refs.image.show();
-    },
     retrieveItem() {
       http
         .get('/item/' + this.$route.params.itemId)
@@ -165,9 +142,6 @@ export default {
     setNavigationData(item) {
       NavigationDataService.set(item);
     },
-  },
-  created() {
-    this.baseURL = http.defaults.baseURL + '/file/';
   },
   mounted() {
     const navData = NavigationDataService.get();
