@@ -18,13 +18,9 @@
           <label class="col-3 form-label">Reason</label>
           <label class="col-9">{{ getGermanReason(realChange.reason) }}</label>
         </div>
-        <div class="mb-3 row">
+        <div class="mb-3 row" v-if="hasPrice(realChange.reason)">
           <label class="col-3 form-label">Net/Brotto Price</label>
-          <label class="col-9">{{ $filters.asEuro(realChange.netPrice) }} / {{ $filters.asEuro(realChange.brottoPrice) }}</label>
-        </div>
-        <div class="mb-3 row">
-          <label class="col-3 form-label">Price Accuracy</label>
-          <label class="col-9">{{ getGermanPriceAccuracy(realChange.priceAccuracy) }}</label>
+          <edit-price-component :object="realChange" />
         </div>
 
         <div class="mb-3 row">
@@ -65,11 +61,11 @@
 <script>
 import http from '@/http-common';
 import { getGermanReason } from './changeUtil';
-
-const getGermanPriceAccuracy = e => e;
+import EditPriceComponent from '@/components/EditPriceComponent.vue';
 
 export default {
   name: 'stock-change',
+  components: { EditPriceComponent },
   data() {
     return {
       realChange: null,
@@ -78,8 +74,10 @@ export default {
     };
   },
   methods: {
-    getGermanPriceAccuracy,
     getGermanReason,
+    hasPrice(reason) {
+      return reason === 'bought' || reason === 'sold';
+    },
     retrieveChange() {
       http
         .get('/stockChange/' + this.$route.params.changeId)

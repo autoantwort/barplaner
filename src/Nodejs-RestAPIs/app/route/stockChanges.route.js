@@ -1,7 +1,8 @@
-import { create, getItemStock, getStockChanges, getStockChange, deleteStockChange, getStockChangeLog, getAllChangesAtDay, getItemGroupStock, getStockForItem, getStockChangesForItem, getItemStockForItemGroup, getStockChangesForItemGroup, getItemStockForPosition, getAllDatesWhereChangesHappen } from '../controller/stockChange.controller';
+import { create, changeStockChange, getItemStock, getStockChanges, getStockChange, deleteStockChange, getStockChangeLog, getAllChangesAtDay, getItemGroupStock, getStockForItem, getStockChangesForItem, getItemStockForItemGroup, getStockChangesForItemGroup, getItemStockForPosition, getAllDatesWhereChangesHappen } from '../controller/stockChange.controller';
 export default function (app) {
 
     app.post('/api/stockChange', create);
+    app.put('/api/stockChange/:id', changeStockChange);
 
     app.get('/api/itemStock', getItemStock);
     app.get('/api/stockChanges', getStockChanges);
