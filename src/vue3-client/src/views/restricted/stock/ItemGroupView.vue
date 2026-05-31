@@ -27,6 +27,9 @@
           <label class="col-9" v-if="usage">
             {{ usage.threeMonths }} <small>in three months</small>, {{ usage.sixMonths }} <small>in six months</small>, {{ usage.oneYear }}
             <small>in one year</small>
+            <div class="mt-2" v-if="stockChanges && stockChanges.length > 0">
+              <consumption-chart :stockChanges="stockChanges" />
+            </div>
           </label>
         </div>
         <div class="mb-3 row">
@@ -106,6 +109,7 @@ import http from '@/http-common';
 import GenericInputComponent from '@/components/GenericInputComponent.vue';
 import EditPositionComponent from '@/components/EditPositionComponent.vue';
 import StockChangesList from './StockChangesListView.vue';
+import ConsumptionChart from '@/components/ConsumptionChart.vue';
 import { REASON } from '@common/stockChangeReasons.js';
 import NavigationDataService from '@/router/navigationDataService';
 
@@ -126,6 +130,7 @@ export default {
     GenericInputComponent,
     EditPositionComponent,
     StockChangesList,
+    ConsumptionChart,
   },
   data() {
     return {
