@@ -103,38 +103,7 @@
             <label for="itemGroupName" class="form-label">Notiz</label>
             <textarea type="text" class="form-control" rows="4" name="reason" :required="noteRequired ? 'true' : null" v-model.trim="note" />
           </div>
-          <div class="mb-3" v-if="reason === 'bought'">
-            <label class="form-label">Preisgenauigkeit</label>
-            <div class="form-check mb-2">
-              <input class="form-check-input" type="radio" v-model="priceAccuracy" name="pA" id="unknown" value="unknown" required />
-              <label class="form-check-label" for="unknown">
-                <strong>Unbekannt:</strong> Der Preis ist nicht bekannt (Aber es gab wahrscheinlich einen und es war keine Spende)
-              </label>
-            </div>
-            <div class="form-check mb-2">
-              <input class="form-check-input" type="radio" v-model="priceAccuracy" name="pA" id="estimated" value="estimated" required />
-              <label class="form-check-label" for="estimated">
-                <strong>Geschätzt:</strong> Der Preis ist geschätzt, so teuer sollte der Artikel ungefähr sein
-              </label>
-            </div>
-            <div class="form-check mb-2">
-              <input class="form-check-input" type="radio" v-model="priceAccuracy" name="pA" id="fromBill" value="fromBill" required />
-              <label class="form-check-label" for="fromBill"> <strong>Von der Rechnung:</strong> Der Preis ist wie auf der Rechnung </label>
-            </div>
-            <div class="form-check mb-2">
-              <input class="form-check-input" type="radio" v-model="priceAccuracy" name="pA" id="researched" value="researched" required />
-              <label class="form-check-label" for="researched">
-                <strong>Recherchiert:</strong> Der Preis wurde recherchiert. Es kann aber sein, dass der Preis anders oder es ein Sonderangebot war
-              </label>
-            </div>
-            <div class="form-check mb-2">
-              <input class="form-check-input" type="radio" v-model="priceAccuracy" name="pA" id="fpb" value="fromPreviousBill" required />
-              <label class="form-check-label" for="fpb">
-                <strong>Von vorheriger Rechnung:</strong> Der Preis von einer vorherigen Rechnung, wurde nicht neu nachgeschaut, könnte sich aber geändert haben
-              </label>
-            </div>
-            <div v-if="priceAccuracy === null" class="invalid-feedback" style="display: block">Please select an price accuracy.</div>
-          </div>
+          <price-accuracy-input v-if="reason === 'bought'" class="mb-3" v-model="priceAccuracy" inputName="pA" />
           <PriceInput ref="priceInput" :showBrotto="showBrotto" :showNetto="showNetto" :change="change" v-model:einzelNetto="einzelNetto"
             v-model:einzelBrotto="einzelBrotto" :initialTax="tax" :priceInputDisabled="priceInputDisabled" />
           <div class="mt-2 text-danger" v-if="errorString.length !== 0">{{ errorString }}</div>
@@ -159,11 +128,13 @@ import NavigationDataService from '@/router/navigationDataService';
 import { RouterLink } from 'vue-router';
 import { subscribeMqtt } from '@/mqttSub';
 import PriceInput from '@/components/PriceInput.vue';
+import PriceAccuracyInput from '@/components/PriceAccuracyInput.vue';
 import { onlyNumbers } from '@/components/eventFilters';
 
 export default {
   components: {
     PriceInput,
+    PriceAccuracyInput,
   },
   data() {
     return {
