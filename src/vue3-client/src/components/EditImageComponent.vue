@@ -6,7 +6,7 @@
       </button>
       <template v-else>None</template>
     </span>
-    <b-modal ref="modal" hide-footer no-fade centered :title="object.name">
+    <b-modal ref="modal" no-footer no-fade centered :title="object.name">
       <div v-if="loading" class="justify-content-center" style="display: flex">
         <b-spinner label="Loading..." />
       </div>

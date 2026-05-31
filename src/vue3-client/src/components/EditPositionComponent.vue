@@ -32,7 +32,7 @@
       </button>
     </template>
     <span v-else>None</span>
-    <b-modal ref="modal" hide-footer no-fade centered :title="selectedPosition && selectedPosition.name">
+    <b-modal ref="modal" no-footer no-fade centered :title="selectedPosition && selectedPosition.name">
       <positionImage :position="selectedPosition"></positionImage>
     </b-modal>
     <template v-slot:edit>

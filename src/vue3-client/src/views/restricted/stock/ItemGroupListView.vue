@@ -52,7 +52,7 @@
             </table>
           </div>
         </div>
-        <b-modal ref="modal" hide-footer no-fade centered :title="selectedPosition && selectedPosition.name">
+        <b-modal ref="modal" no-footer no-fade centered :title="selectedPosition && selectedPosition.name">
           <positionImage :position="selectedPosition"></positionImage>
         </b-modal>
       </div>

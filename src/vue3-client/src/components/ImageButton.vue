@@ -2,7 +2,7 @@
   <button v-if="item.imageId !== null" class="ms-2 btn btn-sm btn-sm-flat btn-secondary" type="button" v-on:click="openImage()">
     <i-fa-image />
 
-    <b-modal ref="image" hide-footer no-fade centered :title="item.name">
+    <b-modal ref="image" no-footer no-fade centered :title="item.name">
       <img v-if="fileURL" style="width: 100%; height: 80dvh; object-fit: contain" :src="fileURL" />
     </b-modal>
   </button>

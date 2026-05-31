@@ -308,7 +308,7 @@
         </table>
       </div>
     </b-modal>
-    <b-modal ref="imageModal" hide-footer no-fade centered>
+    <b-modal ref="imageModal" no-footer no-fade centered>
       <div v-if="loading === true" class="justify-content-center" style="display: flex">
         <b-spinner class="center" label="Loading..."></b-spinner>
       </div>
