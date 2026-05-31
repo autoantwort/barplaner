@@ -95,11 +95,13 @@ export default {
     'update:einzelBrotto'
   ],
   data() {
+    const abs = this.change ? Math.abs(this.change) : null;
+    const round = v => Math.round(v * 100) / 100;
     return {
       internalEinzelNetto: this.einzelNetto,
-      internalGesamtNetto: null,
+      internalGesamtNetto: this.einzelNetto !== null && abs ? round(this.einzelNetto * abs) : null,
       internalEinzelBrotto: this.einzelBrotto,
-      internalGesamtBrotto: null,
+      internalGesamtBrotto: this.einzelBrotto !== null && abs ? round(this.einzelBrotto * abs) : null,
       tax: this.initialTax,
       ownTax: this.initialOwnTax,
       priceFrom: null,
